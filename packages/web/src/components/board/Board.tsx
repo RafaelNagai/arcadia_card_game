@@ -2,6 +2,7 @@ import type { GameContent, GameState } from '@eltyca/engine';
 import { BoardCell } from './BoardCell';
 import type { Selection } from '../../reducer/types';
 import { isLegalDropCell } from '../../game/dropTargets';
+import type { CommitAnimationState } from '../../hooks/useCommitAnimations';
 
 export interface BoardProps {
   /** The state actually shown — the live gameState, or a speculative previewState while a target cell is picked. */
@@ -12,9 +13,18 @@ export interface BoardProps {
   selection: Selection | null;
   targetCellIdx: number | null;
   onSelectCell: (idx: number) => void;
+  commitEffects: CommitAnimationState;
 }
 
-export function Board({ displayState, baseState, content, selection, targetCellIdx, onSelectCell }: BoardProps) {
+export function Board({
+  displayState,
+  baseState,
+  content,
+  selection,
+  targetCellIdx,
+  onSelectCell,
+  commitEffects,
+}: BoardProps) {
   const { grid } = displayState;
 
   return (
@@ -41,6 +51,9 @@ export function Board({ displayState, baseState, content, selection, targetCellI
             isTarget={selectable && cell.idx === targetCellIdx}
             selectable={selectable}
             onClick={() => onSelectCell(cell.idx)}
+            justPlaced={commitEffects.justPlacedCellIdx === cell.idx}
+            dominated={commitEffects.dominatedCellIndices.has(cell.idx)}
+            dominating={commitEffects.dominatingCellIdx === cell.idx}
           />
         );
       })}

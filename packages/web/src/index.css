@@ -122,6 +122,52 @@ header h1 {
   box-shadow: 0 0 8px var(--danger);
 }
 
+@keyframes cell-drop-in {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.board-cell.just-placed {
+  animation: cell-drop-in 350ms ease-out;
+}
+
+@keyframes cell-dominated-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.9);
+    background-color: rgba(248, 113, 113, 0.28);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(248, 113, 113, 0);
+    background-color: transparent;
+  }
+}
+
+.board-cell.just-dominated {
+  animation: cell-dominated-flash 650ms ease-out;
+}
+
+@keyframes cell-dominating-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.85);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(74, 222, 128, 0);
+  }
+}
+
+.board-cell.just-dominating {
+  animation: cell-dominating-pulse 650ms ease-out;
+}
+
 .board-cell-hidden {
   color: var(--text-dim);
   font-size: 1.4rem;

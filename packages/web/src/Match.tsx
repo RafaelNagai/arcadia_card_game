@@ -13,6 +13,7 @@ import { HotSeatScreen } from './components/hotseat/HotSeatScreen';
 import { EndScreen } from './components/end/EndScreen';
 import { useRotateShortcut } from './hooks/useRotateShortcut';
 import { useDragPlacement } from './hooks/useDragPlacement';
+import { useCommitAnimations } from './hooks/useCommitAnimations';
 import { nextSetupPlayer } from './game/setupProgress';
 
 export interface MatchProps {
@@ -34,6 +35,7 @@ export default function Match({ config, onNewMatch }: MatchProps) {
   );
   useRotateShortcut(state.selection, dispatch);
   const { ghostPos, startDrag } = useDragPlacement(dispatch, state.gameState, state.selection);
+  const commitEffects = useCommitAnimations(state.gameState, state.awaitingHandoff);
 
   const { gameState, content } = state;
 
@@ -70,6 +72,7 @@ export default function Match({ config, onNewMatch }: MatchProps) {
             selection={state.selection}
             targetCellIdx={state.targetCellIdx}
             onSelectCell={(idx) => dispatch({ type: 'SELECT_CELL', cellIdx: idx })}
+            commitEffects={commitEffects}
           />
           <aside>
             <SetupPanel
@@ -108,6 +111,7 @@ export default function Match({ config, onNewMatch }: MatchProps) {
           selection={state.selection}
           targetCellIdx={state.targetCellIdx}
           onSelectCell={(idx) => dispatch({ type: 'SELECT_CELL', cellIdx: idx })}
+          commitEffects={commitEffects}
         />
         <aside>
           {gameState.players.map((p) => (

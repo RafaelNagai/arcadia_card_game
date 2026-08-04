@@ -10,9 +10,24 @@ export interface BoardCellProps {
   isTarget: boolean;
   selectable: boolean;
   onClick: () => void;
+  /** Transient post-commit animation flags — see hooks/useCommitAnimations.ts. */
+  justPlaced?: boolean;
+  dominated?: boolean;
+  dominating?: boolean;
 }
 
-export function BoardCell({ cell, gameState, content, captured, isTarget, selectable, onClick }: BoardCellProps) {
+export function BoardCell({
+  cell,
+  gameState,
+  content,
+  captured,
+  isTarget,
+  selectable,
+  onClick,
+  justPlaced,
+  dominated,
+  dominating,
+}: BoardCellProps) {
   if (cell.chasm) {
     return <div className="board-cell chasm" aria-hidden="true" />;
   }
@@ -21,6 +36,9 @@ export function BoardCell({ cell, gameState, content, captured, isTarget, select
   if (selectable) classes.push('selectable');
   if (isTarget) classes.push('target');
   if (captured) classes.push('captured');
+  if (justPlaced) classes.push('just-placed');
+  if (dominated) classes.push('just-dominated');
+  if (dominating) classes.push('just-dominating');
 
   let inner: React.ReactNode = null;
   if (cell.hiddenUntil === 'setup') {
