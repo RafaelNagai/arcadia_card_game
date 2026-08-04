@@ -1,42 +1,37 @@
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Config } from '@eltyca/engine';
+import { useConfig } from '../game/configStore';
 
-export interface StartScreenProps {
-  initialConfig: Config;
-  onStart: (config: Config) => void;
-}
-
-/** The game's actual front door: title, a one-line pitch, then every balance knob from
- *  the spec, editable before a match starts — the settings live on this screen on purpose,
- *  not behind a separate step. */
-export function StartScreen({ initialConfig, onStart }: StartScreenProps) {
-  const [config, setConfig] = useState(initialConfig);
+/** Every balance knob from the spec, editable on its own screen — changes apply live to
+ *  the shared config, so whatever's set here is what "Start" on the landing page uses. */
+export function SettingsPage() {
+  const navigate = useNavigate();
+  const { config, setConfig } = useConfig();
   const chainUnlimited = config.chainDepth === Infinity;
 
   function set<K extends keyof Config>(key: K, value: Config[K]) {
-    setConfig((c) => ({ ...c, [key]: value }));
+    setConfig({ ...config, [key]: value });
   }
 
   function setGrid(dim: 'width' | 'height', value: number) {
     if (!Number.isFinite(value)) return;
-    setConfig((c) => ({ ...c, grid: { ...c.grid, [dim]: value } }));
+    setConfig({ ...config, grid: { ...config.grid, [dim]: value } });
   }
 
   function setPowerChart(arrows: string, power: number) {
     if (!Number.isFinite(power)) return;
-    setConfig((c) => ({ ...c, powerChart: { ...c.powerChart, [arrows]: power } }));
+    setConfig({ ...config, powerChart: { ...config.powerChart, [arrows]: power } });
   }
 
   return (
     <div className="start-screen">
       <div className="start-hero">
-        <h1>ELTYCA</h1>
-        <p className="start-tagline">Prototype · hot-seat · 2 players</p>
+        <h1>Settings</h1>
+        <p className="start-tagline">Every balance knob from the spec, in one place</p>
       </div>
 
       <p className="config-intro">
-        Every balance knob from the spec, in one place. Fields marked "not wired" are saved and exported with
-        telemetry but don't change resolution yet.
+        Fields marked "not wired" are saved and exported with telemetry but don't change resolution yet.
       </p>
 
       <section>
@@ -192,8 +187,8 @@ export function StartScreen({ initialConfig, onStart }: StartScreenProps) {
         </label>
       </section>
 
-      <button type="button" className="confirm" onClick={() => onStart(config)}>
-        Start match
+      <button type="button" className="confirm" onClick={() => navigate('/')}>
+        Back to menu
       </button>
     </div>
   );
