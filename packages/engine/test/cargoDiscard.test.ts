@@ -49,4 +49,26 @@ describe('Test 9 — Playing a Cargo discards one common card and refills the ha
     const newState = resolvePlacement(state, content, 'P1', 12, { kind: 'cargo' }, 0);
     expect(newState.players.find((p) => p.id === 'P1')!.discard).toEqual(['a']);
   });
+
+  it('discardCanBeCargo=true lets a second Cargo be discarded when no common card is left', () => {
+    const content = makeContent({ cards: [] });
+    const state = makeMinimalState({
+      config: { discardCanBeCargo: true },
+      players: { P1: { hand: [{ kind: 'cargo' }, { kind: 'cargo' }] } },
+    });
+
+    const newState = resolvePlacement(state, content, 'P1', 12, { kind: 'cargo' }, 0);
+    const player = newState.players.find((p) => p.id === 'P1')!;
+    expect(player.hand).toEqual([]);
+    expect(player.discard).toEqual([]); // Cargo is fungible, never tracked in the discard pile
+  });
+
+  it('discardCanBeCargo=false (default) still refuses when only Cargo is left', () => {
+    const content = makeContent({ cards: [] });
+    const state = makeMinimalState({
+      players: { P1: { hand: [{ kind: 'cargo' }, { kind: 'cargo' }] } },
+    });
+
+    expect(() => resolvePlacement(state, content, 'P1', 12, { kind: 'cargo' }, 0)).toThrow(/discard/);
+  });
 });

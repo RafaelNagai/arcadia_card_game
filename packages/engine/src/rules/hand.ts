@@ -33,6 +33,11 @@ export function playCargo(state: GameState, player: Player, discardCardId?: stri
     if (discardIdx === -1) throw new Error(`Discard card ${discardCardId} is not in hand`);
   } else {
     discardIdx = player.hand.findIndex((i) => i.kind === 'card');
+    // discardCanBeCargo relaxes the "never another Cargo" guardrail — only used as a
+    // fallback (Cargo tokens are fungible, so there's nothing to name explicitly).
+    if (discardIdx === -1 && state.config.discardCanBeCargo) {
+      discardIdx = player.hand.findIndex((i) => i.kind === 'cargo');
+    }
   }
   if (discardIdx === -1) {
     throw new Error('No common card in hand to discard — the discard can never be a Cargo');
