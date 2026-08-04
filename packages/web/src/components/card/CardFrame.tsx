@@ -45,7 +45,17 @@ export function CardFrame({
       style={{ '--card-accent': accentColor, borderColor: accentColor } as CSSProperties}
       title={title}
     >
-      <img className="card-mini-img" src={image} alt="" />
+      {/* draggable=false + the dragstart guard stop the browser's own native image-drag
+          ghost from starting alongside our custom pointer-based drag — Safari doesn't
+          suppress it the way Chrome does, so without this the native ghost and our
+          drag ghost run at once and Safari's grows without bound while the drag holds. */}
+      <img
+        className="card-mini-img"
+        src={image}
+        alt=""
+        draggable={false}
+        onDragStart={(e) => e.preventDefault()}
+      />
 
       <div className="card-mini-arrows">
         {directionMarks.map(

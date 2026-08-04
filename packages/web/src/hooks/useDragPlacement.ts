@@ -3,6 +3,19 @@ import type { GameState } from '@eltyca/engine';
 import type { Action, Selection } from '../reducer/types';
 import { isLegalDropCell } from '../game/dropTargets';
 
+// Safari's trackpad pinch-to-zoom doesn't go through `wheel` (unlike Chrome/Firefox, where
+// it's synthesized as wheel + ctrlKey and already blocked by the wheel handler's
+// preventDefault below) — it fires these non-standard gesture events instead. Without
+// blocking them too, an accidental pinch while holding a drag zooms the whole page
+// (board included) continuously for as long as the drag lasts.
+declare global {
+  interface WindowEventMap {
+    gesturestart: Event;
+    gesturechange: Event;
+    gestureend: Event;
+  }
+}
+
 const CLICK_MOVEMENT_THRESHOLD_PX = 6;
 const WHEEL_ROTATE_THRESHOLD = 60;
 
@@ -145,12 +158,19 @@ export function useDragPlacement(
       if (event.key === 'Escape') cancelDrag();
     }
 
+    function onGesture(event: Event) {
+      event.preventDefault();
+    }
+
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerCancel);
     window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('blur', cancelDrag);
+    window.addEventListener('gesturestart', onGesture);
+    window.addEventListener('gesturechange', onGesture);
+    window.addEventListener('gestureend', onGesture);
 
     return () => {
       window.removeEventListener('pointermove', onPointerMove);
@@ -159,6 +179,9 @@ export function useDragPlacement(
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('blur', cancelDrag);
+      window.removeEventListener('gesturestart', onGesture);
+      window.removeEventListener('gesturechange', onGesture);
+      window.removeEventListener('gestureend', onGesture);
     };
   }, [isDragging, dispatch, endDrag, cancelDrag]);
 
