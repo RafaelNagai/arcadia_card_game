@@ -402,3 +402,118 @@ header h1 {
   font-size: 1.1rem;
   color: var(--accent);
 }
+
+.telemetry-summary {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 24px;
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.telemetry-summary h2 {
+  margin-top: 0;
+  font-size: 0.95rem;
+}
+
+.telemetry-summary ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.telemetry-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* --- config screen --- */
+
+.config-screen {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.config-screen h1 {
+  margin: 0;
+}
+
+.config-intro {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.config-screen section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.config-screen h2 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.config-screen label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.config-screen label.checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.config-screen input[type='number'],
+.config-screen input[type='text'] {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 6px 8px;
+  font-family: inherit;
+  width: 100%;
+  max-width: 220px;
+}
+
+.config-screen input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+}
+
+.knob-note {
+  color: var(--text-dim);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.72rem;
+}
+
+.power-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+.power-chart-grid input {
+  max-width: 100%;
+}
