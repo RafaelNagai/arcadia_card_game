@@ -465,6 +465,25 @@ header h1 {
   color: var(--accent);
 }
 
+.score-total.counting {
+  font-size: 2.4rem;
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0 0;
+}
+
+.winner-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.analysis-recap {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin: -8px 0 8px;
+}
+
 .telemetry-summary {
   background: var(--panel);
   border: 1px solid var(--border);

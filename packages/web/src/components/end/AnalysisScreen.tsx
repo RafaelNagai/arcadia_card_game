@@ -1,41 +1,33 @@
 import {
-  computeTelemetry,
   rowsToCsv,
-  samplePlayerSetups,
   telemetryToJson,
   toTelemetryRow,
   type GameContent,
   type GameState,
+  type MatchTelemetry,
 } from '@eltyca/engine';
 import { LogPanel } from '../log/LogPanel';
 import { downloadTextFile } from '../../game/download';
 
-export interface EndScreenProps {
+export interface AnalysisScreenProps {
+  telemetry: MatchTelemetry;
   gameState: GameState;
   content: GameContent;
-  durationMs: number | null;
+  onBack: () => void;
   onNewMatch: () => void;
 }
 
-export function EndScreen({ gameState, content, durationMs, onNewMatch }: EndScreenProps) {
-  const telemetry = computeTelemetry(gameState, content, samplePlayerSetups, durationMs);
+/** Everything the "Analyze" button on WinnerScreen leads to — metrics, downloads, and the full turn log. */
+export function AnalysisScreen({ telemetry, gameState, content, onBack, onNewMatch }: AnalysisScreenProps) {
   const { winner, metrics } = telemetry;
+  const recap = telemetry.finalScore.map((s) => `${s.player}: ${s.total}`).join(' · ');
 
   return (
     <div className="app app-end">
-      <h1>{winner === 'drift' ? 'Drift — tie' : `${winner} wins`}</h1>
-
-      <div className="scores">
-        {telemetry.finalScore.map((score) => (
-          <div key={score.player} className="score-card">
-            <h2>{score.player}</h2>
-            <p>{score.cardPoints} cards</p>
-            <p>{score.shipPoints} ship(s)</p>
-            <p>{score.routeBonus} route bonus</p>
-            <p className="score-total">Total: {score.total}</p>
-          </div>
-        ))}
-      </div>
+      <h1>Match analysis</h1>
+      <p className="analysis-recap">
+        {recap} — {winner === 'drift' ? 'Drift (tie)' : `${winner} wins`}
+      </p>
 
       <div className="telemetry-summary">
         <h2>Telemetry</h2>
@@ -88,9 +80,14 @@ export function EndScreen({ gameState, content, durationMs, onNewMatch }: EndScr
 
       <LogPanel gameState={gameState} content={content} />
 
-      <button type="button" className="confirm" onClick={onNewMatch}>
-        New match
-      </button>
+      <div className="winner-actions">
+        <button type="button" onClick={onBack}>
+          Back to result
+        </button>
+        <button type="button" className="confirm" onClick={onNewMatch}>
+          New match
+        </button>
+      </div>
     </div>
   );
 }

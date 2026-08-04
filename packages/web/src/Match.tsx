@@ -10,7 +10,7 @@ import { PanelCaptain } from './components/panels/PanelCaptain';
 import { PanelShip } from './components/panels/PanelShip';
 import { LogPanel } from './components/log/LogPanel';
 import { HotSeatScreen } from './components/hotseat/HotSeatScreen';
-import { EndScreen } from './components/end/EndScreen';
+import { EndSequence } from './components/end/EndSequence';
 import { useRotateShortcut } from './hooks/useRotateShortcut';
 import { useDragPlacement } from './hooks/useDragPlacement';
 import { useCommitAnimations } from './hooks/useCommitAnimations';
@@ -45,7 +45,7 @@ export default function Match({ config, onNewMatch }: MatchProps) {
 
   if (gameState.phase === 'end') {
     return (
-      <EndScreen
+      <EndSequence
         gameState={gameState}
         content={content}
         durationMs={Date.now() - startedAt.current}
