@@ -8,7 +8,7 @@ import {
   resolvePlacement,
   revealSetup,
 } from '@eltyca/engine';
-import { isSetupDoneForAll, isSetupDoneForPlayer, nextSetupPlayer } from '../game/setupProgress';
+import { isSetupDoneForAll, nextSetupPlayer } from '../game/setupProgress';
 import type { Action, Selection, UIState } from './types';
 
 export function createInitialUIState(content: GameContent, gameState: GameState): UIState {
@@ -133,10 +133,11 @@ function commitSetupPlacement(state: UIState, selection: Selection, cellIdx: num
     return { ...base, gameState: nextGameState, awaitingHandoff: nextGameState.turnPlayer };
   }
 
-  // Only hand off once this player has buried the Ship and every required Cargo —
-  // otherwise let them keep going without re-confirming "ready" after every single item.
-  const stillActing = !isSetupDoneForPlayer(nextGameState, activePlayerId);
-  return { ...base, awaitingHandoff: stillActing ? null : nextSetupPlayer(nextGameState) };
+  // Alternate one piece at a time ("em ordem, revezando" per regras_v0.9.md) — hand off
+  // after every placement unless the only player left to act is the one who just went
+  // (the other player already finished their own setup, so there's no one to alternate with).
+  const upcoming = nextSetupPlayer(nextGameState)!;
+  return { ...base, awaitingHandoff: upcoming === activePlayerId ? null : upcoming };
 }
 
 function commitMainPlacement(

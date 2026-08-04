@@ -31,7 +31,24 @@ export function isSetupDoneForAll(state: GameState): boolean {
   return state.players.every((p) => isSetupDoneForPlayer(state, p.id));
 }
 
+function piecesPlacedByPlayer(state: GameState, playerId: PlayerId): number {
+  return (isShipPlaced(state, playerId) ? 1 : 0) + hiddenItemsPlacedCount(state, playerId);
+}
+
+/** Alternates one piece at a time ("em ordem, revezando" per regras_v0.9.md) — no extra
+ *  state needed: whoever has placed fewer pieces so far goes next, ties broken by the
+ *  fixed player order (P1 before P2). A player who finishes early (e.g. a Captain with
+ *  less Cargo than setupHiddenCards) simply drops out of the comparison, and the other
+ *  finishes their remaining pieces alone without a pointless "pass to yourself" handoff. */
 export function nextSetupPlayer(state: GameState): PlayerId | null {
-  const pending = state.players.find((p) => !isSetupDoneForPlayer(state, p.id));
-  return pending ? pending.id : null;
+  const pending = state.players.filter((p) => !isSetupDoneForPlayer(state, p.id));
+  if (pending.length === 0) return null;
+
+  let next = pending[0];
+  for (const player of pending.slice(1)) {
+    if (piecesPlacedByPlayer(state, player.id) < piecesPlacedByPlayer(state, next.id)) {
+      next = player;
+    }
+  }
+  return next.id;
 }
