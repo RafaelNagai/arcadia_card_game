@@ -1,0 +1,20 @@
+{
+  "name": "@eltyca/server",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "partykit dev",
+    "deploy": "partykit deploy",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@eltyca/engine": "*",
+    "partykit": "0.0.115"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "vitest": "^2.1.0"
+  }
+}

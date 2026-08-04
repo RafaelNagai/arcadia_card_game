@@ -1,0 +1,5 @@
+{
+  "name": "eltyca",
+  "main": "src/server.ts",
+  "compatibilityDate": "2026-08-04"
+}
