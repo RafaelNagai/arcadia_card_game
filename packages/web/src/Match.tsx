@@ -4,7 +4,7 @@ import { createDraftState, sampleContent, toPlayerSetups } from '@eltyca/engine'
 import { createInitialDraftUIState, draftReducer } from './reducer/draftReducer';
 import { ChoiceScreen } from './components/draft/ChoiceScreen';
 import { DraftScreen } from './components/draft/DraftScreen';
-import LiveMatch from './LiveMatch';
+import LiveMatchHost from './LiveMatchHost';
 
 export interface MatchProps {
   config: Config;
@@ -14,9 +14,9 @@ export interface MatchProps {
 /** Pre-game orchestrator: runs Captain/Ship choice, then the Porto draft, entirely as its
  *  own small reducer — see reducer/draftReducer.ts and @eltyca/engine's rules/draft.ts for
  *  why this is kept separate from the real match state rather than folded into it. Once the
- *  draft reaches stage 'done', hands the result to LiveMatch (the actual game — this used to
- *  be the whole of Match.tsx before the draft existed), which knows nothing about how the
- *  Captain/Ship/deck it received were decided. */
+ *  draft reaches stage 'done', hands the result to LiveMatchHost (which owns the actual game's
+ *  reducer — this used to be the whole of Match.tsx before the draft existed), which knows
+ *  nothing about how the Captain/Ship/deck it received were decided. */
 export default function Match({ config, onNewMatch }: MatchProps) {
   const [draftState, dispatch] = useReducer(draftReducer, config, (initialConfig) => {
     const seed = Math.floor(Math.random() * 1_000_000);
@@ -39,5 +39,5 @@ export default function Match({ config, onNewMatch }: MatchProps) {
   }
 
   const playerSetups = toPlayerSetups(draft, draftState.content);
-  return <LiveMatch config={config} playerSetups={playerSetups} onNewMatch={onNewMatch} />;
+  return <LiveMatchHost config={config} playerSetups={playerSetups} onNewMatch={onNewMatch} />;
 }

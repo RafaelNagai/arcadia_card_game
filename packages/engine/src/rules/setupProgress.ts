@@ -1,4 +1,4 @@
-import type { GameState, PlayerId } from '@eltyca/engine';
+import type { GameState, PlayerId } from '../types';
 
 export function isShipPlaced(state: GameState, playerId: PlayerId): boolean {
   const player = state.players.find((p) => p.id === playerId)!;

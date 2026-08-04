@@ -15,6 +15,15 @@ export { placeInSetup, revealSetup, type SetupItem } from './rules/setup';
 export { playTurn, isGameOver } from './rules/turn';
 export { createInitialState, type PlayerSetup } from './rules/initialState';
 export {
+  isShipPlaced,
+  hiddenItemsPlacedCount,
+  effectiveHiddenCargoTarget,
+  isSetupDoneForPlayer,
+  isSetupDoneForAll,
+  nextSetupPlayer,
+} from './rules/setupProgress';
+export { redactGameStateForPlayer, type RedactedGameState, type RedactedCell, type RedactedCellContent, type RedactedPlayer, type RedactedHandItem } from './rules/redact';
+export {
   createDraftState,
   pickCaptain,
   pickShip,

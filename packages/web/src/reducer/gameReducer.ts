@@ -3,12 +3,13 @@ import {
   type GameState,
   type Rotation,
   type SetupItem,
+  isSetupDoneForAll,
+  nextSetupPlayer,
   placeInSetup,
   playTurn,
   resolvePlacement,
   revealSetup,
 } from '@eltyca/engine';
-import { isSetupDoneForAll, nextSetupPlayer } from '../game/setupProgress';
 import type { Action, Selection, UIState } from './types';
 
 export function createInitialUIState(content: GameContent, gameState: GameState): UIState {

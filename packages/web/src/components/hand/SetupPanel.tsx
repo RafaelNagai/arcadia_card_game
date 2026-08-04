@@ -1,7 +1,7 @@
 import type { Dispatch, PointerEvent } from 'react';
 import type { GameContent, GameState, Player } from '@eltyca/engine';
+import { effectiveHiddenCargoTarget, hiddenItemsPlacedCount, isShipPlaced } from '@eltyca/engine';
 import type { Action, Selection } from '../../reducer/types';
-import { effectiveHiddenCargoTarget, hiddenItemsPlacedCount, isShipPlaced } from '../../game/setupProgress';
 import { ShipBadge } from '../card/ShipBadge';
 
 export interface SetupPanelProps {
