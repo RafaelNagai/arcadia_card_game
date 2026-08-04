@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import type { Config } from '@eltyca/engine';
 
-export interface ConfigScreenProps {
+export interface StartScreenProps {
   initialConfig: Config;
   onStart: (config: Config) => void;
 }
 
-/** Every balance knob from prototipo_web.md's config.json, editable before a match starts. */
-export function ConfigScreen({ initialConfig, onStart }: ConfigScreenProps) {
+/** The game's actual front door: title, a one-line pitch, then every balance knob from
+ *  the spec, editable before a match starts — the settings live on this screen on purpose,
+ *  not behind a separate step. */
+export function StartScreen({ initialConfig, onStart }: StartScreenProps) {
   const [config, setConfig] = useState(initialConfig);
   const chainUnlimited = config.chainDepth === Infinity;
 
@@ -26,8 +28,12 @@ export function ConfigScreen({ initialConfig, onStart }: ConfigScreenProps) {
   }
 
   return (
-    <div className="config-screen">
-      <h1>ELTYCA — Prototype</h1>
+    <div className="start-screen">
+      <div className="start-hero">
+        <h1>ELTYCA</h1>
+        <p className="start-tagline">Prototype · hot-seat · 2 players</p>
+      </div>
+
       <p className="config-intro">
         Every balance knob from the spec, in one place. Fields marked "not wired" are saved and exported with
         telemetry but don't change resolution yet.

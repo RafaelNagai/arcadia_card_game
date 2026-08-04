@@ -496,9 +496,9 @@ header h1 {
   margin-top: 12px;
 }
 
-/* --- config screen --- */
+/* --- start screen --- */
 
-.config-screen {
+.start-screen {
   max-width: 720px;
   margin: 0 auto;
   padding: 24px 16px 64px;
@@ -507,8 +507,27 @@ header h1 {
   gap: 16px;
 }
 
-.config-screen h1 {
+.start-hero {
+  text-align: center;
+  padding: 12px 0 4px;
+}
+
+.start-hero h1 {
   margin: 0;
+  font-size: 2.4rem;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.start-tagline {
+  margin: 4px 0 0;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .config-intro {
@@ -517,7 +536,7 @@ header h1 {
   margin: 0;
 }
 
-.config-screen section {
+.start-screen section {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -527,12 +546,12 @@ header h1 {
   gap: 10px;
 }
 
-.config-screen h2 {
+.start-screen h2 {
   margin: 0;
   font-size: 0.9rem;
 }
 
-.config-screen label {
+.start-screen label {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -540,14 +559,14 @@ header h1 {
   color: var(--text-dim);
 }
 
-.config-screen label.checkbox {
+.start-screen label.checkbox {
   flex-direction: row;
   align-items: center;
   gap: 8px;
 }
 
-.config-screen input[type='number'],
-.config-screen input[type='text'] {
+.start-screen input[type='number'],
+.start-screen input[type='text'] {
   background: var(--panel-alt);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -558,7 +577,7 @@ header h1 {
   max-width: 220px;
 }
 
-.config-screen input[type='checkbox'] {
+.start-screen input[type='checkbox'] {
   width: 16px;
   height: 16px;
 }
