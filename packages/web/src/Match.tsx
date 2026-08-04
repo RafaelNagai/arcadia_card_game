@@ -14,6 +14,7 @@ import { EndSequence } from './components/end/EndSequence';
 import { useRotateShortcut } from './hooks/useRotateShortcut';
 import { useDragPlacement } from './hooks/useDragPlacement';
 import { useCommitAnimations } from './hooks/useCommitAnimations';
+import { useHandDrawAnimation } from './hooks/useHandDrawAnimation';
 import { nextSetupPlayer } from './game/setupProgress';
 
 export interface MatchProps {
@@ -39,6 +40,11 @@ export default function Match({ config, onNewMatch }: MatchProps) {
 
   const { gameState, content } = state;
 
+  // Tracked here (not inside Hand.tsx) because Hand unmounts every hot-seat handoff —
+  // this needs to survive that to know what each player's hand looked like last time.
+  const turnPlayer = gameState.players.find((p) => p.id === gameState.turnPlayer);
+  const newlyDrawnCount = useHandDrawAnimation(gameState.turnPlayer, turnPlayer?.hand ?? []);
+
   if (state.awaitingHandoff) {
     return <HotSeatScreen playerId={state.awaitingHandoff} dispatch={dispatch} />;
   }
@@ -59,21 +65,23 @@ export default function Match({ config, onNewMatch }: MatchProps) {
     const player = gameState.players.find((p) => p.id === activePlayerId)!;
 
     return (
-      <div className="app">
+      <div className="game-screen">
         <header>
-          <h1>ELTYCA — Prototype (setup)</h1>
+          <h1>ELTYCA (setup)</h1>
         </header>
         {state.error && <div className="error-banner">{state.error}</div>}
         <div className="layout">
-          <Board
-            displayState={gameState}
-            baseState={gameState}
-            content={content}
-            selection={state.selection}
-            targetCellIdx={state.targetCellIdx}
-            onSelectCell={(idx) => dispatch({ type: 'SELECT_CELL', cellIdx: idx })}
-            commitEffects={commitEffects}
-          />
+          <div className="board-wrapper">
+            <Board
+              displayState={gameState}
+              baseState={gameState}
+              content={content}
+              selection={state.selection}
+              targetCellIdx={state.targetCellIdx}
+              onSelectCell={(idx) => dispatch({ type: 'SELECT_CELL', cellIdx: idx })}
+              commitEffects={commitEffects}
+            />
+          </div>
           <aside>
             <SetupPanel
               content={content}
@@ -96,23 +104,25 @@ export default function Match({ config, onNewMatch }: MatchProps) {
   const displayState = state.previewState ?? gameState;
 
   return (
-    <div className="app">
+    <div className="game-screen">
       <header>
         <h1>
-          ELTYCA — Prototype · Turn {gameState.turnNumber} · {activePlayer.id} to play
+          Turn {gameState.turnNumber} · {activePlayer.id} to play
         </h1>
       </header>
       {state.error && <div className="error-banner">{state.error}</div>}
       <div className="layout">
-        <Board
-          displayState={displayState}
-          baseState={gameState}
-          content={content}
-          selection={state.selection}
-          targetCellIdx={state.targetCellIdx}
-          onSelectCell={(idx) => dispatch({ type: 'SELECT_CELL', cellIdx: idx })}
-          commitEffects={commitEffects}
-        />
+        <div className="board-wrapper">
+          <Board
+            displayState={displayState}
+            baseState={gameState}
+            content={content}
+            selection={state.selection}
+            targetCellIdx={state.targetCellIdx}
+            onSelectCell={(idx) => dispatch({ type: 'SELECT_CELL', cellIdx: idx })}
+            commitEffects={commitEffects}
+          />
+        </div>
         <aside>
           {gameState.players.map((p) => (
             <div key={p.id} className={`player-panels${p.id === activePlayer.id ? ' active' : ''}`}>
@@ -130,6 +140,7 @@ export default function Match({ config, onNewMatch }: MatchProps) {
         targetCellIdx={state.targetCellIdx}
         dispatch={dispatch}
         startDrag={startDrag}
+        newlyDrawnCount={newlyDrawnCount}
       />
       <DragGhost ghostPos={ghostPos} selection={state.selection} content={content} player={activePlayer} />
     </div>
