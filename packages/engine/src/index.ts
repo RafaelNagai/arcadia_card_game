@@ -14,6 +14,15 @@ export { resolvePlacement, type PlacementOptions } from './rules/resolvePlacemen
 export { placeInSetup, revealSetup, type SetupItem } from './rules/setup';
 export { playTurn, isGameOver } from './rules/turn';
 export { createInitialState, type PlayerSetup } from './rules/initialState';
+export {
+  createDraftState,
+  pickCaptain,
+  pickShip,
+  pickCard,
+  toPlayerSetups,
+  type DraftState,
+  type DraftPlayerState,
+} from './rules/draft';
 export { largestRoute, routeBonusWinner } from './rules/route';
 export { computeScores, determineWinner, type Score } from './rules/scoring';
 export { formatLogEvent } from './rules/log';
