@@ -1,6 +1,6 @@
 # ELTYCA — Protótipo Web
 
-### Especificação técnica v1, baseada nas Regras v0.9
+### Especificação técnica, baseada nas Regras v0.9 — **M0 a M3 implementados**
 
 ---
 
@@ -12,6 +12,8 @@ O objetivo é responder às sete perguntas da lista de teste das regras com dado
 
 Isso significa uma inversão de prioridade em relação a um projeto normal: **motor de regras e telemetria vêm antes de qualquer coisa visual.** Uma tela feia que registra tudo vale mais aqui do que uma tela bonita que não mede nada.
 
+Esse instrumento já existe e roda: motor com 46 testes automatizados, três bots, simulação em lote com relatório, e um app jogável com arrastar-e-soltar e telemetria exportável. O resto deste documento descreve o que foi construído — não mais um plano, um relato do que existe.
+
 ---
 
 ## A decisão de arquitetura que importa
@@ -19,35 +21,60 @@ Isso significa uma inversão de prioridade em relação a um projeto normal: **m
 > **O motor de regras é uma função pura, sem nenhuma dependência de UI.**
 
 ```
-resolve(estado, ação) -> novoEstado
+resolvePlacement(state, action) -> newState
 ```
 
 Sem DOM, sem framework, sem timers, sem aleatoriedade não-semeada. Todo acaso passa por um `seed` guardado no estado.
 
-O motivo não é elegância. É que um motor puro roda **fora do navegador**, e isso libera o modo mais valioso do projeto inteiro: simular dez mil partidas com bots antes de convidar um ser humano. Metade das perguntas de balanceamento se responde sozinha assim, de graça, numa noite.
+O motivo não é elegância. É que um motor puro roda **fora do navegador**, e isso libera o modo mais valioso do projeto inteiro: simular partidas com bots antes de convidar um ser humano. Isso já está de pé — `npm run batch` roda centenas de partidas em segundos e cospe taxa de vitória, médias de métrica e um CSV pra planilha.
 
-Se o motor nascer amarrado na tela, essa porta fecha e não abre depois.
+**Stack escolhida:** TypeScript nos dois pacotes. Monorepo com npm workspaces:
 
-**Stack:** qualquer uma serve, desde que o pacote do motor seja separado e rode em Node ou equivalente. TypeScript é o caminho de menor atrito para web + simulação headless no mesmo código. Flutter Web também funciona e aproveita seu terreno conhecido — nesse caso o motor é um pacote Dart puro e a simulação roda em Dart CLI. O que não pode é o motor morar dentro do widget.
+```
+arcadia_card_game/
+├── package.json                 # workspaces: packages/*
+├── tsconfig.base.json
+└── packages/
+    ├── engine/                  # @eltyca/engine — TS puro, zero UI
+    │   ├── src/
+    │   │   ├── types.ts, constants.ts, rotation.ts, config.ts
+    │   │   ├── rules/           # resolvePlacement, setup, turn, route,
+    │   │   │                    # scoring, hand, silencing, initialState, log
+    │   │   ├── effects/         # os dois ganchos + exemplos
+    │   │   ├── content/         # cartas/capitães/navios/decks de exemplo
+    │   │   ├── bots/            # random, greedy, route
+    │   │   ├── simulation/      # runMatch, runBatch, summarize
+    │   │   ├── telemetry/       # computeTelemetry, csv, serialize
+    │   │   └── cli/             # simulateMatch.ts, runBatch.ts
+    │   └── test/                # 16 arquivos, 46 testes, Vitest
+    └── web/                     # @eltyca/web — Vite + React, consome o engine
+        └── src/
+            ├── App.tsx, Match.tsx
+            ├── reducer/         # gameReducer, drive tudo via ações
+            ├── components/      # board, card, hand, panels, log, start, end, hotseat
+            ├── hooks/           # useDragPlacement, useCommitAnimations, useRotateShortcut
+            └── game/            # setupProgress, dropTargets, captureEffects, theme
+```
+
+Scripts principais: `npm test` (motor), `npm run simulate` (uma partida via CLI), `npm run batch -- N` (N partidas por par de bot, CSV no fim), `npm run dev:web` (app jogável).
 
 ---
 
 ## Escopo
 
-**v1 — jogável e mensurável**
-Dois jogadores, hot-seat, mesma tela. Sem contas, sem servidor, sem persistência além de `localStorage` para o log das partidas.
+**v1 — jogável e mensurável.** ✅ Feito. Dois jogadores, hot-seat, mesma tela. Sem contas, sem servidor, sem persistência.
 
-**v2 — instrumentado**
-Painel de configuração com todos os botões de balanceamento, exportação de telemetria, modo simulação com bots.
+**v2 — instrumentado.** ✅ Feito. Painel de configuração com todos os botões de balanceamento (na tela inicial), exportação de telemetria (JSON/CSV, tanto no app quanto no CLI), modo simulação com bots.
 
-**v3 — opcional**
-Bot decente, partida por link compartilhado, coleção persistente.
+**v3 — opcional.** 🟡 Parcial. Os três bots existem e rodam em lote (`runBatch`). Partida por link e coleção persistente **não** foram feitas — continuam fora de escopo.
 
-**Fora de escopo em v1:** arte definitiva, animação, layout mobile polido, deckbuilding persistente, contas, som.
+**Fora de escopo ainda:** arte definitiva, som, layout mobile dedicado, deckbuilding persistente, contas, modo Porto (draft).
 
 ---
 
 ## Modelo de dados
+
+O código é todo em inglês — os tipos abaixo já são os nomes reais em `packages/engine/src/types.ts`, não uma tradução aproximada.
 
 ### Direções
 
@@ -60,7 +87,7 @@ const OFFSET: [number, number][] = [
   [1, 0], [1, -1], [0, -1], [-1, -1]
 ];
 
-const oposta = (d: number) => (d + 4) % 8;
+const opposite = (d: number) => (d + 4) % 8;
 ```
 
 ### Rotação
@@ -68,12 +95,12 @@ const oposta = (d: number) => (d + 4) % 8;
 A carta é quadrada: quatro orientações. Cada giro de 90° desloca o padrão **duas posições** no índice.
 
 ```ts
-type Rotacao = 0 | 1 | 2 | 3; // 0°, 90°, 180°, 270°
+type Rotation = 0 | 1 | 2 | 3; // 0°, 90°, 180°, 270°
 
-function setasEfetivas(setas: boolean[], rot: Rotacao): boolean[] {
+function effectiveArrows(arrows: boolean[], rot: Rotation): boolean[] {
   const out = new Array(8).fill(false);
   for (let i = 0; i < 8; i++) {
-    if (setas[i]) out[(i + rot * 2) % 8] = true;
+    if (arrows[i]) out[(i + rot * 2) % 8] = true;
   }
   return out;
 }
@@ -82,205 +109,202 @@ function setasEfetivas(setas: boolean[], rot: Rotacao): boolean[] {
 ### Entidades
 
 ```ts
-type Elemento = 'energia' | 'anomalia' | 'paradoxo' | 'cognitivo' | 'astral';
-type TipoCarta = 'criatura' | 'embarcacao' | 'npc';
+type Element = 'energy' | 'anomaly' | 'paradox' | 'cognitive' | 'astral';
+type CardType = 'creature' | 'vessel' | 'npc';
 
-interface Carta {
+interface Card {
   id: string;
-  nome: string;
-  tipo: TipoCarta;
-  elemento: Elemento;
-  poder: number;          // 1..12
-  setas: boolean[];       // length 8, orientação impressa
-  efeito?: EfeitoDef;
+  name: string;
+  type: CardType;
+  element: Element;
+  power: number;
+  arrows: boolean[];      // length 8, orientação impressa
+  effect?: EffectDef;
   tier: 'E'|'D'|'C'|'B'|'A'|'S'|'SS';
 }
 
-interface Navio {
+interface Ship {
   id: string;
-  nome: string;
-  escudos: boolean[];     // length 8
-  casco: number;
+  name: string;
+  shields: boolean[];     // length 8
+  hull: number;
 }
 
-interface Capitao {
+interface Captain {
   id: string;
-  nome: string;
-  cargas: number;         // 2..5
-  passivo?: EfeitoDef;
+  name: string;
+  cargoSlots: number;     // 2..5
+  passive?: EffectDef;
 }
 
-type ConteudoCasa =
-  | { kind: 'carta'; cartaId: string; rot: Rotacao; dono: PlayerId }
-  | { kind: 'navio'; navioId: string; dono: PlayerId }   // rot sempre 0
-  | { kind: 'carga'; colocadaPor: PlayerId }             // neutra: sem dono
+// Setup só enterra o Navio ou Carga — carta comum nunca é item de setup.
+type SetupItem = { kind: 'cargo' } | { kind: 'ship' };
+type HandItem = { kind: 'card'; cardId: string } | { kind: 'cargo' };
+
+type CellContent =
+  | { kind: 'card'; cardId: string; rot: Rotation; owner: PlayerId }
+  | { kind: 'ship'; shipId: string; owner: PlayerId }   // sem campo rot: nunca gira, estruturalmente
+  | { kind: 'cargo'; placedBy: PlayerId }               // neutra: sem dono
   | null;
 
-interface Casa {
-  idx: number;            // linha * largura + coluna
-  abismo: boolean;
-  conteudo: ConteudoCasa;
-  ocultaAte: 'setup' | null;   // cartas viradas para baixo no setup
+interface Cell {
+  idx: number;             // row * width + column
+  chasm: boolean;
+  content: CellContent;
+  hiddenUntil: 'setup' | null;
 }
 
-interface Jogador {
+interface Player {
   id: PlayerId;
-  capitaoId: string;
-  navioId: string;
-  deck: string[];         // ids, ordem embaralhada
-  mao: ItemMao[];         // cartas + cargas
-  cargasRestantes: number;
-  descarte: string[];
+  captainId: string;
+  shipId: string;
+  deck: string[];
+  hand: HandItem[];
+  cargoRemaining: number;
+  discard: string[];
 }
 
-interface Estado {
+interface Config { /* ver seção Configuração */ }
+
+interface GameState {
   config: Config;
   seed: number;
-  grade: { largura: number; altura: number };
-  casas: Casa[];
-  jogadores: Jogador[];
-  vez: PlayerId;
-  fase: 'escolha' | 'draft' | 'setup' | 'principal' | 'fim';
-  log: EventoLog[];
+  grid: { width: number; height: number };
+  cells: Cell[];
+  players: Player[];
+  turnPlayer: PlayerId;
+  phase: 'choice' | 'draft' | 'setup' | 'main' | 'end';
+  turnNumber: number;
+  log: LogEvent[];
 }
 ```
 
-O **dono do Navio** é quem o controla agora, não quem o colocou. Guarde `navioId` para saber de quem ele é originalmente — é isso que decide qual Capitão fica silenciado.
+O **dono do Navio agora** é o `owner` dentro de `CellContent`. `Player.shipId` guarda de quem o Navio é originalmente — é isso que decide qual Capitão fica silenciado (`rules/silencing.ts::isCaptainSilenced`).
 
 ---
 
 ## O coração: resolver uma colocação
 
-Esta é a parte que precisa de teste automatizado antes de qualquer tela.
+`packages/engine/src/rules/resolvePlacement.ts`. É a parte com teste automatizado antes de qualquer tela — os 12 testes da lista abaixo cobrem exatamente isso.
 
 ```
-resolverColocacao(estado, jogador, casa, cartaOuCarga, rotacao):
+resolvePlacement(state, content, playerId, cellIdx, item, rotation, options?):
 
 1. Valida: casa vazia, não é abismo, item está na mão.
-   Se for Navio no setup: valida que não é casa de borda.
 
-2. Coloca. Se for Carga: aplica a regra de descarte e reposição, e ENCERRA.
-   Carga não resolve setas.
+2. Coloca. Se for Carga: aplica a regra de descarte e reposição
+   (rules/hand.ts::playCargo), e ENCERRA. Carga não resolve setas.
 
-3. A = setasEfetivas(carta.setas, rotacao)
-   Tira um snapshot do tabuleiro ANTES de aplicar qualquer captura.
+3. A = effectiveArrows(card.arrows, rotation)
+   Daqui em diante `working` (um clone) É o snapshot: nenhuma captura
+   é escrita nele até o fim, todas as comparações leem esse estado.
 
 4. Resolução direta — para cada d em A:
-     vizinho = casa + OFFSET[d]
+     neighbor = vizinho da casa na direção d
      se inválido, vazio, abismo, carga, ou já é seu -> ignora
 
      se vizinho é NAVIO adversário:
-        se navio.escudos[oposta(d)] == false  -> DOMÍNIO (abordagem)
-        senão: se poderEfetivo(carta) > cascoEfetivo(navio) -> DOMÍNIO
+        se ship.shields[opposite(d)] == false  -> DOMÍNIO (boarding)
+        senão: se effectivePower(carta) > ship.hull -> DOMÍNIO
                senão -> nada
 
      se vizinho é CARTA adversária:
-        B = setasEfetivas(cartaAlvo.setas, rotAlvo)
-        se B[oposta(d)] == false -> DOMÍNIO (abordagem), não propaga
-        senão -> CONFRONTO:
-             se poderEfetivo(carta) > poderEfetivo(alvo) -> DOMÍNIO, propaga
-             senão -> nada (empate mantém com o defensor)
+        B = effectiveArrows(cartaAlvo.arrows, rotAlvo)
+        se B[opposite(d)] == false -> DOMÍNIO (boarding), não propaga
+        senão -> CLASH:
+             se effectivePower(carta) > effectivePower(alvo) -> DOMÍNIO, propaga
+             senão -> nada (empate mantém com o defensor, salvo tieKeepsDefender=false)
 
-   Todas as comparações usam o snapshot. Capturas são aplicadas depois,
-   simultaneamente.
-
-5. Cadeia — para cada carta dominada por CONFRONTO:
-     C = setasEfetivas(dela)
+5. Chain — para cada carta dominada por CLASH:
+     C = effectiveArrows(dela)
      para cada d em C:
         vizinho adversário, ainda não capturado neste turno,
-        e que NÃO tenha seta de volta -> DOMÍNIO por cadeia
+        sem seta de volta -> DOMÍNIO por chain
 
-   A cadeia tem profundidade 1: captura por cadeia não propaga de novo.
-   (Deixe isso como knob de config: `profundidadeCadeia: 1 | Infinity`.)
+   Profundidade controlada por config.chainDepth (1 por padrão, ou Infinity).
 
-6. Nenhuma carta é dominada mais de uma vez no mesmo turno.
-   Mantenha um Set<idxCasa> durante toda a resolução.
+6. Nenhuma carta é dominada mais de uma vez no mesmo turno (Set<idx>).
 
-7. Repõe a mão até o limite.
+7. Repõe a mão até o limite (rules/hand.ts::refillHand).
 ```
+
+`resolvePlacement` para exatamente no passo 7 — quem avança `turnPlayer` e detecta fim de partida é uma camada fina acima (`rules/turn.ts::playTurn`), pra manter a função testável isolada. Colocação de Navio/Carga no setup usa `rules/setup.ts::placeInSetup`, que reaproveita a mesma validação de casa mas nunca resolve setas (fica tudo oculto até `revealSetup`).
 
 ### Poder efetivo e domínio permitido
 
-Todo efeito de carta e todo passivo de Capitão entram por **dois ganchos apenas**. Resistir à tentação de criar um terceiro é o que mantém isso administrável.
-
 ```ts
-poderEfetivo(carta, contexto): number
+effectivePower(ctx: PowerContext): number
 // aplica MODIFICADORES: da própria carta, da carta oposta,
 // e do passivo do Capitão do dono — se ele não estiver silenciado.
 
-podeSerDominada(atacante, defensora, contexto): boolean
+canBeDominated(ctx: LockContext): boolean
 // aplica TRAVAS. Default true.
 ```
 
-**Silenciamento:** antes de aplicar o passivo de um Capitão, checar se o Navio daquele jogador está sob controle adversário. Se estiver, o passivo não existe naquele cálculo.
+Continuam sendo os dois únicos ganchos (`rules/effectivePower.ts`, `rules/canBeDominated.ts`), apoiados num registry pequeno (`effects/registry.ts`) — cada efeito de carta ou passivo de Capitão é uma função registrada por id, nunca um sistema genérico de gatilhos.
+
+**Silenciamento:** `rules/silencing.ts::isCaptainSilenced` — checa se o Navio original daquele jogador está sob controle adversário antes de aplicar o passivo.
 
 ---
 
 ## Cálculo da rota
 
-Grafo simples, roda só na pontuação final.
+`rules/route.ts::largestRoute`. Mesmo grafo simples, roda só na pontuação final — Navio e Carga nunca entram (Carga porque não tem `owner`, estruturalmente; Navio porque a rota só olha `content.kind === 'card'`).
 
-```
-para cada jogador P:
-  nós = casas com carta comum sob controle de P (navio e carga fora)
-  aresta entre a e b se: a e b são vizinhos,
-      setasEfetivas(a)[direção de a para b] == true  E
-      setasEfetivas(b)[direção de b para a] == true
-  maiorRota(P) = tamanho da maior componente conexa
-```
-
-Bônus de +3 só para quem tiver a **maior estritamente**. Empate: ninguém leva.
+Bônus de +3 (`config.routeBonus`) só para quem tiver a **maior estritamente** (`routeBonusWinner`). Empate: ninguém leva.
 
 ---
 
 ## Pontuação
 
+`rules/scoring.ts::computeScores` / `determineWinner`.
+
 ```
-pontos(P) = (cartas comuns sob Eltys de P)
-          + (navios sob Eltys de P)
-          + (3 se maiorRota(P) for única e máxima)
+score(P) = (cartas comuns sob controle de P)
+         + (navios sob controle de P)
+         + (config.routeBonus se maiorRota(P) for única e máxima)
 ```
 
-Cargas valem 0. Empate na pontuação final = Deriva.
+Cargas valem 0. Empate na pontuação final = `'drift'`.
 
 ---
 
 ## Configuração — todos os botões num arquivo
 
-Tudo que a lista de teste pode querer mexer precisa ser dado, não código.
+`packages/engine/config/config.default.json`, carregado por `src/config.ts::loadConfig(overrides?)`. Editável na **tela inicial** do app (todo campo abaixo tem um input lá — os marcados "not wired" existem, são salvos e exportados com a telemetria, mas ainda não mudam a resolução):
 
 ```json
 {
-  "grade": { "largura": 5, "altura": 5 },
-  "abismos": [12],
-  "maoMaxima": 7,
-  "deckTamanho": 12,
-  "draftPorRodada": 4,
-  "draftRodadas": 3,
-  "bonusRota": 3,
-  "profundidadeCadeia": 1,
-  "empateMantemDefensor": true,
-  "navioNaBorda": false,
-  "navioRotacionavel": false,
-  "descartePodeSerCarga": false,
-  "setupCartasOcultas": 2,
-  "gabarito": {
+  "grid": { "width": 5, "height": 5 },
+  "chasms": [12],
+  "maxHandSize": 7,
+  "deckSize": 12,
+  "draftPerRound": 4,
+  "draftRounds": 3,
+  "routeBonus": 3,
+  "chainDepth": 1,
+  "tieKeepsDefender": true,
+  "shipOnEdge": false,
+  "shipRotatable": false,
+  "discardCanBeCargo": false,
+  "setupHiddenCards": 2,
+  "powerChart": {
     "2": 10, "3": 9, "4": 8, "5": 7, "6": 6, "7": 5, "8": 4
   },
-  "custoModificador": 2,
-  "custoTrava": 4
+  "modifierCost": 2,
+  "lockCost": 4
 }
 ```
 
-Cada item dessa lista é uma pergunta em aberto do documento de regras. Se um deles estiver hardcoded, aquele teste vira uma tarde de refatoração em vez de um clique.
+`deckSize`, `draftPerRound`, `draftRounds`, `shipRotatable`, `powerChart`, `modifierCost`, `lockCost` ainda não são lidos em runtime (deck vem direto do `PlayerSetup`; draft e rotação de Navio não estão implementados; o gabarito de poder é ferramenta de criação de carta, nunca consultada durante a partida). `discardCanBeCargo` **é lido** — relaxa a trava "descarte nunca pode ser Carga" quando não sobra carta comum na mão.
 
 ---
 
 ## Telemetria — o que registrar em toda partida
 
-Sem isso o protótipo não cumpre a função dele.
+Implementado em `telemetry/computeTelemetry.ts`, chamado uma vez por partida (no CLI e no app, no início da sequência de fim de partida).
 
-**Da partida:** seed, config usada, capitães e navios escolhidos, decks completos, vencedor, placar final, número de turnos, duração real, turno a turno em formato replayável.
+**Da partida:** seed, config usada, capitães/navios/decks de cada jogador, vencedor, placar final, número de turnos, duração real, log turno a turno (já no formato usado pra montar o texto de replay).
 
 **Do que a gente quer saber:**
 
@@ -295,72 +319,98 @@ Sem isso o protótipo não cumpre a função dele.
 | Cartas nunca jogadas | Cartas mortas no set |
 | Margem de vitória | Partidas apertadas ou atropelo |
 
-Exportar JSON e CSV. Uma tela simples de agregação já basta — a análise pode ser feita em planilha.
+Exportação: `telemetry/csv.ts` (`toTelemetryRow`, `rowsToCsv`) e `telemetry/serialize.ts` (`telemetryToJson`, preserva `Infinity` como string legível). No app, os botões "Download JSON"/"Download CSV" ficam na tela de **Analysis** (ver Interface). No CLI, `runBatch.ts` escreve um CSV com uma linha por partida de todo o lote.
 
 ---
 
 ## Modo simulação
 
-Roda o motor sem tela, N partidas, e cospe o agregado.
+`simulation/runMatch.ts` (uma partida headless: setup aleatório + bots no turno principal) e `simulation/runBatch.ts` (N partidas, agregado via `summarize.ts`). `npm run batch -- N` roda os 3×3 pares de bot e escreve o CSV combinado.
 
-**Bots, do mais burro ao menos:**
+**Bots implementados** (`bots/`), do mais burro ao menos:
 
-1. **Aleatório** — casa e rotação sorteadas. Serve de linha de base: se um deck vence outro consistentemente contra bots aleatórios, o desbalanceamento é do deck, não do jogador.
-2. **Guloso** — maximiza domínios imediatos no turno. É o bot que mede se "abordagem é forte demais".
-3. **Rotista** — prioriza construir rota contígua. Mede se os +3 valem a pena.
+1. **`randomBot`** — casa e rotação sorteadas. Linha de base: se um deck vence outro consistentemente contra ele, o desbalanceamento é do deck, não do jogador.
+2. **`greedyBot`** — testa toda combinação (item × casa × rotação) através do próprio `resolvePlacement` especulativo e fica com a que mais domina cartas nesse turno. Mede se "abordagem é forte demais".
+3. **`routeBot`** — mesma busca, pontuando por `largestRoute` em vez de domínios. Mede se os +3 valem a pena.
 
-Rodar os três em todos os pares (aleatório vs guloso, guloso vs rotista, etc.) responde os itens 1, 4 e 5 da lista de teste sem gastar uma noite de ninguém.
+Os dois últimos compartilham a busca por força bruta (`bots/scoreSearch.ts::bestMoveByScore`) — nenhuma heurística duplicando lógica do motor, só o motor pontuando os próprios resultados especulativos.
 
----
-
-## Interface mínima da v1
-
-**Tabuleiro.** Grade clicável. Casa vazia destacada ao selecionar uma carta. Abismo visualmente morto.
-
-**Mão.** Faixa embaixo, cartas comuns e Cargas visualmente distintas. Como a carta é quadrada e gira, a miniatura precisa mostrar as setas com clareza — nessa fase, um quadrado com as oito posições e os traços marcados já resolve. Arte pode ser placeholder.
-
-**Rotação.** Selecionou a carta, tecla `R` ou clique gira 90°. Antes de confirmar, mostrar em **overlay no tabuleiro** o que aquela colocação vai capturar. Isso não é conforto: é o que permite o jogador entender a regra sem ler o manual, e é o que faz o teste render.
-
-**Painéis laterais.** Capitão e Navio de cada jogador, com o passivo escrito e um indicador claro de **silenciado**.
-
-**Log de turno.** Texto corrido, uma linha por evento: `P1 colocou Leviatã (rot 90°) em D3 → abordou C3, confronto em D4 (8 vs 6) venceu, cadeia capturou E4`. É a ferramenta de depuração de regra mais barata que existe, e depois vira replay.
-
-**Hot-seat.** Tela de "passe o dispositivo" entre turnos, escondendo a mão. No setup, ocultar as colocações até a revelação.
+Uma leitura real já feita com essa ferramenta (config padrão, 20 partidas por par): `routeBot` bate `randomBot` 100% das vezes; `greedyBot` bate `routeBot` 65/35. Já é sinal, não é medo.
 
 ---
 
-## Testes automatizados a escrever primeiro
+## Interface — o que existe hoje
 
-Antes da UI. Cada um é uma regra que já mudou de ideia pelo menos uma vez nesta conversa.
+### Tela inicial
 
-1. Seta contra carta sem seta de volta → domínio, sem propagação.
-2. Seta contra seta → confronto; empate mantém com o defensor.
-3. Cadeia: só a partir de vitória em confronto, profundidade 1, sem capturar duas vezes a mesma carta no turno.
-4. Rotação: padrão de setas desloca 2 índices por giro; 4 giros voltam ao original.
-5. Navio: ângulo sem escudo cai sempre, ângulo com escudo exige poder estritamente maior que o Casco.
-6. Navio não pode ser colocado na borda; nunca é rotacionado; nunca propaga cadeia; nunca entra em rota.
-7. Navio pode ser dominado em turnos consecutivos, e o passivo do Capitão liga e desliga junto.
-8. Carga: neutra, não pode ser dominada, não pontua, não entra em rota.
-9. Carga jogada obriga descarte de carta comum — nunca de outra Carga — e repõe a mão até o limite.
-10. Mão nunca passa do limite; deck vazio não trava o turno.
-11. Rota: componente conexa por setas mútuas; empate na maior rota não dá bônus a ninguém.
-12. Pontuação final bate com a contagem manual num tabuleiro montado à mão.
+`components/start/StartScreen.tsx`. Título grande + tagline, seguido de todos os knobs de balanceamento do arquivo de config, seção por seção (Board, Hand & deck, Combat & scoring, Ship, Cargo, Draft, Card-creation chart). Botão "Start match" cria a partida com esse config.
+
+### Setup
+
+Cada jogador enterra o Navio (nunca na borda) e `config.setupHiddenCards` Cargas (nunca carta comum — a Carga que sobrar continua jogável no turno principal). **Alterna peça a peça** (`game/setupProgress.ts::nextSetupPlayer`): quem colocou menos peças até agora joga a seguir, empate resolvido pela ordem fixa dos jogadores. Um jogador que termina antes (Capitão com pouca Carga) simplesmente some da alternância e o outro termina sozinho, sem handoff redundante.
+
+### Tabuleiro e mão — arrastar e soltar
+
+Arraste a carta/Navio/Carga da mão até uma casa (`hooks/useDragPlacement.ts`). Scroll do mouse **ou** tecla `R` giram a carta enquanto ela está sendo arrastada. O clique clássico (selecionar → clicar na casa → confirmar) continua funcionando em paralelo, como caminho alternativo — os dois convergem pras mesmas ações do reducer.
+
+Antes de soltar, o tabuleiro já mostra em **overlay** o que aquela colocação vai capturar — não é um recurso à parte, é a própria `resolvePlacement` chamada de forma especulativa (`resolverColocação(estado_atual, ...)`, resultado nunca commitado a menos que o jogador solte ali).
+
+### Animações
+
+Três efeitos, todos derivados por diff (nenhuma mudança no motor pra existir):
+
+- **Drop** — qualquer casa que passa de vazia pra ocupada faz um bounce de entrada (setup ou turno principal).
+- **Dominada** — flash vermelho em cada casa realmente capturada pela última jogada.
+- **Dominando** — pulso verde na casa de quem acabou de capturar algo.
+
+### Painéis, log, hot-seat
+
+Capitão e Navio de cada jogador nas laterais, com indicador de **silenciado**. Log de turno em texto corrido (`formatLogEvent`), uma linha por evento. Tela de "passe o dispositivo" entre turnos e a cada peça do setup, escondendo a mão/decisão até a revelação.
+
+### Fim de partida — três telas
+
+1. **Contagem** (`ScoreCountingScreen`) — o total de cada jogador sobe de 0 até o valor real em paralelo, ~1.2s, avança sozinho.
+2. **Vencedor** (`WinnerScreen`) — só o resultado e os placares, limpo. Botões "Analyze" e "New match".
+3. **Análise** (`AnalysisScreen`) — atrás do botão "Analyze": resumo de telemetria, downloads JSON/CSV, log completo. "Back to result" volta pro vencedor sem recalcular nada (mesma telemetria computada uma vez em `EndSequence`).
+
+---
+
+## Testes automatizados
+
+✅ Escritos primeiro, como planejado — `packages/engine/test/`, 16 arquivos, 46 testes, Vitest. Os 12 originais (um por regra que mudou de ideia pelo menos uma vez):
+
+1. Seta contra carta sem seta de volta → domínio, sem propagação. (`boardingCard.test.ts`)
+2. Seta contra seta → confronto; empate mantém com o defensor. (`clashCard.test.ts`)
+3. Cadeia: só a partir de vitória em confronto, profundidade 1, sem capturar duas vezes. (`chain.test.ts`)
+4. Rotação: padrão de setas desloca 2 índices por giro; 4 giros voltam ao original. (`rotation.test.ts`)
+5. Navio: ângulo sem escudo cai sempre, ângulo com escudo exige poder estritamente maior que o Casco. (`shipResolution.test.ts`)
+6. Navio não pode ser colocado na borda; nunca é rotacionado (estrutural); nunca propaga cadeia; nunca entra em rota. (`shipPlacement.test.ts`)
+7. Navio pode ser dominado em turnos consecutivos, e o passivo do Capitão liga e desliga junto. (`captainSilencing.test.ts`)
+8. Carga: neutra, não pode ser dominada, não pontua, não entra em rota. (`cargoNeutral.test.ts`)
+9. Carga jogada obriga descarte de carta comum — nunca de outra Carga — e repõe a mão até o limite. (`cargoDiscard.test.ts`)
+10. Mão nunca passa do limite; deck vazio não trava o turno. (`handLimit.test.ts`)
+11. Rota: componente conexa por setas mútuas; empate na maior rota não dá bônus a ninguém. (`route.test.ts`)
+12. Pontuação final bate com a contagem manual num tabuleiro montado à mão. (`scoring.test.ts`)
+
+Mais: `telemetry.test.ts`, `bots.test.ts`, `simulation.test.ts`, `setupCargoOnly.test.ts` (a regra de setup só-Carga, incluindo o caso de borda de Capitão com pouca Carga).
 
 ---
 
 ## Marcos
 
-**M0 — Motor + testes.** Sem tela nenhuma. Roda no terminal, resolve uma partida inteira via script. É aqui que as regras param de ser texto e viram verdade.
+**M0 — Motor + testes.** ✅ Feito. Roda no terminal (`npm run simulate`), resolve uma partida inteira via script.
 
-**M1 — Hot-seat jogável.** Tabuleiro, mão, rotação, overlay de previsão, log. Suficiente pra jogar com outra pessoa na mesma tela.
+**M1 — Hot-seat jogável.** ✅ Feito, e evoluído depois: tabuleiro, mão, rotação e overlay de previsão continuam, mas a interação virou arrastar-e-soltar (clique ainda funciona em paralelo), ganhou animações de captura, uma tela inicial de verdade, e o setup passou a alternar peça a peça em vez de jogador a jogador.
 
-**M2 — Config + telemetria.** Painel de knobs, exportação, tela de agregação.
+**M2 — Config + telemetria.** ✅ Feito. Painel de knobs (tela inicial), exportação JSON/CSV, tela de agregação (Analysis, atrás de um botão pra manter a tela de resultado limpa).
 
-**M3 — Simulação.** Os três bots, execução em lote, relatório.
+**M3 — Simulação.** ✅ Feito. Os três bots, execução em lote (`npm run batch`), relatório com win rate e médias por métrica.
 
-**M4 — Opcional.** Partida por link, bot melhor, coleção persistente.
+**M4 — Opcional.** Não feito: bot melhor, partida por link, coleção persistente.
 
-O protótipo cumpriu a função dele quando você conseguir dizer, com número, quais dos sete itens da lista de teste eram problema de verdade — e quais eram medo.
+**Depois do M1, em rodadas de ajuste pós-playtest:** a regra de setup mudou de "2 itens quaisquer da mão" pra "só Carga, quantidade capada pela Carga disponível" (removeu o blefe original, decisão consciente do design); drag-and-drop com giro por scroll/tecla substituiu o clique como interação principal; animações de queda/domínio/dominação; setup passou a alternar por peça; fim de partida virou uma sequência de três telas em vez de uma só.
+
+O protótipo cumpriu a função dele quando você conseguir dizer, com número, quais dos sete itens da lista de teste eram problema de verdade — e quais eram medo. `npm run batch` já dá o primeiro pedaço dessa resposta de graça.
 
 ---
 
