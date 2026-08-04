@@ -229,32 +229,6 @@ header h1 {
   padding: 4px 6px;
 }
 
-/* --- eight-angle indicator --- */
-
-.eight-angle-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 2px;
-}
-
-.eight-angle-dot {
-  background: #2a3245;
-  border-radius: 3px;
-}
-
-.eight-angle-dot.active {
-  background: var(--accent);
-}
-
-.eight-angle-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
 /* --- card mini --- */
 
 .card-mini-button {
@@ -445,38 +419,15 @@ header h1 {
 }
 
 /* --- ship badge --- */
-
-.ship-badge {
-  border: 2px solid var(--border);
-  border-radius: 999px;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.06), transparent 70%);
-}
+/* ShipBadge itself now renders the shared .card-mini frame (see CardFrame.tsx) — the only
+   ship-specific styling left is the "not placed yet" placeholder, which isn't a real badge. */
 
 .ship-badge.pending {
+  border: 2px solid var(--border);
+  border-radius: 8px;
   color: var(--text-dim);
   padding: 16px 6px;
-  border-radius: 8px;
-}
-
-.ship-badge-name {
-  font-size: 0.65rem;
-  color: var(--text-dim);
-}
-
-.ship-badge-tag {
-  font-size: 0.55rem;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  font-weight: 700;
-}
-
-.ship-badge-hull {
-  font-weight: 700;
+  text-align: center;
 }
 
 /* --- hand --- */
@@ -545,10 +496,6 @@ header h1 {
   padding: 0;
   touch-action: none;
   user-select: none;
-}
-
-.ship-pickup.selected .ship-badge {
-  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .hand-actions {

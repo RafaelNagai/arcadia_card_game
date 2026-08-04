@@ -28,11 +28,16 @@ export function SetupPanel({ content, gameState, player, selection, targetCellId
       {!shipDone && (
         <button
           type="button"
-          className={`ship-pickup${selection?.mode === 'setup-ship' ? ' selected' : ''}`}
+          className="ship-pickup"
           onClick={() => dispatch({ type: 'SELECT_SETUP_SHIP' })}
           onPointerDown={(e) => startDrag(e, { type: 'SELECT_SETUP_SHIP' })}
         >
-          <ShipBadge ship={content.ships[player.shipId]} owner={player.id} compact />
+          <ShipBadge
+            ship={content.ships[player.shipId]}
+            owner={player.id}
+            compact
+            selected={selection?.mode === 'setup-ship'}
+          />
         </button>
       )}
 
