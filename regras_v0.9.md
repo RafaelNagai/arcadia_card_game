@@ -181,10 +181,10 @@ As cartas saem do **Baralho do Porto** (pilha comum) ou, em campanha, da coleç�
 1. Monte a grade e marque os **Abismos**. Casa morta.
 2. Cada jogador escolhe **Capitão** e **Navio** e revela os dois.
 3. Compre a mão: 7 cartas, sendo as Cargas do seu Capitão e o resto comprado do deck.
-4. **Setup escondido:** em ordem, revezando, cada jogador coloca **3 cartas viradas para baixo** — o **Navio** e mais **2 cartas da mão**, que podem ser Cargas ou cartas comuns. O Navio não pode ir na borda e entra em pé.
+4. **Setup escondido:** cada jogador coloca **o Navio e Cargas viradas para baixo**, na ordem que quiser — nunca carta comum. O Navio não pode ir na borda e entra em pé. O número de Cargas enterradas é o de sempre (padrão 2, configurável); se o Capitão tiver menos Carga do que isso, enterra só o que tiver — o resto da mão fica intocado.
 5. **Revela tudo de uma vez.** Complete a mão até 7.
 
-> As 2 cartas do setup virem da mão é o que faz o blefe existir: o adversário não sabe se você enterrou entulho ou uma carta de Poder 9 colocada no escuro.
+> O setup deixou de ser blefe (as 2 cartas escondidas eram carta-comum-ou-Carga antes; agora são sempre Carga, sem força nenhuma) e virou só a organização inicial do porão — Navio e lastro descendo antes da partida começar de verdade.
 
 ---
 

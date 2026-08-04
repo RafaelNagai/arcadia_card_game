@@ -14,8 +14,17 @@ export function hiddenItemsPlacedCount(state: GameState, playerId: PlayerId): nu
   }).length;
 }
 
+/** config.setupHiddenCards capped by however much Cargo the player actually has — Cargo
+ *  only ever leaves the hand (buried here, or played later), never returns, so
+ *  "already buried + still in hand" is a safe, uncached ceiling for the whole setup phase. */
+export function effectiveHiddenCargoTarget(state: GameState, playerId: PlayerId): number {
+  const player = state.players.find((p) => p.id === playerId)!;
+  const cargoInHand = player.hand.filter((i) => i.kind === 'cargo').length;
+  return Math.min(state.config.setupHiddenCards, hiddenItemsPlacedCount(state, playerId) + cargoInHand);
+}
+
 export function isSetupDoneForPlayer(state: GameState, playerId: PlayerId): boolean {
-  return isShipPlaced(state, playerId) && hiddenItemsPlacedCount(state, playerId) >= state.config.setupHiddenCards;
+  return isShipPlaced(state, playerId) && hiddenItemsPlacedCount(state, playerId) >= effectiveHiddenCargoTarget(state, playerId);
 }
 
 export function isSetupDoneForAll(state: GameState): boolean {

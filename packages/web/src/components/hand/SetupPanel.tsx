@@ -1,11 +1,9 @@
 import type { Dispatch } from 'react';
-import type { GameContent, GameState, Player } from '@eltyca/engine';
-import { CardMini } from '../card/CardMini';
+import type { GameState, Player } from '@eltyca/engine';
 import type { Action, Selection } from '../../reducer/types';
-import { hiddenItemsPlacedCount, isShipPlaced } from '../../game/setupProgress';
+import { effectiveHiddenCargoTarget, hiddenItemsPlacedCount, isShipPlaced } from '../../game/setupProgress';
 
 export interface SetupPanelProps {
-  content: GameContent;
   gameState: GameState;
   player: Player;
   selection: Selection | null;
@@ -13,15 +11,15 @@ export interface SetupPanelProps {
   dispatch: Dispatch<Action>;
 }
 
-export function SetupPanel({ content, gameState, player, selection, targetCellIdx, dispatch }: SetupPanelProps) {
+export function SetupPanel({ gameState, player, selection, targetCellIdx, dispatch }: SetupPanelProps) {
   const shipDone = isShipPlaced(gameState, player.id);
   const hiddenDone = hiddenItemsPlacedCount(gameState, player.id);
-  const hiddenNeeded = gameState.config.setupHiddenCards;
+  const hiddenNeeded = effectiveHiddenCargoTarget(gameState, player.id);
 
   return (
     <div className="setup-panel">
       <p>
-        Hidden setup for {player.id}: Ship {shipDone ? 'placed' : 'pending'} · {hiddenDone}/{hiddenNeeded} cards buried
+        Hidden setup for {player.id}: Ship {shipDone ? 'placed' : 'pending'} · {hiddenDone}/{hiddenNeeded} Cargo buried
       </p>
 
       {!shipDone && (
@@ -36,31 +34,18 @@ export function SetupPanel({ content, gameState, player, selection, targetCellId
 
       {hiddenDone < hiddenNeeded && (
         <div className="hand-strip">
-          {player.hand.map((item, idx) => {
-            const selected = selection?.mode === 'setup-hand' && selection.handIndex === idx;
-            if (item.kind === 'card') {
-              const card = content.cards[item.cardId];
-              return (
-                <CardMini
-                  key={idx}
-                  card={card}
-                  rotation={0}
-                  selected={selected}
-                  onClick={() => dispatch({ type: 'SELECT_SETUP_HAND_ITEM', handIndex: idx })}
-                />
-              );
-            }
-            return (
+          {player.hand
+            .filter((item) => item.kind === 'cargo')
+            .map((_, idx) => (
               <button
                 key={idx}
                 type="button"
-                className={`cargo-chip${selected ? ' selected' : ''}`}
-                onClick={() => dispatch({ type: 'SELECT_SETUP_HAND_ITEM', handIndex: idx })}
+                className={`cargo-chip${selection?.mode === 'setup-cargo' ? ' selected' : ''}`}
+                onClick={() => dispatch({ type: 'SELECT_SETUP_CARGO' })}
               >
                 Cargo
               </button>
-            );
-          })}
+            ))}
         </div>
       )}
 

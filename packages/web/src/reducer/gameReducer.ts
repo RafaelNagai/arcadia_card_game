@@ -33,14 +33,9 @@ export function gameReducer(state: UIState, action: Action): UIState {
       if (state.gameState.phase !== 'setup') return state;
       return { ...state, selection: { mode: 'setup-ship' }, targetCellIdx: null, error: null };
 
-    case 'SELECT_SETUP_HAND_ITEM':
+    case 'SELECT_SETUP_CARGO':
       if (state.gameState.phase !== 'setup') return state;
-      return {
-        ...state,
-        selection: { mode: 'setup-hand', handIndex: action.handIndex },
-        targetCellIdx: null,
-        error: null,
-      };
+      return { ...state, selection: { mode: 'setup-cargo' }, targetCellIdx: null, error: null };
 
     case 'SELECT_HAND_ITEM':
       if (state.gameState.phase !== 'main') return state;
@@ -112,17 +107,15 @@ function commitPlacement(state: UIState, discardCardId?: string): UIState {
 function commitSetupPlacement(state: UIState, selection: Selection, cellIdx: number): UIState {
   const activePlayerId = state.awaitingHandoff ?? nextSetupPlayer(state.gameState);
   if (!activePlayerId) return state;
-  const player = state.gameState.players.find((p) => p.id === activePlayerId)!;
 
   let item: SetupItem;
   if (selection.mode === 'setup-ship') {
     item = { kind: 'ship' };
-  } else if (selection.mode === 'setup-hand') {
-    item = player.hand[selection.handIndex];
+  } else if (selection.mode === 'setup-cargo') {
+    item = { kind: 'cargo' };
   } else {
-    throw new Error('Select the Ship or a hand item first');
+    throw new Error('Select the Ship or a Cargo token first');
   }
-  if (!item) throw new Error('Selected item is no longer in hand');
 
   let nextGameState = placeInSetup(state.gameState, activePlayerId, cellIdx, item);
 
@@ -140,8 +133,8 @@ function commitSetupPlacement(state: UIState, selection: Selection, cellIdx: num
     return { ...base, gameState: nextGameState, awaitingHandoff: nextGameState.turnPlayer };
   }
 
-  // Only hand off once this player has placed all 3 of their pieces — otherwise
-  // let them keep going without re-confirming "ready" after every single item.
+  // Only hand off once this player has buried the Ship and every required Cargo —
+  // otherwise let them keep going without re-confirming "ready" after every single item.
   const stillActing = !isSetupDoneForPlayer(nextGameState, activePlayerId);
   return { ...base, awaitingHandoff: stillActing ? null : nextSetupPlayer(nextGameState) };
 }

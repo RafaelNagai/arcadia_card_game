@@ -2,7 +2,7 @@ import type { GameContent, GameState, PlayerId, Rotation } from '@eltyca/engine'
 
 export type Selection =
   | { mode: 'setup-ship' }
-  | { mode: 'setup-hand'; handIndex: number }
+  | { mode: 'setup-cargo' }
   | { mode: 'main-hand'; handIndex: number; rotation: Rotation };
 
 export interface UIState {
@@ -20,7 +20,7 @@ export interface UIState {
 export type Action =
   | { type: 'CONFIRM_HANDOFF' }
   | { type: 'SELECT_SETUP_SHIP' }
-  | { type: 'SELECT_SETUP_HAND_ITEM'; handIndex: number }
+  | { type: 'SELECT_SETUP_CARGO' }
   | { type: 'SELECT_HAND_ITEM'; handIndex: number }
   | { type: 'ROTATE' }
   | { type: 'SELECT_CELL'; cellIdx: number }

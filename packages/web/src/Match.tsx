@@ -70,7 +70,6 @@ export default function Match({ config, onNewMatch }: MatchProps) {
           />
           <aside>
             <SetupPanel
-              content={content}
               gameState={gameState}
               player={player}
               selection={state.selection}

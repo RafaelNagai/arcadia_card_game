@@ -29,10 +29,12 @@ function findFirstEmptyNonEdgeCell(state: GameState): number {
 function runSetupForPlayer(state: GameState, playerId: PlayerId): GameState {
   let working = placeInSetup(state, playerId, findFirstEmptyNonEdgeCell(state), { kind: 'ship' });
 
-  for (let i = 0; i < working.config.setupHiddenCards; i++) {
-    const player = working.players.find((p) => p.id === playerId)!;
-    const item = player.hand[0];
-    working = placeInSetup(working, playerId, findFirstEmptyCell(working), item);
+  const player = working.players.find((p) => p.id === playerId)!;
+  const cargoInHand = player.hand.filter((i) => i.kind === 'cargo').length;
+  const target = Math.min(working.config.setupHiddenCards, cargoInHand);
+
+  for (let i = 0; i < target; i++) {
+    working = placeInSetup(working, playerId, findFirstEmptyCell(working), { kind: 'cargo' });
   }
 
   return working;

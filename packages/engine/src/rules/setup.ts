@@ -1,22 +1,18 @@
-import type { GameState, HandItem, PlayerId, Rotation } from '../types';
+import type { GameState, PlayerId } from '../types';
 import { cloneState } from '../util/clone';
 import { isOnEdge } from '../util/grid';
-import { refillHand, removeCardFromHand, removeCargoFromHand } from './hand';
+import { refillHand, removeCargoFromHand } from './hand';
 
-export type SetupItem = HandItem | { kind: 'ship' };
+export type SetupItem = { kind: 'cargo' } | { kind: 'ship' };
 
 /**
- * Places one of the 3 hidden setup pieces (the Ship, or a card/Cargo from hand) face-down.
- * Unlike resolvePlacement, this never resolves arrows or captures — everything stays
- * hidden until revealSetup flips the board over.
+ * Places one of the hidden setup pieces (the Ship, or a Cargo token from hand) face-down.
+ * A common card is never a legal setup item — the hidden pieces are always the Ship
+ * (once) plus Cargo (see setupProgress.ts for how many). Unlike resolvePlacement, this
+ * never resolves arrows or captures — everything stays hidden until revealSetup flips
+ * the board over.
  */
-export function placeInSetup(
-  state: GameState,
-  playerId: PlayerId,
-  cellIdx: number,
-  item: SetupItem,
-  rotation: Rotation = 0
-): GameState {
+export function placeInSetup(state: GameState, playerId: PlayerId, cellIdx: number, item: SetupItem): GameState {
   if (state.phase !== 'setup') throw new Error('placeInSetup can only be used during the setup phase');
 
   const player = state.players.find((p) => p.id === playerId);
@@ -31,12 +27,8 @@ export function placeInSetup(
     if (!state.config.shipOnEdge && isOnEdge(cellIdx, state.grid)) {
       throw new Error('The Ship cannot be placed on the edge of the board');
     }
-  } else {
-    const isInHand =
-      item.kind === 'cargo'
-        ? player.hand.some((i) => i.kind === 'cargo')
-        : player.hand.some((i) => i.kind === 'card' && i.cardId === item.cardId);
-    if (!isInHand) throw new Error("Item is not in the player's hand");
+  } else if (!player.hand.some((i) => i.kind === 'cargo')) {
+    throw new Error('Player has no Cargo left in hand to bury');
   }
 
   const working = cloneState(state);
@@ -45,12 +37,9 @@ export function placeInSetup(
 
   if (item.kind === 'ship') {
     workingCell.content = { kind: 'ship', shipId: player.shipId, owner: playerId };
-  } else if (item.kind === 'cargo') {
+  } else {
     removeCargoFromHand(workingPlayer);
     workingCell.content = { kind: 'cargo', placedBy: playerId };
-  } else {
-    removeCardFromHand(workingPlayer, item.cardId);
-    workingCell.content = { kind: 'card', cardId: item.cardId, rot: rotation, owner: playerId };
   }
   workingCell.hiddenUntil = 'setup';
 

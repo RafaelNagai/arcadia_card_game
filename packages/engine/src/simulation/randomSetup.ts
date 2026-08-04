@@ -11,13 +11,14 @@ export function randomSetupForPlayer(state: GameState, playerId: PlayerId, rng: 
   const shipCell = shipCells[Math.floor(rng() * shipCells.length)];
   working = placeInSetup(working, playerId, shipCell.idx, { kind: 'ship' });
 
-  for (let i = 0; i < working.config.setupHiddenCards; i++) {
-    const player = working.players.find((p) => p.id === playerId)!;
-    if (player.hand.length === 0) break;
-    const item = player.hand[Math.floor(rng() * player.hand.length)];
+  const player = working.players.find((p) => p.id === playerId)!;
+  const cargoInHand = player.hand.filter((i) => i.kind === 'cargo').length;
+  const target = Math.min(working.config.setupHiddenCards, cargoInHand);
+
+  for (let i = 0; i < target; i++) {
     const emptyCells = working.cells.filter((c) => !c.chasm && c.content === null);
     const cell = emptyCells[Math.floor(rng() * emptyCells.length)];
-    working = placeInSetup(working, playerId, cell.idx, item);
+    working = placeInSetup(working, playerId, cell.idx, { kind: 'cargo' });
   }
 
   return working;
