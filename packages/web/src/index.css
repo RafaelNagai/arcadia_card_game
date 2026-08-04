@@ -677,33 +677,45 @@ header h1 {
 
 /* --- landing page --- */
 
+/* Full-bleed hero: key art behind the title, like a game's main menu, instead of a
+   placeholder box above a plain form. */
 .landing {
-  max-width: 480px;
-  margin: 8vh auto 0;
-  padding: 0 16px 64px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.landing-art {
+  position: relative;
+  min-height: 100dvh;
   width: 100%;
-  aspect-ratio: 16 / 10;
-  border-radius: 16px;
-  border: 1px dashed var(--border);
-  background: radial-gradient(circle at 30% 20%, rgba(74, 222, 128, 0.12), transparent 60%),
-    radial-gradient(circle at 70% 80%, rgba(59, 130, 246, 0.12), transparent 60%), var(--panel);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
-.landing-art-label {
-  color: var(--text-dim);
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Darkens toward the bottom, where the title/buttons sit, so they stay legible over
+   arbitrary art without needing a solid panel behind them. */
+.landing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(6, 8, 14, 0.25) 0%, rgba(6, 8, 14, 0.55) 60%, rgba(6, 8, 14, 0.94) 100%);
+  z-index: 1;
+}
+
+.landing-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 0 16px 8vh;
 }
 
 .landing-actions {
