@@ -1,4 +1,4 @@
-import type { Dispatch } from 'react';
+import type { Dispatch, PointerEvent } from 'react';
 import type { GameContent, Player } from '@eltyca/engine';
 import { CardMini } from '../card/CardMini';
 import type { Action, Selection } from '../../reducer/types';
@@ -9,9 +9,10 @@ export interface HandProps {
   selection: Selection | null;
   targetCellIdx: number | null;
   dispatch: Dispatch<Action>;
+  startDrag: (event: PointerEvent, selectAction: Action) => void;
 }
 
-export function Hand({ content, player, selection, targetCellIdx, dispatch }: HandProps) {
+export function Hand({ content, player, selection, targetCellIdx, dispatch, startDrag }: HandProps) {
   const selectedHandIndex = selection?.mode === 'main-hand' ? selection.handIndex : null;
   const selectedItem = selectedHandIndex !== null ? player.hand[selectedHandIndex] : null;
   const showDiscardPicker = selectedItem?.kind === 'cargo' && targetCellIdx !== null;
@@ -30,6 +31,7 @@ export function Hand({ content, player, selection, targetCellIdx, dispatch }: Ha
                 rotation={rotation}
                 selected={selectedHandIndex === idx}
                 onClick={() => dispatch({ type: 'SELECT_HAND_ITEM', handIndex: idx })}
+                onPointerDown={(e) => startDrag(e, { type: 'SELECT_HAND_ITEM', handIndex: idx })}
               />
             );
           }
@@ -39,6 +41,7 @@ export function Hand({ content, player, selection, targetCellIdx, dispatch }: Ha
               type="button"
               className={`cargo-chip${selectedHandIndex === idx ? ' selected' : ''}`}
               onClick={() => dispatch({ type: 'SELECT_HAND_ITEM', handIndex: idx })}
+              onPointerDown={(e) => startDrag(e, { type: 'SELECT_HAND_ITEM', handIndex: idx })}
             >
               Cargo
             </button>

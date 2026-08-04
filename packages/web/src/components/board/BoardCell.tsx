@@ -37,7 +37,13 @@ export function BoardCell({ cell, gameState, content, captured, isTarget, select
   }
 
   return (
-    <button type="button" className={classes.join(' ')} onClick={onClick} disabled={!selectable}>
+    <button
+      type="button"
+      className={classes.join(' ')}
+      data-cell-idx={cell.idx}
+      onClick={onClick}
+      disabled={!selectable}
+    >
       {inner}
     </button>
   );

@@ -3,6 +3,7 @@ import type { Config, GameState } from '@eltyca/engine';
 import { createInitialState, sampleContent, samplePlayerSetups } from '@eltyca/engine';
 import { createInitialUIState, gameReducer } from './reducer/gameReducer';
 import { Board } from './components/board/Board';
+import { DragGhost } from './components/board/DragGhost';
 import { Hand } from './components/hand/Hand';
 import { SetupPanel } from './components/hand/SetupPanel';
 import { PanelCaptain } from './components/panels/PanelCaptain';
@@ -11,6 +12,7 @@ import { LogPanel } from './components/log/LogPanel';
 import { HotSeatScreen } from './components/hotseat/HotSeatScreen';
 import { EndScreen } from './components/end/EndScreen';
 import { useRotateShortcut } from './hooks/useRotateShortcut';
+import { useDragPlacement } from './hooks/useDragPlacement';
 import { nextSetupPlayer } from './game/setupProgress';
 
 export interface MatchProps {
@@ -31,6 +33,7 @@ export default function Match({ config, onNewMatch }: MatchProps) {
     (initialConfig) => createInitialUIState(sampleContent, buildInitialState(initialConfig))
   );
   useRotateShortcut(state.selection, dispatch);
+  const { ghostPos, startDrag } = useDragPlacement(dispatch, state.gameState, state.selection);
 
   const { gameState, content } = state;
 
@@ -70,14 +73,17 @@ export default function Match({ config, onNewMatch }: MatchProps) {
           />
           <aside>
             <SetupPanel
+              content={content}
               gameState={gameState}
               player={player}
               selection={state.selection}
               targetCellIdx={state.targetCellIdx}
               dispatch={dispatch}
+              startDrag={startDrag}
             />
           </aside>
         </div>
+        <DragGhost ghostPos={ghostPos} selection={state.selection} content={content} player={player} />
       </div>
     );
   }
@@ -119,7 +125,9 @@ export default function Match({ config, onNewMatch }: MatchProps) {
         selection={state.selection}
         targetCellIdx={state.targetCellIdx}
         dispatch={dispatch}
+        startDrag={startDrag}
       />
+      <DragGhost ghostPos={ghostPos} selection={state.selection} content={content} player={activePlayer} />
     </div>
   );
 }

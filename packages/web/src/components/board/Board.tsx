@@ -1,6 +1,7 @@
-import { isOnEdge, type GameContent, type GameState } from '@eltyca/engine';
+import type { GameContent, GameState } from '@eltyca/engine';
 import { BoardCell } from './BoardCell';
 import type { Selection } from '../../reducer/types';
+import { isLegalDropCell } from '../../game/dropTargets';
 
 export interface BoardProps {
   /** The state actually shown — the live gameState, or a speculative previewState while a target cell is picked. */
@@ -15,7 +16,6 @@ export interface BoardProps {
 
 export function Board({ displayState, baseState, content, selection, targetCellIdx, onSelectCell }: BoardProps) {
   const { grid } = displayState;
-  const shipNeedsInterior = selection?.mode === 'setup-ship' && !baseState.config.shipOnEdge;
 
   return (
     <div className="board" style={{ gridTemplateColumns: `repeat(${grid.width}, 1fr)` }}>
@@ -29,7 +29,7 @@ export function Board({ displayState, baseState, content, selection, targetCellI
           'owner' in baseCell.content &&
           cell.content.owner !== baseCell.content.owner;
 
-        const legalForSelection = !shipNeedsInterior || !isOnEdge(cell.idx, baseState.grid);
+        const selectable = isLegalDropCell(baseState, selection, cell.idx);
 
         return (
           <BoardCell
@@ -38,8 +38,8 @@ export function Board({ displayState, baseState, content, selection, targetCellI
             gameState={displayState}
             content={content}
             captured={captured}
-            isTarget={cell.idx === targetCellIdx}
-            selectable={selection !== null && legalForSelection && !baseCell.chasm && baseCell.content === null}
+            isTarget={selectable && cell.idx === targetCellIdx}
+            selectable={selectable}
             onClick={() => onSelectCell(cell.idx)}
           />
         );
