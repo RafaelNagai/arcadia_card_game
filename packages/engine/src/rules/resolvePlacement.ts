@@ -128,6 +128,10 @@ export function resolvePlacement(
       ? attackerPower > defenderPower
       : attackerPower >= defenderPower;
 
+    const dominated =
+      attackerWins &&
+      canBeDominated({ state: working, content, attackerIdx: cellIdx, defenderIdx: neighborIdx });
+
     results.push({
       type: 'clash',
       targetIdx: neighborIdx,
@@ -135,12 +139,10 @@ export function resolvePlacement(
       attackerPower,
       defenderPower,
       winner: attackerWins ? 'attacker' : 'defender',
+      dominated,
     });
 
-    if (
-      attackerWins &&
-      canBeDominated({ state: working, content, attackerIdx: cellIdx, defenderIdx: neighborIdx })
-    ) {
+    if (dominated) {
       captures.set(neighborIdx, playerId);
       dominatedByClash.push(neighborIdx);
     }

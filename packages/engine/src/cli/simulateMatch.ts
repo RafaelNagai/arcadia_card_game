@@ -5,6 +5,7 @@ import { placeInSetup, revealSetup } from '../rules/setup';
 import { isGameOver, playTurn } from '../rules/turn';
 import { computeScores, determineWinner } from '../rules/scoring';
 import { formatLogEvent } from '../rules/log';
+import { computeTelemetry } from '../telemetry/computeTelemetry';
 import { isOnEdge } from '../util/grid';
 import type { GameContent, GameState, PlayerId } from '../types';
 
@@ -75,6 +76,34 @@ function run(): void {
 
   const winner = determineWinner(scores);
   console.log(winner === 'drift' ? '\nResult: Drift (tie)' : `\nResult: ${winner} wins`);
+
+  const telemetry = computeTelemetry(state, sampleContent, samplePlayerSetups);
+  console.log('\n--- Telemetry ---');
+  console.log(`Cargo plays: P1 turns ${telemetry.metrics.cargoPlaysByPlayer.P1.join(', ') || '(none)'}` +
+    ` · P2 turns ${telemetry.metrics.cargoPlaysByPlayer.P2.join(', ') || '(none)'}`);
+  console.log(
+    `Ship ownership changes: ${telemetry.metrics.shipOwnershipChanges
+      .map((c) => `turn ${c.turnNumber}: ${c.from} -> ${c.to}`)
+      .join(' | ') || '(none)'}`
+  );
+  console.log(
+    `First Ship fall: P1 turn ${telemetry.metrics.firstShipFallTurn.P1 ?? 'never'}` +
+      ` · P2 turn ${telemetry.metrics.firstShipFallTurn.P2 ?? 'never'}`
+  );
+  console.log(
+    `Dominations — boarding: ${telemetry.metrics.dominationsByType.boarding}` +
+      `, clash: ${telemetry.metrics.dominationsByType.clash}` +
+      `, chain: ${telemetry.metrics.dominationsByType.chain}`
+  );
+  console.log(
+    `Largest route — P1: ${telemetry.metrics.largestRouteByPlayer.P1}` +
+      `, P2: ${telemetry.metrics.largestRouteByPlayer.P2}`
+  );
+  console.log(
+    `Never played — P1: [${telemetry.metrics.neverPlayedCardsByPlayer.P1.join(', ')}]` +
+      ` · P2: [${telemetry.metrics.neverPlayedCardsByPlayer.P2.join(', ')}]`
+  );
+  console.log(`Victory margin: ${telemetry.metrics.victoryMargin}`);
 
   if (!isGameOver(state)) {
     throw new Error(`Simulation hit the turn cap (${maxTurns}) without finishing — board did not fill.`);

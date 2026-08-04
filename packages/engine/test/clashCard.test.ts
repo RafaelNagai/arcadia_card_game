@@ -24,7 +24,15 @@ describe('Test 2 — Clash: arrow against arrow', () => {
 
     expect(newState.cells[13].content).toMatchObject({ kind: 'card', owner: 'P1' });
     expect(newState.log.at(-1)!.results).toEqual([
-      { type: 'clash', targetIdx: 13, direction: 2, attackerPower: 8, defenderPower: 5, winner: 'attacker' },
+      {
+        type: 'clash',
+        targetIdx: 13,
+        direction: 2,
+        attackerPower: 8,
+        defenderPower: 5,
+        winner: 'attacker',
+        dominated: true,
+      },
     ]);
   });
 
@@ -49,7 +57,15 @@ describe('Test 2 — Clash: arrow against arrow', () => {
 
     expect(newState.cells[13].content).toMatchObject({ kind: 'card', owner: 'P2' });
     expect(newState.log.at(-1)!.results).toEqual([
-      { type: 'clash', targetIdx: 13, direction: 2, attackerPower: 6, defenderPower: 6, winner: 'defender' },
+      {
+        type: 'clash',
+        targetIdx: 13,
+        direction: 2,
+        attackerPower: 6,
+        defenderPower: 6,
+        winner: 'defender',
+        dominated: false,
+      },
     ]);
   });
 });

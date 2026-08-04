@@ -18,6 +18,10 @@ export { largestRoute, routeBonusWinner } from './rules/route';
 export { computeScores, determineWinner, type Score } from './rules/scoring';
 export { formatLogEvent } from './rules/log';
 
+export { computeTelemetry, type MatchTelemetry, type ShipOwnershipChange } from './telemetry/computeTelemetry';
+export { toTelemetryRow, rowsToCsv, type TelemetryRow } from './telemetry/csv';
+export { telemetryToJson } from './telemetry/serialize';
+
 export {
   sampleCards,
   sampleCaptains,

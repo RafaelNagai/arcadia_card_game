@@ -89,6 +89,8 @@ export type DirectionResult =
       attackerPower: number;
       defenderPower: number;
       winner: 'attacker' | 'defender';
+      /** false when the attacker won but a Lock effect blocked the capture anyway. */
+      dominated: boolean;
     }
   | { type: 'ship-open'; targetIdx: number; direction: number }
   | {
