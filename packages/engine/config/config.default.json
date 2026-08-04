@@ -1,0 +1,26 @@
+{
+  "grid": { "width": 5, "height": 5 },
+  "chasms": [12],
+  "maxHandSize": 7,
+  "deckSize": 12,
+  "draftPerRound": 4,
+  "draftRounds": 3,
+  "routeBonus": 3,
+  "chainDepth": 1,
+  "tieKeepsDefender": true,
+  "shipOnEdge": false,
+  "shipRotatable": false,
+  "discardCanBeCargo": false,
+  "setupHiddenCards": 2,
+  "powerChart": {
+    "2": 10,
+    "3": 9,
+    "4": 8,
+    "5": 7,
+    "6": 6,
+    "7": 5,
+    "8": 4
+  },
+  "modifierCost": 2,
+  "lockCost": 4
+}
