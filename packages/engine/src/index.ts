@@ -22,6 +22,12 @@ export { computeTelemetry, type MatchTelemetry, type ShipOwnershipChange } from 
 export { toTelemetryRow, rowsToCsv, type TelemetryRow } from './telemetry/csv';
 export { telemetryToJson } from './telemetry/serialize';
 
+export { randomBot, greedyBot, routeBot, BOTS, BOT_NAMES, type Bot, type BotContext, type BotMove, type BotName } from './bots';
+export { randomSetupForPlayer } from './simulation/randomSetup';
+export { runMatch, type MatchRunOptions, type MatchRunResult } from './simulation/runMatch';
+export { runBatch, type BatchOptions, type BatchResult } from './simulation/runBatch';
+export { summarizeBatch, type BatchSummary } from './simulation/summarize';
+
 export {
   sampleCards,
   sampleCaptains,

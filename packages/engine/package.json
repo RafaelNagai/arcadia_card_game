@@ -8,7 +8,8 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "simulate": "tsx src/cli/simulateMatch.ts"
+    "simulate": "tsx src/cli/simulateMatch.ts",
+    "batch": "tsx src/cli/runBatch.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
