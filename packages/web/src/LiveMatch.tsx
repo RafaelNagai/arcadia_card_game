@@ -58,6 +58,7 @@ export default function LiveMatch({ config, playerSetups, onNewMatch }: LiveMatc
       <EndSequence
         gameState={gameState}
         content={content}
+        playerSetups={playerSetups}
         durationMs={Date.now() - startedAt.current}
         onNewMatch={onNewMatch}
       />

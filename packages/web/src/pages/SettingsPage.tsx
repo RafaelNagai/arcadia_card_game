@@ -148,7 +148,7 @@ export function SettingsPage() {
 
       <section>
         <h2>
-          Draft <span className="knob-note">(Porto mode not implemented — this build only plays Route/constructed decks)</span>
+          Draft <span className="knob-note">(every match plays Porto — these control the shared draft pool)</span>
         </h2>
         <label>
           Cards opened per round
