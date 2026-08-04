@@ -542,11 +542,6 @@ header h1 {
   border-color: var(--accent);
 }
 
-.panel-captain h3 {
-  margin: 0 0 4px;
-  font-size: 0.9rem;
-}
-
 .panel-captain p {
   margin: 2px 0;
   font-size: 0.78rem;

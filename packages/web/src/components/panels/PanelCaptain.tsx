@@ -1,4 +1,5 @@
 import { isCaptainSilenced, type Captain, type GameState, type Player } from '@eltyca/engine';
+import { CaptainBadge } from '../card/CaptainBadge';
 
 export interface PanelCaptainProps {
   captain: Captain;
@@ -12,7 +13,7 @@ export function PanelCaptain({ captain, player, gameState }: PanelCaptainProps) 
 
   return (
     <div className={`panel-captain${silenced ? ' silenced' : ''}`}>
-      <h3>{captain.name}</h3>
+      <CaptainBadge captain={captain} owner={player.id} />
       <p>
         Cargo: {cargoInHand} in hand (started with {captain.cargoSlots})
       </p>
