@@ -260,7 +260,8 @@ header h1 {
   pointer-events: none;
 }
 
-.card-mini-button:hover .card-mini {
+.card-mini-button:hover .card-mini,
+.choice-card:hover .card-mini {
   transform: translateY(-4px);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.5);
 }
@@ -826,6 +827,32 @@ header h1 {
 
 .power-chart-grid input {
   max-width: 100%;
+}
+
+/* --- draft / choice --- */
+
+.choice-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.choice-card {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.choice-confirmed {
+  opacity: 0.85;
+}
+
+.draft-picked-counts {
+  display: flex;
+  gap: 16px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
 }
 
 /* --- drag ghost --- */

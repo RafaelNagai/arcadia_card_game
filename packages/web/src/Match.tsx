@@ -1,148 +1,43 @@
-import { useReducer, useRef } from 'react';
-import type { Config, GameState } from '@eltyca/engine';
-import { createInitialState, sampleContent, samplePlayerSetups } from '@eltyca/engine';
-import { createInitialUIState, gameReducer } from './reducer/gameReducer';
-import { Board } from './components/board/Board';
-import { DragGhost } from './components/board/DragGhost';
-import { Hand } from './components/hand/Hand';
-import { SetupPanel } from './components/hand/SetupPanel';
-import { PanelCaptain } from './components/panels/PanelCaptain';
-import { PanelShip } from './components/panels/PanelShip';
-import { LogPanel } from './components/log/LogPanel';
-import { HotSeatScreen } from './components/hotseat/HotSeatScreen';
-import { EndSequence } from './components/end/EndSequence';
-import { useRotateShortcut } from './hooks/useRotateShortcut';
-import { useDragPlacement } from './hooks/useDragPlacement';
-import { useCommitAnimations } from './hooks/useCommitAnimations';
-import { useHandDrawAnimation } from './hooks/useHandDrawAnimation';
-import { nextSetupPlayer } from './game/setupProgress';
+import { useReducer } from 'react';
+import type { Config } from '@eltyca/engine';
+import { createDraftState, sampleContent, toPlayerSetups } from '@eltyca/engine';
+import { createInitialDraftUIState, draftReducer } from './reducer/draftReducer';
+import { ChoiceScreen } from './components/draft/ChoiceScreen';
+import { DraftScreen } from './components/draft/DraftScreen';
+import LiveMatch from './LiveMatch';
 
 export interface MatchProps {
   config: Config;
   onNewMatch: () => void;
 }
 
-function buildInitialState(config: Config): GameState {
-  const seed = Math.floor(Math.random() * 1_000_000);
-  return createInitialState(config, samplePlayerSetups, seed);
-}
-
+/** Pre-game orchestrator: runs Captain/Ship choice, then the Porto draft, entirely as its
+ *  own small reducer — see reducer/draftReducer.ts and @eltyca/engine's rules/draft.ts for
+ *  why this is kept separate from the real match state rather than folded into it. Once the
+ *  draft reaches stage 'done', hands the result to LiveMatch (the actual game — this used to
+ *  be the whole of Match.tsx before the draft existed), which knows nothing about how the
+ *  Captain/Ship/deck it received were decided. */
 export default function Match({ config, onNewMatch }: MatchProps) {
-  const startedAt = useRef(Date.now());
-  const [state, dispatch] = useReducer(
-    gameReducer,
-    config,
-    (initialConfig) => createInitialUIState(sampleContent, buildInitialState(initialConfig))
-  );
-  useRotateShortcut(state.selection, dispatch);
-  const { ghostPos, startDrag } = useDragPlacement(dispatch, state.gameState, state.selection);
-  const commitEffects = useCommitAnimations(state.gameState, state.awaitingHandoff);
+  const [draftState, dispatch] = useReducer(draftReducer, config, (initialConfig) => {
+    const seed = Math.floor(Math.random() * 1_000_000);
+    return createInitialDraftUIState(sampleContent, createDraftState(sampleContent, initialConfig, ['P1', 'P2'], seed));
+  });
 
-  const { gameState, content } = state;
+  const { draft } = draftState;
 
-  // Tracked here (not inside Hand.tsx) because Hand unmounts every hot-seat handoff —
-  // this needs to survive that to know what each player's hand looked like last time.
-  const turnPlayer = gameState.players.find((p) => p.id === gameState.turnPlayer);
-  const newlyDrawnCount = useHandDrawAnimation(gameState.turnPlayer, turnPlayer?.hand ?? []);
-
-  if (state.awaitingHandoff) {
-    return <HotSeatScreen playerId={state.awaitingHandoff} dispatch={dispatch} />;
-  }
-
-  if (gameState.phase === 'end') {
-    return (
-      <EndSequence
-        gameState={gameState}
-        content={content}
-        durationMs={Date.now() - startedAt.current}
-        onNewMatch={onNewMatch}
-      />
-    );
-  }
-
-  if (gameState.phase === 'setup') {
-    const activePlayerId = nextSetupPlayer(gameState)!;
-    const player = gameState.players.find((p) => p.id === activePlayerId)!;
-
+  if (draft.stage !== 'done') {
     return (
       <div className="game-screen">
-        <header>
-          <h1>ELTYCA (setup)</h1>
-        </header>
-        {state.error && <div className="error-banner">{state.error}</div>}
-        <div className="layout">
-          <div className="board-wrapper">
-            <Board
-              displayState={gameState}
-              baseState={gameState}
-              content={content}
-              selection={state.selection}
-              targetCellIdx={state.targetCellIdx}
-              onSelectCell={(idx) => dispatch({ type: 'SELECT_CELL', cellIdx: idx })}
-              commitEffects={commitEffects}
-            />
-          </div>
-          <aside>
-            <SetupPanel
-              content={content}
-              gameState={gameState}
-              player={player}
-              selection={state.selection}
-              targetCellIdx={state.targetCellIdx}
-              dispatch={dispatch}
-              startDrag={startDrag}
-            />
-          </aside>
-        </div>
-        <DragGhost ghostPos={ghostPos} selection={state.selection} content={content} player={player} />
+        {draftState.error && <div className="error-banner">{draftState.error}</div>}
+        {draft.stage === 'choice' ? (
+          <ChoiceScreen content={draftState.content} draft={draft} dispatch={dispatch} />
+        ) : (
+          <DraftScreen content={draftState.content} draft={draft} dispatch={dispatch} />
+        )}
       </div>
     );
   }
 
-  // main phase
-  const activePlayer = gameState.players.find((p) => p.id === gameState.turnPlayer)!;
-  const displayState = state.previewState ?? gameState;
-
-  return (
-    <div className="game-screen">
-      <header>
-        <h1>
-          Turn {gameState.turnNumber} · {activePlayer.id} to play
-        </h1>
-      </header>
-      {state.error && <div className="error-banner">{state.error}</div>}
-      <div className="layout">
-        <div className="board-wrapper">
-          <Board
-            displayState={displayState}
-            baseState={gameState}
-            content={content}
-            selection={state.selection}
-            targetCellIdx={state.targetCellIdx}
-            onSelectCell={(idx) => dispatch({ type: 'SELECT_CELL', cellIdx: idx })}
-            commitEffects={commitEffects}
-          />
-        </div>
-        <aside>
-          {gameState.players.map((p) => (
-            <div key={p.id} className={`player-panels${p.id === activePlayer.id ? ' active' : ''}`}>
-              <PanelCaptain captain={content.captains[p.captainId]} player={p} gameState={gameState} />
-              <PanelShip content={content} gameState={gameState} player={p} />
-            </div>
-          ))}
-          <LogPanel gameState={gameState} content={content} />
-        </aside>
-      </div>
-      <Hand
-        content={content}
-        player={activePlayer}
-        selection={state.selection}
-        targetCellIdx={state.targetCellIdx}
-        dispatch={dispatch}
-        startDrag={startDrag}
-        newlyDrawnCount={newlyDrawnCount}
-      />
-      <DragGhost ghostPos={ghostPos} selection={state.selection} content={content} player={activePlayer} />
-    </div>
-  );
+  const playerSetups = toPlayerSetups(draft, draftState.content);
+  return <LiveMatch config={config} playerSetups={playerSetups} onNewMatch={onNewMatch} />;
 }
