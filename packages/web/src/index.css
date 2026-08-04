@@ -855,6 +855,53 @@ header h1 {
   font-size: 0.85rem;
 }
 
+/* Wider and row-oriented than the plain .start-screen column it's layered on — room for the
+   deck-so-far sidebar next to the pool. */
+.draft-screen {
+  max-width: 1100px;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.draft-deck-panel {
+  flex: 0 0 250px;
+  position: sticky;
+  top: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.draft-deck-panel h2 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.draft-deck-empty {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+.draft-deck-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.draft-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 /* --- drag ghost --- */
 
 .drag-ghost {

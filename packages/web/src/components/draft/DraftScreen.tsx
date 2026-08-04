@@ -15,36 +15,56 @@ export interface DraftScreenProps {
 export function DraftScreen({ content, draft, dispatch }: DraftScreenProps) {
   const picker = draft.currentPicker;
   if (!picker) return null;
+  const picked = draft.players.find((p) => p.id === picker)!.pickedCardIds;
 
   return (
     <div className="start-screen draft-screen">
-      <div className="start-hero">
-        <h1>Porto Draft</h1>
-        <p className="start-tagline">
-          Round {draft.round}/{draft.totalRounds} · {picker} to pick
-        </p>
-      </div>
+      <aside className="draft-deck-panel">
+        <h2>
+          {picker}'s deck ({picked.length})
+        </h2>
+        {picked.length === 0 ? (
+          <p className="draft-deck-empty">No cards picked yet.</p>
+        ) : (
+          <div className="draft-deck-list">
+            {/* Keyed by index — a drafted deck can end up with duplicate card ids (see the
+                pool comment below), same reasoning as the table below. */}
+            {picked.map((cardId, idx) => (
+              <CardMini key={idx} card={content.cards[cardId]} rotation={0} compact />
+            ))}
+          </div>
+        )}
+      </aside>
 
-      <div className="draft-picked-counts">
-        {draft.players.map((p) => (
-          <span key={p.id}>
-            {p.id}: {p.pickedCardIds.length} picked
-          </span>
-        ))}
-      </div>
+      <div className="draft-main">
+        <div className="start-hero">
+          <h1>Porto Draft</h1>
+          <p className="start-tagline">
+            Round {draft.round}/{draft.totalRounds} · {picker} to pick
+          </p>
+        </div>
 
-      <div className="choice-grid">
-        {/* Keyed by index, not cardId — the pool intentionally reuses common card ids within
-            the same revealed round (see rules/draft.ts), so cardId alone isn't unique here.
-            Index is safe: cards are only ever removed from this array, never reordered. */}
-        {draft.tableCards.map((cardId, idx) => (
-          <CardMini
-            key={idx}
-            card={content.cards[cardId]}
-            rotation={0}
-            onClick={() => dispatch({ type: 'PICK_CARD', playerId: picker, cardId })}
-          />
-        ))}
+        <div className="draft-picked-counts">
+          {draft.players.map((p) => (
+            <span key={p.id}>
+              {p.id}: {p.pickedCardIds.length} picked
+            </span>
+          ))}
+        </div>
+
+        <div className="choice-grid">
+          {/* Keyed by index, not cardId — the pool intentionally reuses common card ids within
+              the same revealed round (see rules/draft.ts), so cardId alone isn't unique here.
+              Index is safe: cards are only ever removed from this array, never reordered. */}
+          {draft.tableCards.map((cardId, idx) => (
+            <CardMini
+              key={idx}
+              card={content.cards[cardId]}
+              rotation={0}
+              onClick={() => dispatch({ type: 'PICK_CARD', playerId: picker, cardId })}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
