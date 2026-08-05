@@ -39,9 +39,22 @@ export interface LiveMatchProps {
    *  opponent piece no longer looks like a placed Ship/Cargo). LiveMatch itself stays
    *  agnostic to which source it came from. */
   activeSetupPlayer: PlayerId | null;
+  /** Online only (ignored in hot-seat, where there's no concept of "connected"): whether the
+   *  opponent's socket is currently open. A simple static banner, not the richer forfeit-timer
+   *  UX the multiplayer plan explicitly scoped out — just enough that a player isn't left
+   *  wondering why a move never comes. */
+  opponentConnected?: boolean;
 }
 
-export default function LiveMatch({ state, dispatch, playerSetups, onNewMatch, viewerId, activeSetupPlayer }: LiveMatchProps) {
+export default function LiveMatch({
+  state,
+  dispatch,
+  playerSetups,
+  onNewMatch,
+  viewerId,
+  activeSetupPlayer,
+  opponentConnected = true,
+}: LiveMatchProps) {
   const startedAt = useRef(Date.now());
   useRotateShortcut(state.selection, dispatch);
   const { ghostPos, startDrag } = useDragPlacement(dispatch, state.gameState, state.selection);
@@ -95,6 +108,9 @@ export default function LiveMatch({ state, dispatch, playerSetups, onNewMatch, v
           <h1>ELTYCA (setup){viewerId && !canAct ? ` — waiting for ${activeSetupPlayer}` : ''}</h1>
         </header>
         {state.error && <div className="error-banner">{state.error}</div>}
+        {viewerId && !opponentConnected && (
+          <div className="opponent-disconnected-banner">Your opponent disconnected — waiting for them to come back…</div>
+        )}
         <div className="layout">
           <div className="board-wrapper">
             <Board

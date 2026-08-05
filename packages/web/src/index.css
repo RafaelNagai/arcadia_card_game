@@ -829,6 +829,37 @@ header h1 {
   max-width: 100%;
 }
 
+/* --- online room lobby --- */
+
+.room-code-box {
+  align-self: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 20px;
+}
+
+.room-code-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.opponent-disconnected-banner {
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: center;
+  flex: none;
+}
+
 /* --- draft / choice --- */
 
 .choice-grid {

@@ -42,7 +42,13 @@ export function OnlineRoomPage() {
     return (
       <div className="game-screen">
         {online.error && <div className="error-banner">{online.error}</div>}
-        <RoomLobby code={code!} opponentConnected={online.opponentConnected} onStart={online.startMatch} />
+        <RoomLobby
+          code={code!}
+          opponentConnected={online.opponentConnected}
+          you={online.you}
+          onStart={online.startMatch}
+          onLeave={() => navigate('/online')}
+        />
       </div>
     );
   }
@@ -51,6 +57,9 @@ export function OnlineRoomPage() {
     return (
       <div className="game-screen">
         {online.error && <div className="error-banner">{online.error}</div>}
+        {!online.opponentConnected && (
+          <div className="opponent-disconnected-banner">Your opponent disconnected — waiting for them to come back…</div>
+        )}
         {online.draftUIState.draft.stage === 'choice' ? (
           <ChoiceScreen content={online.draftUIState.content} draft={online.draftUIState.draft} dispatch={online.dispatchDraft} />
         ) : (
@@ -69,6 +78,7 @@ export function OnlineRoomPage() {
         onNewMatch={() => navigate('/online')}
         viewerId={online.you}
         activeSetupPlayer={online.setupProgress?.activePlayer ?? null}
+        opponentConnected={online.opponentConnected}
       />
     );
   }

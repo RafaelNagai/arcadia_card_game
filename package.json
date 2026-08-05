@@ -5,11 +5,13 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "npm run test --workspace=packages/engine",
+    "test": "npm run test --workspace=packages/engine && npm run test --workspace=packages/server",
     "test:watch": "npm run test:watch --workspace=packages/engine",
     "simulate": "npm run simulate --workspace=packages/engine",
     "batch": "npm run batch --workspace=packages/engine",
-    "dev:web": "npm run dev --workspace=packages/web"
+    "dev:web": "npm run dev --workspace=packages/web",
+    "dev:server": "npm run dev --workspace=packages/server",
+    "deploy:server": "npm run deploy --workspace=packages/server"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
