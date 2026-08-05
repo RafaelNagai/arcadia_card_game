@@ -42,7 +42,7 @@ export function ScoreCountingScreen({ finalScore, onDone }: ScoreCountingScreenP
 
   return (
     <div className="app app-end">
-      <h1>Tallying the score…</h1>
+      <h1>Contando a pontuação…</h1>
       <div className="scores">
         {finalScore.map((score) => (
           <div key={score.player} className="score-card">

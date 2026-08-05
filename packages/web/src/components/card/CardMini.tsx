@@ -1,7 +1,7 @@
 import type { PointerEvent } from 'react';
 import { effectiveArrows, type Card, type PlayerId, type Rotation } from '@eltyca/engine';
 import { CardFrame } from './CardFrame';
-import { ELEMENT_COLORS, PLAYER_COLORS } from '../../game/theme';
+import { ELEMENT_COLORS, ELEMENT_LABELS, PLAYER_COLORS, TYPE_LABELS } from '../../game/theme';
 
 export interface CardMiniProps {
   card: Card;
@@ -23,7 +23,7 @@ export function CardMini({ card, rotation, owner, displayPower, selected, compac
   const power = displayPower ?? card.power;
   const modified = power !== card.power;
 
-  const title = `${card.name} — power ${power}${modified ? ` (base ${card.power})` : ''} — ${card.type}/${card.element}${card.effect ? ` — ${card.effect.description}` : ''}`;
+  const title = `${card.name} — poder ${power}${modified ? ` (base ${card.power})` : ''} — ${TYPE_LABELS[card.type]}/${ELEMENT_LABELS[card.element]}${card.effect ? ` — ${card.effect.description}` : ''}`;
 
   const body = (
     <CardFrame
@@ -33,7 +33,7 @@ export function CardMini({ card, rotation, owner, displayPower, selected, compac
       centerValue={power}
       centerValueModified={modified}
       name={card.name}
-      tags={[{ text: card.element, color: elementColor }, { text: card.type }]}
+      tags={[{ text: ELEMENT_LABELS[card.element], color: elementColor }, { text: TYPE_LABELS[card.type] }]}
       compact={compact}
       selected={selected}
       title={onClick ? undefined : title}

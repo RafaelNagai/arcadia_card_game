@@ -12,16 +12,16 @@ export function WinnerScreen({ telemetry, onAnalyze, onNewMatch }: WinnerScreenP
 
   return (
     <div className="app app-end">
-      <h1>{winner === 'drift' ? 'Drift — tie' : `${winner} wins`}</h1>
-      {surrenderedBy && <p className="surrender-note">{surrenderedBy} surrendered the match</p>}
+      <h1>{winner === 'drift' ? 'Deriva — empate' : `${winner} vence`}</h1>
+      {surrenderedBy && <p className="surrender-note">{surrenderedBy} desistiu da partida</p>}
 
       <div className="scores">
         {finalScore.map((score) => (
           <div key={score.player} className="score-card">
             <h2>{score.player}</h2>
-            <p>{score.cardPoints} cards</p>
-            <p>{score.shipPoints} ship(s)</p>
-            <p>{score.routeBonus} route bonus</p>
+            <p>{score.cardPoints} carta(s)</p>
+            <p>{score.shipPoints} navio(s)</p>
+            <p>{score.routeBonus} bônus de rota</p>
             <p className="score-total">Total: {score.total}</p>
           </div>
         ))}
@@ -29,10 +29,10 @@ export function WinnerScreen({ telemetry, onAnalyze, onNewMatch }: WinnerScreenP
 
       <div className="winner-actions">
         <button type="button" onClick={onAnalyze}>
-          Analyze
+          Analisar
         </button>
         <button type="button" className="confirm" onClick={onNewMatch}>
-          New match
+          Nova partida
         </button>
       </div>
     </div>

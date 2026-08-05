@@ -17,14 +17,14 @@ export function PanelShip({ content, gameState, player }: PanelShipProps) {
       {controller ? (
         <ShipBadge ship={ship} owner={controller} />
       ) : (
-        <div className="ship-badge pending">Not placed yet</div>
+        <div className="ship-badge pending">Ainda não colocado</div>
       )}
       <p>
         {controller === player.id
-          ? 'Under your control'
+          ? 'Sob seu controle'
           : controller
-            ? `Captured by ${controller}`
-            : 'Waiting for setup'}
+            ? `Dominado por ${controller}`
+            : 'Aguardando preparação'}
       </p>
     </div>
   );

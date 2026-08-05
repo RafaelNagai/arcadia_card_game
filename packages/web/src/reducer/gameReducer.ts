@@ -171,7 +171,7 @@ function commitSetupPlacement(state: UIState, selection: Selection, cellIdx: num
   } else if (selection.mode === 'setup-cargo') {
     item = { kind: 'cargo' };
   } else {
-    throw new Error('Select the Ship or a Cargo token first');
+    throw new Error('Selecione o Navio ou uma ficha de Carga primeiro');
   }
 
   let nextGameState = placeInSetup(state.gameState as GameState, activePlayerId, cellIdx, item);
@@ -207,7 +207,7 @@ function commitMainPlacement(
   if (selection.mode !== 'main-hand') return state;
   const player = state.gameState.players.find((p) => p.id === state.gameState.turnPlayer)! as Player;
   const item = player.hand[selection.handIndex];
-  if (!item) throw new Error('Selected item is no longer in hand');
+  if (!item) throw new Error('O item selecionado não está mais na mão');
 
   const nextGameState = playTurn(
     state.gameState as GameState,

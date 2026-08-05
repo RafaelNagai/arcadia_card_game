@@ -53,7 +53,7 @@ export async function savePersistedRoom(storage: DurableObjectStorage, state: Pe
 
 export class RoomFullError extends Error {
   constructor() {
-    super('This room already has two players.');
+    super('Esta sala já tem dois jogadores.');
   }
 }
 

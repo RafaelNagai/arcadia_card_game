@@ -4,62 +4,62 @@
     "name": "Navah",
     "cargoSlots": 4,
     "imageUrl": "/captains/captain-01.jpg",
-    "passive": { "id": "captain-loud-voice", "description": "Your Creature cards have +2 power · your NPC cards have -1." }
+    "passive": { "id": "captain-loud-voice", "description": "Suas cartas de Criatura têm +2 de Poder · suas cartas de NPC têm -1." }
   },
   {
     "id": "captain-2",
     "name": "Navarro",
     "cargoSlots": 3,
     "imageUrl": "/captains/captain-02.jpg",
-    "passive": { "id": "captain-tide-broker", "description": "Your Astral cards have +2 power · your Paradox cards have -1." }
+    "passive": { "id": "captain-tide-broker", "description": "Suas cartas de Astral têm +2 de Poder · suas cartas de Paradoxo têm -1." }
   },
   {
     "id": "captain-3",
     "name": "Annya",
     "cargoSlots": 3,
     "imageUrl": "/captains/captain-03.jpg",
-    "passive": { "id": "captain-tide-broker", "description": "Your Astral cards have +2 power · your Paradox cards have -1." }
+    "passive": { "id": "captain-tide-broker", "description": "Suas cartas de Astral têm +2 de Poder · suas cartas de Paradoxo têm -1." }
   },
   {
     "id": "captain-4",
     "name": "Favacha",
     "cargoSlots": 3,
     "imageUrl": "/captains/captain-04.jpg",
-    "passive": { "id": "captain-tide-broker", "description": "Your Astral cards have +2 power · your Paradox cards have -1." }
+    "passive": { "id": "captain-tide-broker", "description": "Suas cartas de Astral têm +2 de Poder · suas cartas de Paradoxo têm -1." }
   },
   {
     "id": "captain-5",
-    "name": "Violet",
+    "name": "Violeta",
     "cargoSlots": 3,
     "imageUrl": "/captains/captain-05.jpg",
-    "passive": { "id": "captain-tide-broker", "description": "Your Astral cards have +2 power · your Paradox cards have -1." }
+    "passive": { "id": "captain-tide-broker", "description": "Suas cartas de Astral têm +2 de Poder · suas cartas de Paradoxo têm -1." }
   },
   {
     "id": "captain-6",
     "name": "Loren",
     "cargoSlots": 3,
     "imageUrl": "/captains/captain-06.jpg",
-    "passive": { "id": "captain-tide-broker", "description": "Your Astral cards have +2 power · your Paradox cards have -1." }
+    "passive": { "id": "captain-tide-broker", "description": "Suas cartas de Astral têm +2 de Poder · suas cartas de Paradoxo têm -1." }
   },
   {
     "id": "captain-7",
     "name": "Katty",
     "cargoSlots": 3,
     "imageUrl": "/captains/captain-07.jpg",
-    "passive": { "id": "captain-tide-broker", "description": "Your Astral cards have +2 power · your Paradox cards have -1." }
+    "passive": { "id": "captain-tide-broker", "description": "Suas cartas de Astral têm +2 de Poder · suas cartas de Paradoxo têm -1." }
   },
   {
     "id": "captain-8",
     "name": "Golar",
     "cargoSlots": 3,
     "imageUrl": "/captains/captain-08.jpg",
-    "passive": { "id": "captain-tide-broker", "description": "Your Astral cards have +2 power · your Paradox cards have -1." }
+    "passive": { "id": "captain-tide-broker", "description": "Suas cartas de Astral têm +2 de Poder · suas cartas de Paradoxo têm -1." }
   },
   {
     "id": "captain-9",
     "name": "Oswald",
     "cargoSlots": 3,
     "imageUrl": "/captains/captain-09.jpg",
-    "passive": { "id": "captain-tide-broker", "description": "Your Astral cards have +2 power · your Paradox cards have -1." }
+    "passive": { "id": "captain-tide-broker", "description": "Suas cartas de Astral têm +2 de Poder · suas cartas de Paradoxo têm -1." }
   }
 ]

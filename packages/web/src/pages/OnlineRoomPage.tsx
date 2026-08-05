@@ -21,7 +21,7 @@ export function OnlineRoomPage() {
     return (
       <div className="start-screen">
         <div className="start-hero">
-          <h1>Connecting…</h1>
+          <h1>Conectando…</h1>
         </div>
       </div>
     );
@@ -31,7 +31,7 @@ export function OnlineRoomPage() {
     return (
       <div className="start-screen">
         <div className="start-hero">
-          <h1>Disconnected</h1>
+          <h1>Desconectado</h1>
         </div>
         {online.error && <div className="error-banner">{online.error}</div>}
       </div>
@@ -58,7 +58,7 @@ export function OnlineRoomPage() {
       <div className="game-screen">
         {online.error && <div className="error-banner">{online.error}</div>}
         {!online.opponentConnected && (
-          <div className="opponent-disconnected-banner">Your opponent disconnected — waiting for them to come back…</div>
+          <div className="opponent-disconnected-banner">Seu adversário desconectou — aguardando ele(a) voltar…</div>
         )}
         {online.draftUIState.draft.stage === 'choice' ? (
           <ChoiceScreen content={online.draftUIState.content} draft={online.draftUIState.draft} dispatch={online.dispatchDraft} />

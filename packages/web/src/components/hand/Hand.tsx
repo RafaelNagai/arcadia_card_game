@@ -62,7 +62,7 @@ export function Hand({
                 onClick={() => dispatch({ type: 'SELECT_HAND_ITEM', handIndex: idx })}
                 onPointerDown={(e) => startDrag(e, { type: 'SELECT_HAND_ITEM', handIndex: idx })}
               >
-                Cargo
+                Carga
               </button>
             </div>
           );
@@ -73,13 +73,13 @@ export function Hand({
         <div className="hand-actions">
           {selectedItem?.kind === 'card' && (
             <button type="button" onClick={() => dispatch({ type: 'ROTATE' })}>
-              Rotate (R)
+              Girar (R)
             </button>
           )}
 
           {showDiscardPicker ? (
             <div className="discard-picker">
-              <span>Discard which card to play the Cargo?</span>
+              <span>Descartar qual carta para jogar a Carga?</span>
               {player.hand.map((item, idx) =>
                 item.kind === 'card' ? (
                   <button
@@ -87,7 +87,7 @@ export function Hand({
                     type="button"
                     onClick={() => dispatch({ type: 'CONFIRM_PLACEMENT', discardCardId: item.cardId })}
                   >
-                    Discard {content.cards[item.cardId].name}
+                    Descartar {content.cards[item.cardId].name}
                   </button>
                 ) : null
               )}
@@ -95,13 +95,13 @@ export function Hand({
           ) : (
             targetCellIdx !== null && (
               <button type="button" className="confirm" onClick={() => dispatch({ type: 'CONFIRM_PLACEMENT' })}>
-                Confirm placement
+                Confirmar colocação
               </button>
             )
           )}
 
           <button type="button" onClick={() => dispatch({ type: 'CANCEL_SELECTION' })}>
-            Cancel
+            Cancelar
           </button>
         </div>
       )}

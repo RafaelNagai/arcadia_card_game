@@ -39,7 +39,7 @@ export class EltycaRoom extends Server<Env> {
     const url = new URL(ctx.request.url);
     const clientId = url.searchParams.get('clientId');
     if (!clientId) {
-      send(connection, { type: 'error', message: 'Missing clientId' });
+      send(connection, { type: 'error', message: 'clientId ausente' });
       connection.close();
       return;
     }

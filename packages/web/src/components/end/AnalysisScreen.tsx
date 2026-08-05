@@ -24,33 +24,33 @@ export function AnalysisScreen({ telemetry, gameState, content, onBack, onNewMat
 
   return (
     <div className="app app-end">
-      <h1>Match analysis</h1>
+      <h1>Análise da partida</h1>
       <p className="analysis-recap">
-        {recap} — {winner === 'drift' ? 'Drift (tie)' : `${winner} wins`}
+        {recap} — {winner === 'drift' ? 'Deriva (empate)' : `${winner} vence`}
       </p>
 
       <div className="telemetry-summary">
-        <h2>Telemetry</h2>
+        <h2>Telemetria</h2>
         <ul>
-          <li>Turns played: {telemetry.turnCount}</li>
-          <li>Victory margin: {metrics.victoryMargin}</li>
+          <li>Turnos jogados: {telemetry.turnCount}</li>
+          <li>Margem de vitória: {metrics.victoryMargin}</li>
           <li>
-            Cargo plays — P1: {metrics.cargoPlaysByPlayer.P1.length}, P2: {metrics.cargoPlaysByPlayer.P2.length}
+            Cargas jogadas — P1: {metrics.cargoPlaysByPlayer.P1.length}, P2: {metrics.cargoPlaysByPlayer.P2.length}
           </li>
-          <li>Ship changed hands {metrics.shipOwnershipChanges.length} time(s)</li>
+          <li>Navio trocou de mão {metrics.shipOwnershipChanges.length} vez(es)</li>
           <li>
-            First Ship fall — P1: {metrics.firstShipFallTurn.P1 ?? 'never'}, P2:{' '}
-            {metrics.firstShipFallTurn.P2 ?? 'never'}
-          </li>
-          <li>
-            Dominations — boarding: {metrics.dominationsByType.boarding}, clash: {metrics.dominationsByType.clash},
-            chain: {metrics.dominationsByType.chain}
+            Primeira queda do Navio — P1: {metrics.firstShipFallTurn.P1 ?? 'nunca'}, P2:{' '}
+            {metrics.firstShipFallTurn.P2 ?? 'nunca'}
           </li>
           <li>
-            Largest route — P1: {metrics.largestRouteByPlayer.P1}, P2: {metrics.largestRouteByPlayer.P2}
+            Domínios — abordagem: {metrics.dominationsByType.boarding}, confronto: {metrics.dominationsByType.clash},
+            cadeia: {metrics.dominationsByType.chain}
           </li>
           <li>
-            Never-played cards — P1: {metrics.neverPlayedCardsByPlayer.P1.length}, P2:{' '}
+            Maior rota — P1: {metrics.largestRouteByPlayer.P1}, P2: {metrics.largestRouteByPlayer.P2}
+          </li>
+          <li>
+            Cartas nunca jogadas — P1: {metrics.neverPlayedCardsByPlayer.P1.length}, P2:{' '}
             {metrics.neverPlayedCardsByPlayer.P2.length}
           </li>
         </ul>
@@ -61,7 +61,7 @@ export function AnalysisScreen({ telemetry, gameState, content, onBack, onNewMat
               downloadTextFile(`eltyca-match-${telemetry.seed}.json`, telemetryToJson(telemetry), 'application/json')
             }
           >
-            Download JSON
+            Baixar JSON
           </button>
           <button
             type="button"
@@ -73,7 +73,7 @@ export function AnalysisScreen({ telemetry, gameState, content, onBack, onNewMat
               )
             }
           >
-            Download CSV
+            Baixar CSV
           </button>
         </div>
       </div>
@@ -82,10 +82,10 @@ export function AnalysisScreen({ telemetry, gameState, content, onBack, onNewMat
 
       <div className="winner-actions">
         <button type="button" onClick={onBack}>
-          Back to result
+          Voltar ao resultado
         </button>
         <button type="button" className="confirm" onClick={onNewMatch}>
-          New match
+          Nova partida
         </button>
       </div>
     </div>

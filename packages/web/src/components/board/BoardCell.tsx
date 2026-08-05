@@ -55,7 +55,7 @@ export function BoardCell({
     const ship = content.ships[cell.content.shipId];
     inner = <ShipBadge ship={ship} owner={cell.content.owner} compact />;
   } else if (cell.content?.kind === 'cargo') {
-    inner = <div className="board-cell-cargo">Cargo</div>;
+    inner = <div className="board-cell-cargo">Carga</div>;
   }
 
   return (

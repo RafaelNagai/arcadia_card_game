@@ -20,11 +20,11 @@ export function PanelCaptain({ captain, player, gameState }: PanelCaptainProps) 
     <div className={`panel-captain${silenced ? ' silenced' : ''}`}>
       <CaptainBadge captain={captain} owner={player.id} />
       <p>
-        Cargo: {cargoInHand} in hand (started with {captain.cargoSlots})
+        Carga: {cargoInHand} na mão (começou com {captain.cargoSlots})
       </p>
       {captain.passive && (
         <p className="passive">
-          {silenced && <span className="silenced-tag">SILENCED — </span>}
+          {silenced && <span className="silenced-tag">SILENCIADO — </span>}
           {captain.passive.description}
         </p>
       )}

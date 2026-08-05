@@ -15,18 +15,21 @@ export function LandingPage() {
       <div className="landing-content">
         <div className="start-hero">
           <h1>ELTYCA</h1>
-          <p className="start-tagline">Hot-seat · 2 players</p>
+          <p className="start-tagline">Local · 2 jogadores</p>
         </div>
 
         <div className="landing-actions">
           <button type="button" className="confirm" onClick={() => void navigate('/game')}>
-            Start
+            Iniciar
           </button>
           <button type="button" onClick={() => void navigate('/online')}>
-            Play online
+            Jogar online
+          </button>
+          <button type="button" onClick={() => void navigate('/tutorial')}>
+            Como jogar
           </button>
           <button type="button" onClick={() => void navigate('/settings')}>
-            Settings
+            Configurações
           </button>
         </div>
       </div>

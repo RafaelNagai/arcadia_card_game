@@ -29,29 +29,29 @@ export function RoomLobby({ code, opponentConnected, you, onStart, onLeave }: Ro
   return (
     <div className="start-screen">
       <div className="start-hero">
-        <h1>Room {code}</h1>
-        <p className="start-tagline">Share this code with a friend{you ? ` · You are ${you}` : ''}</p>
+        <h1>Sala {code}</h1>
+        <p className="start-tagline">Compartilhe este código com um amigo{you ? ` · Você é ${you}` : ''}</p>
       </div>
 
       <section>
         <div className="room-code-box">{code}</div>
         <div className="room-code-actions">
           <button type="button" onClick={() => copyCode(code)}>
-            {codeCopied ? 'Copied!' : 'Copy code'}
+            {codeCopied ? 'Copiado!' : 'Copiar código'}
           </button>
           <button type="button" onClick={() => copyLink(window.location.href)}>
-            {linkCopied ? 'Copied!' : 'Copy invite link'}
+            {linkCopied ? 'Copiado!' : 'Copiar link de convite'}
           </button>
         </div>
 
-        <p>{opponentConnected ? 'Your friend is here.' : 'Waiting for your friend to join…'}</p>
+        <p>{opponentConnected ? 'Seu amigo chegou.' : 'Aguardando seu amigo entrar…'}</p>
         <button type="button" className="confirm" onClick={onStart} disabled={!opponentConnected}>
-          Start
+          Iniciar
         </button>
       </section>
 
       <button type="button" onClick={onLeave}>
-        Leave room
+        Sair da sala
       </button>
     </div>
   );

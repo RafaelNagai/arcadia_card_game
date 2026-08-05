@@ -26,26 +26,26 @@ export function SettingsPage() {
   return (
     <div className="start-screen">
       <div className="start-hero">
-        <h1>Settings</h1>
-        <p className="start-tagline">Every balance knob from the spec, in one place</p>
+        <h1>Configurações</h1>
+        <p className="start-tagline">Todos os ajustes de balanceamento da especificação, num só lugar</p>
       </div>
 
       <p className="config-intro">
-        Fields marked "not wired" are saved and exported with telemetry but don't change resolution yet.
+        Campos marcados "não conectado" são salvos e exportados com a telemetria, mas ainda não mudam a resolução das jogadas.
       </p>
 
       <section>
-        <h2>Board</h2>
+        <h2>Tabuleiro</h2>
         <label>
-          Width
+          Largura
           <input type="number" min={3} value={config.grid.width} onChange={(e) => setGrid('width', Number(e.target.value))} />
         </label>
         <label>
-          Height
+          Altura
           <input type="number" min={3} value={config.grid.height} onChange={(e) => setGrid('height', Number(e.target.value))} />
         </label>
         <label>
-          Chasms (comma-separated cell indices)
+          Abismos (índices de casa separados por vírgula)
           <input
             type="text"
             defaultValue={config.chasms.join(', ')}
@@ -63,9 +63,9 @@ export function SettingsPage() {
       </section>
 
       <section>
-        <h2>Hand &amp; deck</h2>
+        <h2>Mão &amp; baralho</h2>
         <label>
-          Max hand size
+          Tamanho máximo da mão
           <input
             type="number"
             min={1}
@@ -74,23 +74,23 @@ export function SettingsPage() {
           />
         </label>
         <label>
-          Deck size <span className="knob-note">(not wired — decks come from the player setup directly)</span>
+          Tamanho do baralho <span className="knob-note">(não conectado — os baralhos vêm direto da preparação dos jogadores)</span>
           <input type="number" min={1} value={config.deckSize} onChange={(e) => set('deckSize', Number(e.target.value))} />
         </label>
       </section>
 
       <section>
-        <h2>Combat &amp; scoring</h2>
+        <h2>Combate &amp; pontuação</h2>
         <label className="checkbox">
           <input
             type="checkbox"
             checked={config.tieKeepsDefender}
             onChange={(e) => set('tieKeepsDefender', e.target.checked)}
           />
-          Tie keeps the defender
+          Empate mantém o defensor
         </label>
         <label>
-          Chain depth
+          Profundidade da cadeia
           <input
             type="number"
             min={0}
@@ -105,26 +105,26 @@ export function SettingsPage() {
             checked={chainUnlimited}
             onChange={(e) => set('chainDepth', e.target.checked ? Infinity : 1)}
           />
-          Unlimited chain depth
+          Profundidade de cadeia ilimitada
         </label>
         <label>
-          Route bonus
+          Bônus de rota
           <input type="number" min={0} value={config.routeBonus} onChange={(e) => set('routeBonus', Number(e.target.value))} />
         </label>
       </section>
 
       <section>
-        <h2>Ship</h2>
+        <h2>Navio</h2>
         <label className="checkbox">
           <input type="checkbox" checked={config.shipOnEdge} onChange={(e) => set('shipOnEdge', e.target.checked)} />
-          Ship can be placed on the edge
+          Navio pode ser colocado na borda
         </label>
         <label className="checkbox">
           <input type="checkbox" checked={config.shipRotatable} disabled />
-          Ship is rotatable <span className="knob-note">(not wired — regras_v0.9.md treats this as absolute)</span>
+          Navio pode ser rotacionado <span className="knob-note">(não conectado — o regras_v0.9.md trata isso como absoluto)</span>
         </label>
         <label>
-          Hidden setup items per player
+          Itens escondidos na preparação por jogador
           <input
             type="number"
             min={0}
@@ -135,23 +135,23 @@ export function SettingsPage() {
       </section>
 
       <section>
-        <h2>Cargo</h2>
+        <h2>Carga</h2>
         <label className="checkbox">
           <input
             type="checkbox"
             checked={config.discardCanBeCargo}
             onChange={(e) => set('discardCanBeCargo', e.target.checked)}
           />
-          Discard can be another Cargo once no common card is left
+          Descarte pode ser outra Carga quando não sobrar carta comum
         </label>
       </section>
 
       <section>
         <h2>
-          Draft <span className="knob-note">(every match plays Porto — these control the shared draft pool)</span>
+          Draft <span className="knob-note">(toda partida usa o Porto — isto controla o conjunto de draft compartilhado)</span>
         </h2>
         <label>
-          Cards opened per round
+          Cartas abertas por rodada
           <input
             type="number"
             min={1}
@@ -160,35 +160,35 @@ export function SettingsPage() {
           />
         </label>
         <label>
-          Draft rounds
+          Rodadas de draft
           <input type="number" min={1} value={config.draftRounds} onChange={(e) => set('draftRounds', Number(e.target.value))} />
         </label>
       </section>
 
       <section>
         <h2>
-          Card-creation chart <span className="knob-note">(design-time reference only, never read at runtime)</span>
+          Gabarito de criação de carta <span className="knob-note">(referência apenas de design, nunca lida em tempo real)</span>
         </h2>
         <div className="power-chart-grid">
           {Object.entries(config.powerChart).map(([arrows, power]) => (
             <label key={arrows}>
-              {arrows} arrows
+              {arrows} setas
               <input type="number" value={power} onChange={(e) => setPowerChart(arrows, Number(e.target.value))} />
             </label>
           ))}
         </div>
         <label>
-          Modifier cost
+          Custo do modificador
           <input type="number" value={config.modifierCost} onChange={(e) => set('modifierCost', Number(e.target.value))} />
         </label>
         <label>
-          Lock cost
+          Custo da trava
           <input type="number" value={config.lockCost} onChange={(e) => set('lockCost', Number(e.target.value))} />
         </label>
       </section>
 
       <button type="button" className="confirm" onClick={() => void navigate('/')}>
-        Back to menu
+        Voltar ao menu
       </button>
     </div>
   );

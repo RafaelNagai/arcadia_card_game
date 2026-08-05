@@ -21,10 +21,10 @@ export function DraftScreen({ content, draft, dispatch }: DraftScreenProps) {
     <div className="start-screen draft-screen">
       <aside className="draft-deck-panel">
         <h2>
-          {picker}'s deck ({picked.length})
+          Baralho de {picker} ({picked.length})
         </h2>
         {picked.length === 0 ? (
-          <p className="draft-deck-empty">No cards picked yet.</p>
+          <p className="draft-deck-empty">Nenhuma carta escolhida ainda.</p>
         ) : (
           <div className="draft-deck-list">
             {/* Keyed by index — a drafted deck can end up with duplicate card ids (see the
@@ -38,16 +38,16 @@ export function DraftScreen({ content, draft, dispatch }: DraftScreenProps) {
 
       <div className="draft-main">
         <div className="start-hero">
-          <h1>Porto Draft</h1>
+          <h1>Draft do Porto</h1>
           <p className="start-tagline">
-            Round {draft.round}/{draft.totalRounds} · {picker} to pick
+            Rodada {draft.round}/{draft.totalRounds} · {picker} escolhe
           </p>
         </div>
 
         <div className="draft-picked-counts">
           {draft.players.map((p) => (
             <span key={p.id}>
-              {p.id}: {p.pickedCardIds.length} picked
+              {p.id}: {p.pickedCardIds.length} escolhida(s)
             </span>
           ))}
         </div>

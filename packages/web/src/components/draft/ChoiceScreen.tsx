@@ -22,12 +22,12 @@ export function ChoiceScreen({ content, draft, dispatch }: ChoiceScreenProps) {
   return (
     <div className="start-screen choice-screen">
       <div className="start-hero">
-        <h1>Choose your Captain &amp; Ship</h1>
-        <p className="start-tagline">{chooser} to choose</p>
+        <h1>Escolha seu Capitão &amp; Navio</h1>
+        <p className="start-tagline">{chooser} escolhe</p>
       </div>
 
       <section>
-        <h2>Captain</h2>
+        <h2>Capitão</h2>
         {player.captainId ? (
           <div className="choice-confirmed">
             <CaptainBadge captain={content.captains[player.captainId]} owner={chooser} />
@@ -49,7 +49,7 @@ export function ChoiceScreen({ content, draft, dispatch }: ChoiceScreenProps) {
       </section>
 
       <section>
-        <h2>Ship</h2>
+        <h2>Navio</h2>
         {player.shipId ? (
           <div className="choice-confirmed">
             <ShipBadge ship={content.ships[player.shipId]} owner={chooser} />

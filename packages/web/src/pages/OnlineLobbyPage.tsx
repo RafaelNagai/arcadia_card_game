@@ -12,19 +12,19 @@ export function OnlineLobbyPage() {
   return (
     <div className="start-screen">
       <div className="start-hero">
-        <h1>Play online</h1>
-        <p className="start-tagline">Create a room, or join one with a code</p>
+        <h1>Jogar online</h1>
+        <p className="start-tagline">Crie uma sala, ou entre em uma com um código</p>
       </div>
 
       <section>
-        <h2>Create a room</h2>
+        <h2>Criar uma sala</h2>
         <button type="button" className="confirm" onClick={() => void navigate(`/online/${generateRoomCode()}`)}>
-          Create room
+          Criar sala
         </button>
       </section>
 
       <section>
-        <h2>Join a room</h2>
+        <h2>Entrar em uma sala</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -33,7 +33,7 @@ export function OnlineLobbyPage() {
           }}
         >
           <label>
-            Room code
+            Código da sala
             <input
               type="text"
               value={joinCode}
@@ -43,7 +43,7 @@ export function OnlineLobbyPage() {
             />
           </label>
           <button type="submit" disabled={!joinCode.trim()}>
-            Join room
+            Entrar na sala
           </button>
         </form>
       </section>

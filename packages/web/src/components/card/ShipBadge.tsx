@@ -17,10 +17,10 @@ export function ShipBadge({ ship, owner, compact, selected }: ShipBadgeProps) {
       directionMarks={ship.shields}
       centerValue={ship.hull}
       name={ship.name}
-      tags={[{ text: 'Ship' }]}
+      tags={[{ text: 'Navio' }]}
       compact={compact}
       selected={selected}
-      title={`${ship.name} — hull ${ship.hull} — controlled by ${owner}`}
+      title={`${ship.name} — casco ${ship.hull} — controlado por ${owner}`}
     />
   );
 }

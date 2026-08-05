@@ -1,7 +1,7 @@
 [
-  { "id": "ship-1", "name": "The Widowmaker", "shields": [0, 2, 4], "hull": 8, "imageUrl": "/ships/ship-01.jpg" },
-  { "id": "ship-2", "name": "The Sieve", "shields": [0, 1, 2], "hull": 5, "imageUrl": "/ships/ship-02.jpg" },
-  { "id": "ship-3", "name": "The Sieve", "shields": [2, 3, 4], "hull": 5, "imageUrl": "/ships/ship-03.jpg" },
-  { "id": "ship-4", "name": "The Sieve", "shields": [3, 6, 0], "hull": 5, "imageUrl": "/ships/ship-04.jpg" },
-  { "id": "ship-5", "name": "The Sieve", "shields": [6, 7, 0], "hull": 5, "imageUrl": "/ships/ship-05.jpg" }
+  { "id": "ship-1", "name": "A Viúva Negra", "shields": [0, 2, 4], "hull": 8, "imageUrl": "/ships/ship-01.jpg" },
+  { "id": "ship-2", "name": "A Peneira", "shields": [0, 1, 2], "hull": 5, "imageUrl": "/ships/ship-02.jpg" },
+  { "id": "ship-3", "name": "A Peneira", "shields": [2, 3, 4], "hull": 5, "imageUrl": "/ships/ship-03.jpg" },
+  { "id": "ship-4", "name": "A Peneira", "shields": [3, 6, 0], "hull": 5, "imageUrl": "/ships/ship-04.jpg" },
+  { "id": "ship-5", "name": "A Peneira", "shields": [6, 7, 0], "hull": 5, "imageUrl": "/ships/ship-05.jpg" }
 ]

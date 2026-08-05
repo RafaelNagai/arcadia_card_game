@@ -23,13 +23,13 @@ export function DragGhost({ ghostPos, selection, content, player }: DragGhostPro
   if (selection.mode === 'setup-ship') {
     inner = <ShipBadge ship={content.ships[player.shipId]} owner={player.id} compact />;
   } else if (selection.mode === 'setup-cargo') {
-    inner = <div className="board-cell-cargo">Cargo</div>;
+    inner = <div className="board-cell-cargo">Carga</div>;
   } else if (selection.mode === 'main-hand') {
     const item = player.hand[selection.handIndex];
     if (item?.kind === 'card') {
       inner = <CardMini card={content.cards[item.cardId]} rotation={selection.rotation} compact />;
     } else if (item?.kind === 'cargo') {
-      inner = <div className="board-cell-cargo">Cargo</div>;
+      inner = <div className="board-cell-cargo">Carga</div>;
     }
   }
 

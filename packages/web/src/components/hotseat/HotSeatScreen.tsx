@@ -11,10 +11,10 @@ export interface HotSeatScreenProps {
 export function HotSeatScreen({ playerId, dispatch }: HotSeatScreenProps) {
   return (
     <div className="hotseat-screen" style={{ borderColor: PLAYER_COLORS[playerId] }}>
-      <h1>Pass the device to {playerId}</h1>
-      <p>Hide the screen from the other player, then continue.</p>
+      <h1>Passe o dispositivo para {playerId}</h1>
+      <p>Esconda a tela do outro jogador, depois continue.</p>
       <button type="button" onClick={() => dispatch({ type: 'CONFIRM_HANDOFF' })}>
-        I'm {playerId}, ready
+        Sou {playerId}, pronto(a)
       </button>
     </div>
   );

@@ -10,7 +10,7 @@ export interface LogPanelProps {
 export function LogPanel({ gameState, content }: LogPanelProps) {
   return (
     <div className="log-panel">
-      <h3>Turn log</h3>
+      <h3>Registro de turnos</h3>
       <ol>
         {gameState.log.map((event, idx) => (
           <li key={idx}>{formatLogEvent(event, content)}</li>

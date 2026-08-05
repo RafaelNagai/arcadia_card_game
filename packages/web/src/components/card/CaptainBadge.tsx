@@ -19,8 +19,8 @@ export function CaptainBadge({ captain, owner }: CaptainBadgeProps) {
       directionMarks={NO_DIRECTION_MARKS}
       centerValue={captain.cargoSlots}
       name={captain.name}
-      tags={[{ text: 'Captain' }]}
-      title={`${captain.name} — cargo capacity ${captain.cargoSlots}`}
+      tags={[{ text: 'Capitão' }]}
+      title={`${captain.name} — capacidade de carga ${captain.cargoSlots}`}
     />
   );
 }

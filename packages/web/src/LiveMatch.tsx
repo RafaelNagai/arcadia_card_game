@@ -106,12 +106,12 @@ export default function LiveMatch({
     return (
       <div className="game-screen">
         <header>
-          <h1>ELTYCA (setup){viewerId && !canAct ? ` — waiting for ${activeSetupPlayer}` : ''}</h1>
+          <h1>ELTYCA (preparação){viewerId && !canAct ? ` — aguardando ${activeSetupPlayer}` : ''}</h1>
           <SettingsMenu onSurrender={() => dispatch({ type: 'SURRENDER', playerId: player.id })} />
         </header>
         {state.error && <div className="error-banner">{state.error}</div>}
         {viewerId && !opponentConnected && (
-          <div className="opponent-disconnected-banner">Your opponent disconnected — waiting for them to come back…</div>
+          <div className="opponent-disconnected-banner">Seu adversário desconectou — aguardando ele(a) voltar…</div>
         )}
         <div className="layout">
           <div className="board-wrapper">
@@ -154,8 +154,8 @@ export default function LiveMatch({
     <div className="game-screen">
       <header>
         <h1>
-          Turn {gameState.turnNumber} · {activePlayer.id} to play
-          {viewerId && !canAct ? ' — waiting for opponent' : ''}
+          Turno {gameState.turnNumber} · {activePlayer.id} joga
+          {viewerId && !canAct ? ' — aguardando o adversário' : ''}
         </h1>
         <SettingsMenu onSurrender={() => dispatch({ type: 'SURRENDER', playerId: displayedPlayer.id })} />
       </header>

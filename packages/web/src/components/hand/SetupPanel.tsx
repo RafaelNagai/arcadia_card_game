@@ -27,7 +27,7 @@ export function SetupPanel({ content, gameState, player, selection, targetCellId
   return (
     <div className="setup-panel">
       <p>
-        Hidden setup for {player.id}: Ship {shipDone ? 'placed' : 'pending'} · {hiddenDone}/{hiddenNeeded} Cargo buried
+        Preparação escondida de {player.id}: Navio {shipDone ? 'colocado' : 'pendente'} · {hiddenDone}/{hiddenNeeded} Carga(s) enterrada(s)
       </p>
 
       {!shipDone && (
@@ -58,7 +58,7 @@ export function SetupPanel({ content, gameState, player, selection, targetCellId
                 onClick={() => dispatch({ type: 'SELECT_SETUP_CARGO' })}
                 onPointerDown={(e) => startDrag(e, { type: 'SELECT_SETUP_CARGO' })}
               >
-                Cargo
+                Carga
               </button>
             ))}
         </div>
@@ -68,11 +68,11 @@ export function SetupPanel({ content, gameState, player, selection, targetCellId
         <div className="hand-actions">
           {targetCellIdx !== null && (
             <button type="button" className="confirm" onClick={() => dispatch({ type: 'CONFIRM_PLACEMENT' })}>
-              Bury it here, face-down
+              Enterrar aqui, virada para baixo
             </button>
           )}
           <button type="button" onClick={() => dispatch({ type: 'CANCEL_SELECTION' })}>
-            Cancel
+            Cancelar
           </button>
         </div>
       )}

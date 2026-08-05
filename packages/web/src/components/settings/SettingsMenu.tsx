@@ -17,7 +17,7 @@ export function SettingsMenu({ onSurrender }: SettingsMenuProps) {
       <button
         type="button"
         className="settings-gear"
-        aria-label="Settings"
+        aria-label="Configurações"
         onClick={() => setPanel(panel === 'closed' ? 'menu' : 'closed')}
       >
         ⚙
@@ -29,14 +29,14 @@ export function SettingsMenu({ onSurrender }: SettingsMenuProps) {
           <div className="settings-popover">
             {panel === 'menu' ? (
               <button type="button" className="danger" onClick={() => setPanel('confirm')}>
-                Surrender
+                Desistir
               </button>
             ) : (
               <div className="settings-confirm">
-                <p>Surrender the match? Your opponent wins immediately.</p>
+                <p>Desistir da partida? Seu adversário vence imediatamente.</p>
                 <div className="settings-confirm-actions">
                   <button type="button" onClick={() => setPanel('closed')}>
-                    Cancel
+                    Cancelar
                   </button>
                   <button
                     type="button"
@@ -46,7 +46,7 @@ export function SettingsMenu({ onSurrender }: SettingsMenuProps) {
                       onSurrender();
                     }}
                   >
-                    Yes, surrender
+                    Sim, desistir
                   </button>
                 </div>
               </div>
