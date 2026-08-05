@@ -22,6 +22,9 @@ export function LandingPage() {
           <button type="button" className="confirm" onClick={() => navigate('/game')}>
             Start
           </button>
+          <button type="button" onClick={() => navigate('/online')}>
+            Play online
+          </button>
           <button type="button" onClick={() => navigate('/settings')}>
             Settings
           </button>

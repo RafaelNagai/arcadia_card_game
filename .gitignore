@@ -6,3 +6,5 @@ dist/
 *.csv
 .claude/
 .partykit/
+.env
+.env.local

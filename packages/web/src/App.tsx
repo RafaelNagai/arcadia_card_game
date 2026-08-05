@@ -3,6 +3,8 @@ import { ConfigProvider } from './game/configStore';
 import { LandingPage } from './pages/LandingPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { GamePage } from './pages/GamePage';
+import { OnlineLobbyPage } from './pages/OnlineLobbyPage';
+import { OnlineRoomPage } from './pages/OnlineRoomPage';
 
 export default function App() {
   return (
@@ -12,6 +14,8 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/game" element={<GamePage />} />
+          <Route path="/online" element={<OnlineLobbyPage />} />
+          <Route path="/online/:code" element={<OnlineRoomPage />} />
         </Routes>
       </BrowserRouter>
     </ConfigProvider>

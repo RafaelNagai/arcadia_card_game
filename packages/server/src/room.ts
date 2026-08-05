@@ -1,20 +1,43 @@
 import type * as Party from 'partykit/server';
-import type { PlayerId } from '@eltyca/engine';
+import type { Config, DraftState, GameState, PlayerId } from '@eltyca/engine';
+import { loadConfig } from '@eltyca/engine';
+import type { RoomPhase } from './protocol';
 
 export interface PersistedRoomState {
   code: string;
   /** playerId -> the clientId (persisted per-browser, see packages/web's clientId.ts) that
    *  currently holds that slot. */
   clientAssignments: Partial<Record<PlayerId, string>>;
+  config: Config;
+  phase: RoomPhase;
+  draft: DraftState | null;
+  game: GameState | null;
 }
 
 const STORAGE_KEY = 'room';
 const PLAYER_ORDER: PlayerId[] = ['P1', 'P2'];
 
-export async function loadPersistedRoom(room: Party.Room): Promise<PersistedRoomState> {
-  const existing = await room.storage.get<PersistedRoomState>(STORAGE_KEY);
-  if (existing) return existing;
-  return { code: room.id, clientAssignments: {} };
+/** Just reads storage — returns undefined if this room has never been saved, rather than
+ *  fabricating a default one. Kept separate from creating a new room (below) so `onStart`
+ *  (which runs before any connection exists, with no config to offer) can rehydrate an
+ *  *existing* room without ever accidentally pre-empting a brand new one before its first
+ *  connection gets a chance to supply configOverrides. */
+export async function loadExistingRoom(room: Party.Room): Promise<PersistedRoomState | undefined> {
+  return room.storage.get<PersistedRoomState>(STORAGE_KEY);
+}
+
+/** `configOverrides` only ever matters here, the instant a room is created by whoever
+ *  connects first — once a room exists, its config is fixed for the rest of its life; a
+ *  later joiner's local config is simply ignored, per the plan's "host's config wins". */
+export function createNewRoom(code: string, configOverrides?: Partial<Config>): PersistedRoomState {
+  return {
+    code,
+    clientAssignments: {},
+    config: loadConfig(configOverrides),
+    phase: 'lobby',
+    draft: null,
+    game: null,
+  };
 }
 
 export async function savePersistedRoom(room: Party.Room, state: PersistedRoomState): Promise<void> {
@@ -44,4 +67,8 @@ export function assignPlayerSlot(state: PersistedRoomState, clientId: string): P
     }
   }
   throw new RoomFullError();
+}
+
+export function isRoomFull(state: PersistedRoomState): boolean {
+  return PLAYER_ORDER.every((id) => !!state.clientAssignments[id]);
 }

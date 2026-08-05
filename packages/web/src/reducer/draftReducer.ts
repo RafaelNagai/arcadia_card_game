@@ -16,6 +16,8 @@ export function draftReducer(state: DraftUIState, action: DraftAction): DraftUIS
       return runEngineAction(state, () => pickCard(state.draft, action.playerId, action.cardId));
     case 'DISMISS_ERROR':
       return { ...state, error: null };
+    case 'SYNC_REMOTE_DRAFT':
+      return { ...state, draft: action.draft, error: null };
     default:
       return state;
   }
