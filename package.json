@@ -12,10 +12,16 @@
     "dev:web": "npm run dev --workspace=packages/web",
     "dev:server": "npm run dev --workspace=packages/server",
     "deploy:server": "npm run deploy --workspace=packages/server",
-    "deploy:web": "npm run deploy --workspace=packages/web"
+    "deploy:web": "npm run deploy --workspace=packages/web",
+    "lint": "eslint ."
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
     "typescript": "^5.7.0",
+    "typescript-eslint": "^8.66.0",
     "vitest": "^2.1.0"
   }
 }

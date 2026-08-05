@@ -19,13 +19,13 @@ export function LandingPage() {
         </div>
 
         <div className="landing-actions">
-          <button type="button" className="confirm" onClick={() => navigate('/game')}>
+          <button type="button" className="confirm" onClick={() => void navigate('/game')}>
             Start
           </button>
-          <button type="button" onClick={() => navigate('/online')}>
+          <button type="button" onClick={() => void navigate('/online')}>
             Play online
           </button>
-          <button type="button" onClick={() => navigate('/settings')}>
+          <button type="button" onClick={() => void navigate('/settings')}>
             Settings
           </button>
         </div>

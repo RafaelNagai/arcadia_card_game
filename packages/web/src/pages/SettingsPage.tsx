@@ -187,7 +187,7 @@ export function SettingsPage() {
         </label>
       </section>
 
-      <button type="button" className="confirm" onClick={() => navigate('/')}>
+      <button type="button" className="confirm" onClick={() => void navigate('/')}>
         Back to menu
       </button>
     </div>

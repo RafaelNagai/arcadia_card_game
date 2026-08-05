@@ -21,7 +21,7 @@ export const testConfig: Config = {
 
 /** Turns a list of direction indices (0..7) into an 8-position boolean array. */
 export function bools(indices: number[]): boolean[] {
-  const out = new Array(8).fill(false);
+  const out = new Array<boolean>(8).fill(false);
   for (const i of indices) out[i] = true;
   return out;
 }

@@ -47,7 +47,7 @@ export function OnlineRoomPage() {
           opponentConnected={online.opponentConnected}
           you={online.you}
           onStart={online.startMatch}
-          onLeave={() => navigate('/online')}
+          onLeave={() => void navigate('/online')}
         />
       </div>
     );
@@ -75,7 +75,7 @@ export function OnlineRoomPage() {
         state={online.gameUIState}
         dispatch={online.dispatchGame}
         playerSetups={online.playerSetups ?? []}
-        onNewMatch={() => navigate('/online')}
+        onNewMatch={() => void navigate('/online')}
         viewerId={online.you}
         activeSetupPlayer={online.setupProgress?.activePlayer ?? null}
         opponentConnected={online.opponentConnected}

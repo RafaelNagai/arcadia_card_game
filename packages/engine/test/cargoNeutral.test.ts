@@ -16,7 +16,7 @@ describe('Test 8 — Cargo: neutral, cannot be dominated, never resolves arrows'
 
     expect(newState.cells[13].content).toEqual({ kind: 'cargo', placedBy: 'P2' });
     expect(newState.log.at(-1)!.results).toEqual([]);
-    expect(newState.cells[13].content && 'owner' in newState.cells[13].content!).toBe(false);
+    expect(newState.cells[13].content && 'owner' in newState.cells[13].content).toBe(false);
   });
 
   it('placing a Cargo never resolves arrows, even adjacent to a vulnerable enemy card', () => {

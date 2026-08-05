@@ -18,7 +18,7 @@ export function OnlineLobbyPage() {
 
       <section>
         <h2>Create a room</h2>
-        <button type="button" className="confirm" onClick={() => navigate(`/online/${generateRoomCode()}`)}>
+        <button type="button" className="confirm" onClick={() => void navigate(`/online/${generateRoomCode()}`)}>
           Create room
         </button>
       </section>
@@ -29,7 +29,7 @@ export function OnlineLobbyPage() {
           onSubmit={(e) => {
             e.preventDefault();
             const code = joinCode.trim().toUpperCase();
-            if (code) navigate(`/online/${code}`);
+            if (code) void navigate(`/online/${code}`);
           }}
         >
           <label>

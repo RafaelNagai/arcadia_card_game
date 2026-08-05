@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { effectiveArrows } from '../src/rotation';
+import { bools } from './fixtures/state';
 
 describe('effectiveArrows (Test 4 — rotation)', () => {
   it('shifts the arrow pattern by two positions per 90° turn', () => {
-    const arrows = new Array(8).fill(false);
-    arrows[0] = true; // N
+    const arrows = bools([0]); // N
 
     expect(effectiveArrows(arrows, 0)).toEqual(bools([0]));
     expect(effectiveArrows(arrows, 1)).toEqual(bools([2])); // 90° -> E
@@ -27,9 +27,3 @@ describe('effectiveArrows (Test 4 — rotation)', () => {
     expect(effectiveArrows(arrows, 1)).toEqual(bools([2, 3, 4]));
   });
 });
-
-function bools(indices: number[]): boolean[] {
-  const out = new Array(8).fill(false);
-  for (const i of indices) out[i] = true;
-  return out;
-}

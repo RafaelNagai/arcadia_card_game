@@ -8,5 +8,5 @@ import Match from '../Match';
 export function GamePage() {
   const navigate = useNavigate();
   const { config } = useConfig();
-  return <Match config={config} onNewMatch={() => navigate('/')} />;
+  return <Match config={config} onNewMatch={() => void navigate('/')} />;
 }

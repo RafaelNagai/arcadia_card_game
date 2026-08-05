@@ -77,6 +77,8 @@ describe('computeTelemetry', () => {
 
     const json = telemetryToJson(telemetry);
     expect(json).toContain('"Infinity"');
-    expect(() => JSON.parse(json)).not.toThrow();
+    expect(() => {
+      JSON.parse(json);
+    }).not.toThrow();
   });
 });

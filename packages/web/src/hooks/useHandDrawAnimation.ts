@@ -35,7 +35,7 @@ export function useHandDrawAnimation(playerId: PlayerId, hand: HandItem[] | Reda
     const totalDurationMs = HAND_DRAW_STAGGER_MS * (grown - 1) + CARD_ANIMATION_MS + REVEAL_BUFFER_MS;
     const timeout = setTimeout(() => setNewlyDrawnCount(0), totalDurationMs);
     return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only the length change should retrigger this, not a new array reference for the same contents
+    // Only the length change should retrigger this, not a new array reference for the same contents.
   }, [playerId, hand.length]);
 
   return newlyDrawnCount;

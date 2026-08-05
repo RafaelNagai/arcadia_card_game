@@ -57,7 +57,7 @@ export function useCommitAnimations(gameState: GameState | RedactedGameState, aw
     setVisible(pending);
     const timeout = setTimeout(() => setVisible(EMPTY), VISIBLE_DURATION_MS);
     return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-check whenever gameState changes too, not just awaitingHandoff
+    // Re-check whenever gameState changes too, not just awaitingHandoff.
   }, [gameState, awaitingHandoff]);
 
   return visible;

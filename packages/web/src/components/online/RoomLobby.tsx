@@ -14,7 +14,7 @@ export interface RoomLobbyProps {
 function useCopyFeedback(): [copied: boolean, copy: (text: string) => void] {
   const [copied, setCopied] = useState(false);
   const copy = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
+    void navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     });
