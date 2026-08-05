@@ -16,9 +16,6 @@ export interface CardMiniProps {
   onPointerDown?: (event: PointerEvent<HTMLButtonElement>) => void;
 }
 
-/** Stand-in art for every card until per-card images are authored. */
-const PLACEHOLDER_CARD_IMAGE = '/creature-01.jpg';
-
 export function CardMini({ card, rotation, owner, displayPower, selected, compact, onClick, onPointerDown }: CardMiniProps) {
   const arrows = effectiveArrows(card.arrows, rotation);
   const elementColor = ELEMENT_COLORS[card.element];
@@ -30,7 +27,7 @@ export function CardMini({ card, rotation, owner, displayPower, selected, compac
 
   const body = (
     <CardFrame
-      image={PLACEHOLDER_CARD_IMAGE}
+      image={card.imageUrl}
       accentColor={ownerColor ?? elementColor}
       directionMarks={arrows}
       centerValue={power}

@@ -34,6 +34,7 @@ export function makeCard(overrides: Partial<Card> & { id: string }): Card {
     power: 5,
     arrows: bools([0]),
     tier: 'C',
+    imageUrl: '/creature-01.jpg',
     ...overrides,
   };
 }

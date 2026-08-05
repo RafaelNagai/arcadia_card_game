@@ -19,6 +19,8 @@ export interface Card {
   arrows: boolean[]; // length 8, printed orientation (rotation 0)
   effect?: EffectDef;
   tier: Tier;
+  /** Path to the card's art, served from packages/web/public/ (e.g. "/dragon-01.jpg"). */
+  imageUrl: string;
 }
 
 export interface Ship {
