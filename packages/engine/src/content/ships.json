@@ -1,0 +1,4 @@
+[
+  { "id": "ship-widowmaker", "name": "The Widowmaker", "shields": [0, 2, 4], "hull": 8, "imageUrl": "/ships/ship-01.jpg" },
+  { "id": "ship-sieve", "name": "The Sieve", "shields": [0, 1, 2, 3, 4, 6], "hull": 5, "imageUrl": "/ships/ship-01.jpg" }
+]

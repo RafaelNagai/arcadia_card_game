@@ -9,13 +9,10 @@ export interface ShipBadgeProps {
   selected?: boolean;
 }
 
-/** Stand-in art for the Ship until real art is authored. */
-const PLACEHOLDER_SHIP_IMAGE = '/ship-01.jpg';
-
 export function ShipBadge({ ship, owner, compact, selected }: ShipBadgeProps) {
   return (
     <CardFrame
-      image={PLACEHOLDER_SHIP_IMAGE}
+      image={ship.imageUrl}
       accentColor={PLAYER_COLORS[owner]}
       directionMarks={ship.shields}
       centerValue={ship.hull}

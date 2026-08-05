@@ -44,6 +44,7 @@ export function makeShip(overrides: Partial<Ship> & { id: string }): Ship {
     name: overrides.id,
     shields: bools([]),
     hull: 5,
+    imageUrl: '/ships/ship-01.jpg',
     ...overrides,
   };
 }
@@ -52,6 +53,7 @@ export function makeCaptain(overrides: Partial<Captain> & { id: string }): Capta
   return {
     name: overrides.id,
     cargoSlots: 3,
+    imageUrl: '/captains/captain-01.jpg',
     ...overrides,
   };
 }

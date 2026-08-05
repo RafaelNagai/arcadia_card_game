@@ -28,6 +28,8 @@ export interface Ship {
   name: string;
   shields: boolean[]; // length 8
   hull: number;
+  /** Path to the ship's art, served from packages/web/public/ (e.g. "/ships/ship-01.jpg"). */
+  imageUrl: string;
 }
 
 export interface Captain {
@@ -35,6 +37,8 @@ export interface Captain {
   name: string;
   cargoSlots: number; // 2..5
   passive?: EffectDef;
+  /** Path to the captain's art, served from packages/web/public/ (e.g. "/captains/captain-01.jpg"). */
+  imageUrl: string;
 }
 
 /** An item that can sit in a player's hand: a specific common card, or a Cargo token (fungible, no id). */
