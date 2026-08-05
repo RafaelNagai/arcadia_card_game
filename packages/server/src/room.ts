@@ -1,4 +1,3 @@
-import type * as Party from 'partykit/server';
 import type { Config, DraftState, GameState, PlayerId, PlayerSetup } from '@eltyca/engine';
 import { loadConfig } from '@eltyca/engine';
 import type { RoomPhase } from './protocol';
@@ -29,8 +28,8 @@ const PLAYER_ORDER: PlayerId[] = ['P1', 'P2'];
  *  (which runs before any connection exists, with no config to offer) can rehydrate an
  *  *existing* room without ever accidentally pre-empting a brand new one before its first
  *  connection gets a chance to supply configOverrides. */
-export async function loadExistingRoom(room: Party.Room): Promise<PersistedRoomState | undefined> {
-  return room.storage.get<PersistedRoomState>(STORAGE_KEY);
+export async function loadExistingRoom(storage: DurableObjectStorage): Promise<PersistedRoomState | undefined> {
+  return storage.get<PersistedRoomState>(STORAGE_KEY);
 }
 
 /** `configOverrides` only ever matters here, the instant a room is created by whoever
@@ -48,8 +47,8 @@ export function createNewRoom(code: string, configOverrides?: Partial<Config>): 
   };
 }
 
-export async function savePersistedRoom(room: Party.Room, state: PersistedRoomState): Promise<void> {
-  await room.storage.put(STORAGE_KEY, state);
+export async function savePersistedRoom(storage: DurableObjectStorage, state: PersistedRoomState): Promise<void> {
+  await storage.put(STORAGE_KEY, state);
 }
 
 export class RoomFullError extends Error {

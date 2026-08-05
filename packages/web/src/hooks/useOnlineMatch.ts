@@ -43,7 +43,8 @@ export interface OnlineMatchHandle {
 }
 
 /**
- * Connects to one online match room over PartyKit and exposes it in roughly the same shape
+ * Connects to one online match room (a partyserver-backed Durable Object) and exposes it in
+ * roughly the same shape
  * the local hot-seat reducers already use, so LiveMatch/ChoiceScreen/DraftScreen can stay
  * identical between hot-seat and online. Unlike hot-seat, nothing here runs the engine's
  * mutating rule functions directly — every commit-shaped action (start-match, pick-*,

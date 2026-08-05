@@ -1,4 +1,4 @@
-import type * as Party from 'partykit/server';
+import { Server, routePartykitRequest, type Connection, type ConnectionContext } from 'partyserver';
 import type { Config, PlayerId } from '@eltyca/engine';
 import { redactGameStateForPlayer, sampleContent } from '@eltyca/engine';
 import { assignPlayerSlot, createNewRoom, loadExistingRoom, savePersistedRoom, RoomFullError, type PersistedRoomState } from './room';
@@ -11,26 +11,31 @@ interface ConnectionState {
   playerId: PlayerId;
 }
 
-function send(connection: Party.Connection, message: ServerMessage) {
+interface Env {
+  Main: DurableObjectNamespace<EltycaRoom>;
+}
+
+function send(connection: Connection, message: ServerMessage) {
   connection.send(JSON.stringify(message));
 }
 
-/** Lobby + Porto draft + full setup/main-phase gameplay — see protocol.ts. A room is a
- *  single PartyKit party whose room id *is* the shareable code; state lives in room.storage
- *  so a room survives the server hibernating between messages, not just one connection. */
-export default class Server implements Party.Server {
-  private state: PersistedRoomState | undefined;
+/** Lobby + Porto draft + full setup/main-phase gameplay — see protocol.ts. A room is a single
+ *  Durable Object instance whose name (the URL's :name segment, routed by
+ *  routePartykitRequest below) *is* the shareable code; state lives in ctx.storage so a room
+ *  survives the Durable Object hibernating between messages, not just one connection. */
+export class EltycaRoom extends Server<Env> {
+  static options = { hibernate: true };
 
-  constructor(readonly room: Party.Room) {}
+  private state: PersistedRoomState | undefined;
 
   async onStart() {
     // Only rehydrates a room that already exists — never fabricates a default one here,
     // which would pre-empt the first connection's chance to supply its config (see
     // createNewRoom's doc comment).
-    this.state = await loadExistingRoom(this.room);
+    this.state = await loadExistingRoom(this.ctx.storage);
   }
 
-  async onConnect(connection: Party.Connection, ctx: Party.ConnectionContext) {
+  async onConnect(connection: Connection, ctx: ConnectionContext) {
     const url = new URL(ctx.request.url);
     const clientId = url.searchParams.get('clientId');
     if (!clientId) {
@@ -41,7 +46,7 @@ export default class Server implements Party.Server {
 
     if (!this.state) {
       const configOverrides = parseConfigOverrides(url.searchParams.get('config'));
-      this.state = (await loadExistingRoom(this.room)) ?? createNewRoom(this.room.id, configOverrides);
+      this.state = (await loadExistingRoom(this.ctx.storage)) ?? createNewRoom(this.name, configOverrides);
     }
 
     let playerId: PlayerId;
@@ -52,7 +57,7 @@ export default class Server implements Party.Server {
       connection.close();
       return;
     }
-    await savePersistedRoom(this.room, this.state);
+    await savePersistedRoom(this.ctx.storage, this.state);
 
     connection.setState({ clientId, playerId } satisfies ConnectionState);
     send(connection, {
@@ -69,14 +74,14 @@ export default class Server implements Party.Server {
     this.broadcastPresence();
   }
 
-  async onMessage(message: string, sender: Party.Connection) {
+  async onMessage(sender: Connection, message: string) {
     const senderState = this.connectionState(sender);
     if (!senderState || !this.state) return;
 
     try {
       const msg = JSON.parse(message) as ClientMessage;
       this.state = applyAction(this.state, senderState.playerId, msg, sampleContent);
-      await savePersistedRoom(this.room, this.state);
+      await savePersistedRoom(this.ctx.storage, this.state);
       this.broadcastRoomState();
     } catch (err) {
       send(sender, { type: 'error', message: err instanceof Error ? err.message : String(err) });
@@ -87,12 +92,12 @@ export default class Server implements Party.Server {
     this.broadcastPresence();
   }
 
-  private connectionState(connection: Party.Connection): ConnectionState | undefined {
+  private connectionState(connection: Connection): ConnectionState | undefined {
     return connection.state as ConnectionState | undefined;
   }
 
   private isOpponentConnected(selfConnectionId: string, selfPlayerId: PlayerId): boolean {
-    for (const conn of this.room.getConnections()) {
+    for (const conn of this.getConnections()) {
       if (conn.id === selfConnectionId) continue;
       if (this.connectionState(conn)?.playerId !== selfPlayerId) return true;
     }
@@ -100,7 +105,7 @@ export default class Server implements Party.Server {
   }
 
   private broadcastPresence() {
-    for (const conn of this.room.getConnections()) {
+    for (const conn of this.getConnections()) {
       const state = this.connectionState(conn);
       if (!state) continue;
       send(conn, { type: 'room-update', opponentConnected: this.isOpponentConnected(conn.id, state.playerId) });
@@ -114,17 +119,17 @@ export default class Server implements Party.Server {
     // pool is a shared face-up table — see rules/draft.ts) so every connection gets the exact
     // same broadcast.
     if (this.state.phase === 'draft' && this.state.draft) {
-      this.room.broadcast(JSON.stringify({ type: 'draft-update', draft: this.state.draft } satisfies ServerMessage));
+      this.broadcast(JSON.stringify({ type: 'draft-update', draft: this.state.draft } satisfies ServerMessage));
       return;
     }
 
     // Game state is the opposite — each connection needs its own redacted view, so this has
-    // to be a per-connection send rather than one shared room.broadcast payload.
+    // to be a per-connection send rather than one shared broadcast payload.
     if (this.state.phase === 'game' && this.state.game) {
       const game = this.state.game;
       const setupProgress = game.phase === 'setup' ? summarizeSetupProgress(game) : null;
       const playerSetups = game.phase === 'end' ? this.state.playerSetups : null;
-      for (const conn of this.room.getConnections()) {
+      for (const conn of this.getConnections()) {
         const connState = this.connectionState(conn);
         if (!connState) continue;
         send(conn, { type: 'game-update', game: redactGameStateForPlayer(game, connState.playerId), setupProgress, playerSetups });
@@ -141,3 +146,9 @@ function parseConfigOverrides(raw: string | null): Partial<Config> | undefined {
     return undefined;
   }
 }
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    return (await routePartykitRequest(request, env)) ?? new Response('Not Found', { status: 404 });
+  },
+} satisfies ExportedHandler<Env>;

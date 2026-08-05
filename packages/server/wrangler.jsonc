@@ -1,0 +1,13 @@
+{
+  "name": "eltyca",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-08-04",
+  // Binding name "Main" -> kebab-cased to the URL segment "main" by partyserver's router,
+  // matching the web client's usePartySocket({ party: 'main', ... }) call unchanged.
+  "durable_objects": {
+    "bindings": [{ "name": "Main", "class_name": "EltycaRoom" }]
+  },
+  // Workers Free plan (and any account without an existing KV-backed namespace) requires
+  // SQLite-backed Durable Objects for any *new* class — see Cloudflare's 2026-07-09 changelog.
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["EltycaRoom"] }]
+}

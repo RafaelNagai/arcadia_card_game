@@ -6,17 +6,19 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "dev": "partykit dev",
-    "deploy": "partykit deploy",
+    "dev": "wrangler dev --port 1999",
+    "deploy": "wrangler deploy",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
     "@eltyca/engine": "*",
-    "partykit": "0.0.115"
+    "partyserver": "^0.5.10"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260804.1",
     "@types/node": "^22.10.0",
-    "vitest": "^2.1.0"
+    "vitest": "^2.1.0",
+    "wrangler": "^4.119.0"
   }
 }
