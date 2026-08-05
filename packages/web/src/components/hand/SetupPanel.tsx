@@ -1,12 +1,12 @@
 import type { Dispatch, PointerEvent } from 'react';
-import type { GameContent, GameState, Player } from '@eltyca/engine';
+import type { GameContent, GameState, Player, RedactedGameState } from '@eltyca/engine';
 import { effectiveHiddenCargoTarget, hiddenItemsPlacedCount, isShipPlaced } from '@eltyca/engine';
 import type { Action, Selection } from '../../reducer/types';
 import { ShipBadge } from '../card/ShipBadge';
 
 export interface SetupPanelProps {
   content: GameContent;
-  gameState: GameState;
+  gameState: GameState | RedactedGameState;
   player: Player;
   selection: Selection | null;
   targetCellIdx: number | null;
@@ -15,9 +15,14 @@ export interface SetupPanelProps {
 }
 
 export function SetupPanel({ content, gameState, player, selection, targetCellIdx, dispatch, startDrag }: SetupPanelProps) {
-  const shipDone = isShipPlaced(gameState, player.id);
-  const hiddenDone = hiddenItemsPlacedCount(gameState, player.id);
-  const hiddenNeeded = effectiveHiddenCargoTarget(gameState, player.id);
+  // Always this client's own player (LiveMatch only ever renders SetupPanel for the viewer's
+  // own turn), and redaction never hides your own pieces — only the opponent's — so scanning
+  // gameState for player.id's own Ship/Cargo is safe even against a redacted view. The cast
+  // is for isShipPlaced/etc.'s strict engine typing, not because the data could be redacted.
+  const game = gameState as GameState;
+  const shipDone = isShipPlaced(game, player.id);
+  const hiddenDone = hiddenItemsPlacedCount(game, player.id);
+  const hiddenNeeded = effectiveHiddenCargoTarget(game, player.id);
 
   return (
     <div className="setup-panel">

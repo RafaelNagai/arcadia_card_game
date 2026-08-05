@@ -3,7 +3,7 @@ import { loadConfig } from '@eltyca/engine';
 import { assignPlayerSlot, RoomFullError, type PersistedRoomState } from '../src/room';
 
 function emptyRoom(): PersistedRoomState {
-  return { code: 'TEST01', clientAssignments: {}, config: loadConfig(), phase: 'lobby', draft: null, game: null };
+  return { code: 'TEST01', clientAssignments: {}, config: loadConfig(), phase: 'lobby', draft: null, game: null, playerSetups: null };
 }
 
 describe('assignPlayerSlot', () => {

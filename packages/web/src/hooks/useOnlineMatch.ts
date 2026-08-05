@@ -1,14 +1,20 @@
 import { useCallback, useRef, useState, type Dispatch } from 'react';
 import { usePartySocket } from 'partysocket/react';
-import type { Config, GameContent, PlayerId, RedactedGameState } from '@eltyca/engine';
+import type { Config, GameContent, PlayerId, PlayerSetup, RedactedGameState } from '@eltyca/engine';
 import type { ClientMessage, RoomPhase, ServerMessage, SetupProgressSummary } from '@eltyca/server';
 import { createInitialDraftUIState, draftReducer } from '../reducer/draftReducer';
 import type { DraftAction, DraftUIState } from '../reducer/draftTypes';
+import { buildPlacementRequest, gameReducer } from '../reducer/gameReducer';
+import type { Action, UIState } from '../reducer/types';
 import { getOrCreateClientId } from '../game/clientId';
 
 const PARTYKIT_HOST = import.meta.env.VITE_PARTYKIT_HOST ?? 'localhost:1999';
 
 export type ConnectionStatus = 'connecting' | 'open' | 'closed';
+
+function initialGameUIState(content: GameContent, game: RedactedGameState): UIState {
+  return { content, gameState: game, selection: null, targetCellIdx: null, previewState: null, awaitingHandoff: null, error: null };
+}
 
 export interface OnlineMatchHandle {
   connectionStatus: ConnectionStatus;
@@ -25,20 +31,26 @@ export interface OnlineMatchHandle {
    *  ChoiceScreen/DraftScreen don't need to know or care that this one talks to a server. */
   draftUIState: DraftUIState | null;
   dispatchDraft: Dispatch<DraftAction>;
-  /** Redacted — this client's own view only. Real LiveMatch integration (place-setup,
-   *  play-card) lands in the next phase; for now this just carries whatever the server has
-   *  broadcast once roomPhase is 'game'. */
-  game: RedactedGameState | null;
+  /** Non-null once roomPhase is 'game'. Drop-in replacement for LiveMatchHost's local
+   *  gameReducer state/dispatch pair — LiveMatch doesn't need to know or care that this one
+   *  talks to a server instead of mutating gameState directly. */
+  gameUIState: UIState | null;
+  dispatchGame: Dispatch<Action>;
   setupProgress: SetupProgressSummary | null;
+  /** Only non-null once the match has actually ended — see protocol.ts's doc comment on why
+   *  this is withheld until then. Needed for EndSequence's telemetry. */
+  playerSetups: PlayerSetup[] | null;
 }
 
 /**
  * Connects to one online match room over PartyKit and exposes it in roughly the same shape
- * the local hot-seat reducers already use, so the draft screens can stay identical between
- * hot-seat and online. Unlike hot-seat, nothing here runs the engine's mutating rule
- * functions directly — every commit-shaped action (start-match, pick-*) is sent to the
- * server and only ever applied locally once the server's own broadcast comes back, since the
- * server is the sole authority over the room's real state.
+ * the local hot-seat reducers already use, so LiveMatch/ChoiceScreen/DraftScreen can stay
+ * identical between hot-seat and online. Unlike hot-seat, nothing here runs the engine's
+ * mutating rule functions directly — every commit-shaped action (start-match, pick-*,
+ * CONFIRM_PLACEMENT) is sent to the server and only ever applied locally once the server's
+ * own broadcast comes back, since the server is the sole authority over the room's real
+ * state. Everything else (SELECT_*, ROTATE, CANCEL_SELECTION — the purely local-UI actions)
+ * runs through the same gameReducer/draftReducer hot-seat already uses, unchanged.
  */
 export function useOnlineMatch(roomCode: string, content: GameContent, initialConfig: Config): OnlineMatchHandle {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
@@ -47,8 +59,9 @@ export function useOnlineMatch(roomCode: string, content: GameContent, initialCo
   const [opponentConnected, setOpponentConnected] = useState(false);
   const [config, setConfig] = useState<Config | null>(null);
   const [draftUIState, setDraftUIState] = useState<DraftUIState | null>(null);
-  const [game, setGame] = useState<RedactedGameState | null>(null);
+  const [gameUIState, setGameUIState] = useState<UIState | null>(null);
   const [setupProgress, setSetupProgress] = useState<SetupProgressSummary | null>(null);
+  const [playerSetups, setPlayerSetups] = useState<PlayerSetup[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const clientIdRef = useRef<string | null>(null);
@@ -73,8 +86,9 @@ export function useOnlineMatch(roomCode: string, content: GameContent, initialCo
           setOpponentConnected(msg.opponentConnected);
           setConfig(msg.config);
           setDraftUIState(msg.draft ? createInitialDraftUIState(content, msg.draft) : null);
-          setGame(msg.game);
+          setGameUIState(msg.game ? initialGameUIState(content, msg.game) : null);
           setSetupProgress(msg.setupProgress);
+          setPlayerSetups(msg.playerSetups);
           break;
         case 'room-update':
           setOpponentConnected(msg.opponentConnected);
@@ -87,8 +101,11 @@ export function useOnlineMatch(roomCode: string, content: GameContent, initialCo
           break;
         case 'game-update':
           setRoomPhase('game');
-          setGame(msg.game);
+          setGameUIState((prev) =>
+            prev ? gameReducer(prev, { type: 'SYNC_REMOTE_STATE', gameState: msg.game }) : initialGameUIState(content, msg.game)
+          );
           setSetupProgress(msg.setupProgress);
+          setPlayerSetups(msg.playerSetups);
           break;
         case 'error':
           setError(msg.message);
@@ -123,6 +140,40 @@ export function useOnlineMatch(roomCode: string, content: GameContent, initialCo
     [send]
   );
 
+  const dispatchGame = useCallback<Dispatch<Action>>(
+    (action) => {
+      if (action.type === 'DISMISS_ERROR') {
+        setError(null);
+        return;
+      }
+
+      if (action.type === 'CONFIRM_PLACEMENT') {
+        setGameUIState((prev) => {
+          if (!prev) return prev;
+          const req = buildPlacementRequest(prev, action.discardCardId);
+          if (req) {
+            send(
+              req.phase === 'setup'
+                ? { type: 'place-setup', cellIdx: req.cellIdx, item: req.item }
+                : { type: 'play-card', cellIdx: req.cellIdx, item: req.item, rotation: req.rotation, discardCardId: req.discardCardId }
+            );
+          }
+          // Optimistically clear the local selection while waiting for the server's
+          // broadcast — reuses the existing CANCEL_SELECTION case rather than a new one.
+          return gameReducer(prev, { type: 'CANCEL_SELECTION' });
+        });
+        return;
+      }
+
+      // Everything else (SELECT_*, ROTATE, SELECT_CELL, CANCEL_SELECTION) is purely local UI
+      // state — never touches gameState — so it runs through the exact same gameReducer
+      // hot-seat uses, unchanged. SYNC_REMOTE_STATE and CONFIRM_HANDOFF are handled above/
+      // never dispatched online respectively, but routing them through here too is harmless.
+      setGameUIState((prev) => (prev ? gameReducer(prev, action) : prev));
+    },
+    [send]
+  );
+
   const startMatch = useCallback(() => send({ type: 'start-match' }), [send]);
   const dismissError = useCallback(() => setError(null), []);
 
@@ -137,7 +188,9 @@ export function useOnlineMatch(roomCode: string, content: GameContent, initialCo
     startMatch,
     draftUIState,
     dispatchDraft,
-    game,
+    gameUIState,
+    dispatchGame,
     setupProgress,
+    playerSetups,
   };
 }

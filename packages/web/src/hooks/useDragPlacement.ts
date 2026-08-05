@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type PointerEvent as ReactPointerEvent } from 'react';
-import type { GameState } from '@eltyca/engine';
+import type { GameState, RedactedGameState } from '@eltyca/engine';
 import type { Action, Selection } from '../reducer/types';
 import { isLegalDropCell } from '../game/dropTargets';
 
@@ -42,7 +42,7 @@ export interface UseDragPlacementResult {
  */
 export function useDragPlacement(
   dispatch: Dispatch<Action>,
-  gameState: GameState,
+  gameState: GameState | RedactedGameState,
   selection: Selection | null
 ): UseDragPlacementResult {
   const [isDragging, setIsDragging] = useState(false);

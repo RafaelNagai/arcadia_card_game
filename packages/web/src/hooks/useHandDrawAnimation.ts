@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { HandItem, PlayerId } from '@eltyca/engine';
+import type { HandItem, PlayerId, RedactedHandItem } from '@eltyca/engine';
 
 /** Per-card stagger between successive draw-in animations — also used by Hand.tsx to set animationDelay. */
 export const HAND_DRAW_STAGGER_MS = 90;
@@ -19,7 +19,7 @@ const REVEAL_BUFFER_MS = 100;
  * hand looked like last time" and misfire on every turn. Call this from Match.tsx, which
  * survives the whole match.
  */
-export function useHandDrawAnimation(playerId: PlayerId, hand: HandItem[]): number {
+export function useHandDrawAnimation(playerId: PlayerId, hand: HandItem[] | RedactedHandItem[]): number {
   const lastSeenLengthRef = useRef<Partial<Record<PlayerId, number>>>({});
   const [newlyDrawnCount, setNewlyDrawnCount] = useState(0);
 

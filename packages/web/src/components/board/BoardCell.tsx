@@ -1,10 +1,10 @@
-import { effectivePower, type Cell, type GameContent, type GameState } from '@eltyca/engine';
+import { effectivePower, type Cell, type GameContent, type GameState, type RedactedCell, type RedactedGameState } from '@eltyca/engine';
 import { CardMini } from '../card/CardMini';
 import { ShipBadge } from '../card/ShipBadge';
 
 export interface BoardCellProps {
-  cell: Cell;
-  gameState: GameState;
+  cell: Cell | RedactedCell;
+  gameState: GameState | RedactedGameState;
   content: GameContent;
   captured: boolean;
   isTarget: boolean;
@@ -45,7 +45,11 @@ export function BoardCell({
     inner = <div className="board-cell-hidden">?</div>;
   } else if (cell.content?.kind === 'card') {
     const card = content.cards[cell.content.cardId];
-    const power = effectivePower({ state: gameState, content, cellIdx: cell.idx });
+    // A card on the board is never a redaction target (only face-down setup pieces are —
+    // see redact.ts), so gameState is genuinely a real GameState here regardless of its
+    // widened type; effectivePower stays strictly typed since it's core engine logic that
+    // has no business knowing about the network-only concept of a redacted view.
+    const power = effectivePower({ state: gameState as GameState, content, cellIdx: cell.idx });
     inner = <CardMini card={card} rotation={cell.content.rot} owner={cell.content.owner} displayPower={power} compact />;
   } else if (cell.content?.kind === 'ship') {
     const ship = content.ships[cell.content.shipId];

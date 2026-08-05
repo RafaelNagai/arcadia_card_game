@@ -15,12 +15,9 @@ function send(connection: Party.Connection, message: ServerMessage) {
   connection.send(JSON.stringify(message));
 }
 
-/** Lobby + Porto draft + a first (still unredacted-in-parts, see below) look at the game
- *  once the draft finishes — see protocol.ts. Setup/main-phase gameplay *interaction*
- *  (place-setup, play-card) joins in the next phase; for now, once phase is 'game', clients
- *  only ever receive a redacted, read-only view of it. A room is a single PartyKit party
- *  whose room id *is* the shareable code; state lives in room.storage so a room survives the
- *  server hibernating between messages, not just one connection. */
+/** Lobby + Porto draft + full setup/main-phase gameplay — see protocol.ts. A room is a
+ *  single PartyKit party whose room id *is* the shareable code; state lives in room.storage
+ *  so a room survives the server hibernating between messages, not just one connection. */
 export default class Server implements Party.Server {
   private state: PersistedRoomState | undefined;
 
@@ -67,6 +64,7 @@ export default class Server implements Party.Server {
       draft: this.state.draft,
       game: this.state.game ? redactGameStateForPlayer(this.state.game, playerId) : null,
       setupProgress: this.state.game?.phase === 'setup' ? summarizeSetupProgress(this.state.game) : null,
+      playerSetups: this.state.game?.phase === 'end' ? this.state.playerSetups : null,
     });
     this.broadcastPresence();
   }
@@ -125,10 +123,11 @@ export default class Server implements Party.Server {
     if (this.state.phase === 'game' && this.state.game) {
       const game = this.state.game;
       const setupProgress = game.phase === 'setup' ? summarizeSetupProgress(game) : null;
+      const playerSetups = game.phase === 'end' ? this.state.playerSetups : null;
       for (const conn of this.room.getConnections()) {
         const connState = this.connectionState(conn);
         if (!connState) continue;
-        send(conn, { type: 'game-update', game: redactGameStateForPlayer(game, connState.playerId), setupProgress });
+        send(conn, { type: 'game-update', game: redactGameStateForPlayer(game, connState.playerId), setupProgress, playerSetups });
       }
     }
   }

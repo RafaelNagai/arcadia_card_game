@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { GameState, PlayerId } from '@eltyca/engine';
+import type { GameState, PlayerId, RedactedGameState } from '@eltyca/engine';
 import { diffNewlyOccupiedCells, dominationCellsFromLastLogEvent } from '../game/captureEffects';
 
 export interface CommitAnimationState {
@@ -21,7 +21,7 @@ const VISIBLE_DURATION_MS = 650;
  * it already was (a single player's own back-to-back setup placements), or the moment
  * `awaitingHandoff` clears (the next player just pressed "ready").
  */
-export function useCommitAnimations(gameState: GameState, awaitingHandoff: PlayerId | null): CommitAnimationState {
+export function useCommitAnimations(gameState: GameState | RedactedGameState, awaitingHandoff: PlayerId | null): CommitAnimationState {
   const [visible, setVisible] = useState<CommitAnimationState>(EMPTY);
 
   const prevCellsRef = useRef(gameState.cells);

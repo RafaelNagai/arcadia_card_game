@@ -1,6 +1,6 @@
 import type { Dispatch, PointerEvent as ReactPointerEvent } from 'react';
 import { useRef } from 'react';
-import type { PlayerId, PlayerSetup } from '@eltyca/engine';
+import type { GameState, Player, PlayerId, PlayerSetup } from '@eltyca/engine';
 import type { UIState, Action } from './reducer/types';
 import { Board } from './components/board/Board';
 import { DragGhost } from './components/board/DragGhost';
@@ -66,9 +66,12 @@ export default function LiveMatch({ state, dispatch, playerSetups, onNewMatch, v
   }
 
   if (gameState.phase === 'end') {
+    // redactGameStateForPlayer returns everything unredacted once phase is 'end' (see its
+    // doc comment) — nothing left to hide, and EndSequence/computeTelemetry need full
+    // fidelity for both players' stats. The cast reflects that, not a gap in redaction.
     return (
       <EndSequence
-        gameState={gameState}
+        gameState={gameState as GameState}
         content={content}
         playerSetups={playerSetups}
         durationMs={Date.now() - startedAt.current}
@@ -80,7 +83,11 @@ export default function LiveMatch({ state, dispatch, playerSetups, onNewMatch, v
   if (gameState.phase === 'setup') {
     const displayedPlayerId = viewerId ?? activeSetupPlayer;
     const canAct = viewerId ? activeSetupPlayer === viewerId : true;
-    const player = gameState.players.find((p) => p.id === displayedPlayerId)!;
+    // Always the viewer's own player online (never redacted — redaction only ever hides the
+    // *opponent's* data) and hot-seat's gameState is never actually redacted either, so this
+    // cast is safe despite gameState.players' widened element type; SetupPanel/DragGhost
+    // weren't widened since they only ever render this client's own, always-real hand.
+    const player = gameState.players.find((p) => p.id === displayedPlayerId)! as Player;
 
     return (
       <div className="game-screen">
@@ -120,7 +127,8 @@ export default function LiveMatch({ state, dispatch, playerSetups, onNewMatch, v
   // main phase
   const displayedPlayerId = viewerId ?? gameState.turnPlayer;
   const canAct = viewerId ? gameState.turnPlayer === viewerId : true;
-  const displayedPlayer = gameState.players.find((p) => p.id === displayedPlayerId)!;
+  // Same reasoning as the setup branch above: always this client's own, always-real player.
+  const displayedPlayer = gameState.players.find((p) => p.id === displayedPlayerId)! as Player;
   const activePlayer = gameState.players.find((p) => p.id === gameState.turnPlayer)!;
   const displayState = state.previewState ?? gameState;
 
@@ -129,6 +137,7 @@ export default function LiveMatch({ state, dispatch, playerSetups, onNewMatch, v
       <header>
         <h1>
           Turn {gameState.turnNumber} · {activePlayer.id} to play
+          {viewerId && !canAct ? ' — waiting for opponent' : ''}
         </h1>
       </header>
       {state.error && <div className="error-banner">{state.error}</div>}

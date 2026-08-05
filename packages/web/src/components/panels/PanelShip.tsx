@@ -1,10 +1,10 @@
-import type { GameContent, GameState, Player } from '@eltyca/engine';
+import type { GameContent, GameState, Player, RedactedGameState, RedactedPlayer } from '@eltyca/engine';
 import { ShipBadge } from '../card/ShipBadge';
 
 export interface PanelShipProps {
   content: GameContent;
-  gameState: GameState;
-  player: Player;
+  gameState: GameState | RedactedGameState;
+  player: Player | RedactedPlayer;
 }
 
 export function PanelShip({ content, gameState, player }: PanelShipProps) {

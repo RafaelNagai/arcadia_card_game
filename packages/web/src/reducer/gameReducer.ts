@@ -1,6 +1,8 @@
 import {
   type GameContent,
   type GameState,
+  type HandItem,
+  type Player,
   type Rotation,
   type SetupItem,
   isSetupDoneForAll,
@@ -75,18 +77,53 @@ export function gameReducer(state: UIState, action: Action): UIState {
     case 'DISMISS_ERROR':
       return { ...state, error: null };
 
+    case 'SYNC_REMOTE_STATE':
+      return { ...state, gameState: action.gameState, selection: null, targetCellIdx: null, previewState: null, error: null };
+
     default:
       return state;
   }
 }
 
+export type PlacementRequest =
+  | { phase: 'setup'; cellIdx: number; item: SetupItem }
+  | { phase: 'main'; cellIdx: number; item: HandItem; rotation: Rotation; discardCardId?: string };
+
+/** Derives the same "what am I about to commit" intent commitSetupPlacement/commitMainPlacement
+ *  compute internally, without actually calling the engine — useOnlineMatch.ts uses this to
+ *  turn a CONFIRM_PLACEMENT into a network request instead of a local mutation, so the two
+ *  code paths (hot-seat: mutate locally; online: ask the server) don't have to duplicate the
+ *  "which item, which cell, which rotation" derivation. Returns null for whatever reason
+ *  commitPlacement would have been a no-op (nothing selected/targeted yet). */
+export function buildPlacementRequest(state: UIState, discardCardId?: string): PlacementRequest | null {
+  if (!state.selection || state.targetCellIdx === null) return null;
+
+  if (state.gameState.phase === 'setup') {
+    if (state.selection.mode === 'setup-ship') return { phase: 'setup', cellIdx: state.targetCellIdx, item: { kind: 'ship' } };
+    if (state.selection.mode === 'setup-cargo') return { phase: 'setup', cellIdx: state.targetCellIdx, item: { kind: 'cargo' } };
+    return null;
+  }
+
+  if (state.selection.mode !== 'main-hand') return null;
+  // Same "always the viewer's own, always-real hand" reasoning as computePreview above.
+  const player = state.gameState.players.find((p) => p.id === state.gameState.turnPlayer)! as Player;
+  const item = player.hand[state.selection.handIndex];
+  if (!item) return null;
+  return { phase: 'main', cellIdx: state.targetCellIdx, item, rotation: state.selection.rotation, discardCardId };
+}
+
 function computePreview(state: UIState, selection: Selection, cellIdx: number): GameState | null {
   if (selection.mode !== 'main-hand') return null;
-  const player = state.gameState.players.find((p) => p.id === state.gameState.turnPlayer)!;
+  // SELECT_HAND_ITEM only ever fires from the viewer's own rendered hand (LiveMatch only
+  // wires that up when it's genuinely this player's turn), so this is always real data —
+  // never a redacted opponent view — despite gameState's widened type. resolvePlacement
+  // stays strictly typed on purpose; it's core engine logic that shouldn't need to know
+  // about the network-only concept of redaction.
+  const player = state.gameState.players.find((p) => p.id === state.gameState.turnPlayer)! as Player;
   const item = player.hand[selection.handIndex];
   if (!item) return null;
   try {
-    return resolvePlacement(state.gameState, state.content, player.id, cellIdx, item, selection.rotation);
+    return resolvePlacement(state.gameState as GameState, state.content, player.id, cellIdx, item, selection.rotation);
   } catch {
     return null;
   }
@@ -105,8 +142,13 @@ function commitPlacement(state: UIState, discardCardId?: string): UIState {
   }
 }
 
+/** Hot-seat only in practice: useOnlineMatch's dispatch wrapper intercepts CONFIRM_PLACEMENT
+ *  and sends it to the server instead of ever letting it reach here (see useOnlineMatch.ts),
+ *  since the server is the sole authority for an online match. This still has to satisfy
+ *  UIState's widened gameState type, though, since gameReducer itself is shared by both
+ *  modes — hence the casts below, not because redacted data could genuinely reach here. */
 function commitSetupPlacement(state: UIState, selection: Selection, cellIdx: number): UIState {
-  const activePlayerId = state.awaitingHandoff ?? nextSetupPlayer(state.gameState);
+  const activePlayerId = state.awaitingHandoff ?? nextSetupPlayer(state.gameState as GameState);
   if (!activePlayerId) return state;
 
   let item: SetupItem;
@@ -118,7 +160,7 @@ function commitSetupPlacement(state: UIState, selection: Selection, cellIdx: num
     throw new Error('Select the Ship or a Cargo token first');
   }
 
-  let nextGameState = placeInSetup(state.gameState, activePlayerId, cellIdx, item);
+  let nextGameState = placeInSetup(state.gameState as GameState, activePlayerId, cellIdx, item);
 
   const base: UIState = {
     ...state,
@@ -141,6 +183,7 @@ function commitSetupPlacement(state: UIState, selection: Selection, cellIdx: num
   return { ...base, awaitingHandoff: upcoming === activePlayerId ? null : upcoming };
 }
 
+/** Hot-seat only in practice — see commitSetupPlacement's doc comment; same reasoning. */
 function commitMainPlacement(
   state: UIState,
   selection: Selection,
@@ -148,12 +191,12 @@ function commitMainPlacement(
   discardCardId?: string
 ): UIState {
   if (selection.mode !== 'main-hand') return state;
-  const player = state.gameState.players.find((p) => p.id === state.gameState.turnPlayer)!;
+  const player = state.gameState.players.find((p) => p.id === state.gameState.turnPlayer)! as Player;
   const item = player.hand[selection.handIndex];
   if (!item) throw new Error('Selected item is no longer in hand');
 
   const nextGameState = playTurn(
-    state.gameState,
+    state.gameState as GameState,
     state.content,
     player.id,
     cellIdx,

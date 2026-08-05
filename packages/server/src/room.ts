@@ -1,5 +1,5 @@
 import type * as Party from 'partykit/server';
-import type { Config, DraftState, GameState, PlayerId } from '@eltyca/engine';
+import type { Config, DraftState, GameState, PlayerId, PlayerSetup } from '@eltyca/engine';
 import { loadConfig } from '@eltyca/engine';
 import type { RoomPhase } from './protocol';
 
@@ -12,6 +12,13 @@ export interface PersistedRoomState {
   phase: RoomPhase;
   draft: DraftState | null;
   game: GameState | null;
+  /** Set once, the instant the draft finishes (see applyAction.ts's advancePick) — the
+   *  original drafted decks, which EndSequence/computeTelemetry need at match end. Each
+   *  player's own full deck is exactly the private information the rest of this protocol
+   *  works hard to hide, so — same as everything else — this only ever goes out over the
+   *  wire once game.phase is 'end' (see protocol.ts's ServerMessage doc comment); never
+   *  broadcast mid-match. */
+  playerSetups: PlayerSetup[] | null;
 }
 
 const STORAGE_KEY = 'room';
@@ -37,6 +44,7 @@ export function createNewRoom(code: string, configOverrides?: Partial<Config>): 
     phase: 'lobby',
     draft: null,
     game: null,
+    playerSetups: null,
   };
 }
 

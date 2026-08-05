@@ -1,8 +1,9 @@
-import type { Cell, DirectionResult, LogEvent } from '@eltyca/engine';
+import type { Cell, DirectionResult, LogEvent, RedactedCell } from '@eltyca/engine';
 
 /** Cells that went from empty to occupied between two board snapshots — the uniform
- *  "something got placed" signal across both setup (never logged) and the main phase. */
-export function diffNewlyOccupiedCells(prevCells: Cell[], nextCells: Cell[]): number[] {
+ *  "something got placed" signal across both setup (never logged) and the main phase.
+ *  Works the same against redacted cells — a hidden opponent piece is still non-null. */
+export function diffNewlyOccupiedCells(prevCells: (Cell | RedactedCell)[], nextCells: (Cell | RedactedCell)[]): number[] {
   const prevOccupied = new Set(prevCells.filter((c) => c.content !== null).map((c) => c.idx));
   const newlyOccupied: number[] = [];
   for (const cell of nextCells) {

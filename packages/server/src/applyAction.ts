@@ -1,7 +1,19 @@
-import type { GameContent, PlayerId } from '@eltyca/engine';
-import { createDraftState, createInitialState, pickCaptain, pickCard, pickShip, toPlayerSetups } from '@eltyca/engine';
+import type { GameContent, HandItem, PlayerId, Rotation, SetupItem } from '@eltyca/engine';
+import {
+  createDraftState,
+  createInitialState,
+  isSetupDoneForAll,
+  pickCaptain,
+  pickCard,
+  pickShip,
+  placeInSetup,
+  playTurn,
+  revealSetup,
+  toPlayerSetups,
+} from '@eltyca/engine';
 import type { ClientMessage } from './protocol';
 import { isRoomFull, type PersistedRoomState } from './room';
+import { assertSetupTurn } from './validate';
 
 const PLAYER_IDS: PlayerId[] = ['P1', 'P2'];
 
@@ -21,12 +33,21 @@ export function applyAction(room: PersistedRoomState, playerId: PlayerId, msg: C
       return { ...room, draft: pickShip(mustDraft(room), playerId, msg.shipId) };
     case 'pick-card':
       return advancePick(room, playerId, msg.cardId, content);
+    case 'place-setup':
+      return applySetupPlacement(room, playerId, msg.cellIdx, msg.item);
+    case 'play-card':
+      return applyMainPlay(room, playerId, msg.cellIdx, msg.item, msg.rotation, msg.discardCardId, content);
   }
 }
 
 function mustDraft(room: PersistedRoomState) {
   if (room.phase !== 'draft' || !room.draft) throw new Error('The draft has not started yet');
   return room.draft;
+}
+
+function mustGame(room: PersistedRoomState) {
+  if (room.phase !== 'game' || !room.game) throw new Error('The match has not started yet');
+  return room.game;
 }
 
 function startMatch(room: PersistedRoomState, content: GameContent): PersistedRoomState {
@@ -48,5 +69,34 @@ function advancePick(room: PersistedRoomState, playerId: PlayerId, cardId: strin
   const playerSetups = toPlayerSetups(draft, content);
   const seed = Math.floor(Math.random() * 1_000_000);
   const game = createInitialState(room.config, playerSetups, seed);
-  return { ...room, phase: 'game', draft, game };
+  return { ...room, phase: 'game', draft, game, playerSetups };
+}
+
+/** Mirrors gameReducer.ts's commitSetupPlacement, minus the UI-only bookkeeping. The one
+ *  real addition versus that local reducer: assertSetupTurn, since placeInSetup itself never
+ *  checks whose turn it is (see validate.ts's doc comment) — that enforcement only ever
+ *  existed in the trusted local UI before online play existed. */
+function applySetupPlacement(room: PersistedRoomState, playerId: PlayerId, cellIdx: number, item: SetupItem): PersistedRoomState {
+  const game = mustGame(room);
+  assertSetupTurn(game, playerId);
+
+  let nextGame = placeInSetup(game, playerId, cellIdx, item);
+  if (isSetupDoneForAll(nextGame)) nextGame = revealSetup(nextGame);
+  return { ...room, game: nextGame };
+}
+
+/** Mirrors gameReducer.ts's commitMainPlacement — playTurn already self-validates both the
+ *  phase and whose turn it is, so there's nothing extra to add here. */
+function applyMainPlay(
+  room: PersistedRoomState,
+  playerId: PlayerId,
+  cellIdx: number,
+  item: HandItem,
+  rotation: Rotation,
+  discardCardId: string | undefined,
+  content: GameContent
+): PersistedRoomState {
+  const game = mustGame(room);
+  const nextGame = playTurn(game, content, playerId, cellIdx, item, rotation, discardCardId ? { discardCardId } : undefined);
+  return { ...room, game: nextGame };
 }

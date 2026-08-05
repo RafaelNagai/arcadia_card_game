@@ -1,7 +1,9 @@
-import { formatLogEvent, type GameContent, type GameState } from '@eltyca/engine';
+import { formatLogEvent, type GameContent, type GameState, type RedactedGameState } from '@eltyca/engine';
 
 export interface LogPanelProps {
-  gameState: GameState;
+  /** log is identical between GameState and RedactedGameState — every entry is a placement
+   *  that already happened in the open, never touched by redaction. */
+  gameState: GameState | RedactedGameState;
   content: GameContent;
 }
 

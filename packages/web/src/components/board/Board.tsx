@@ -1,14 +1,16 @@
-import type { GameContent, GameState } from '@eltyca/engine';
+import type { GameContent, GameState, RedactedGameState } from '@eltyca/engine';
 import { BoardCell } from './BoardCell';
 import type { Selection } from '../../reducer/types';
 import { isLegalDropCell } from '../../game/dropTargets';
 import type { CommitAnimationState } from '../../hooks/useCommitAnimations';
 
 export interface BoardProps {
-  /** The state actually shown — the live gameState, or a speculative previewState while a target cell is picked. */
-  displayState: GameState;
+  /** The state actually shown — the live gameState, or a speculative previewState while a target cell is picked.
+   *  Accepts a RedactedGameState too: online, this is the viewer's own redacted view (real GameState locally,
+   *  in hot-seat, which never redacts). Hidden cells render identically either way — see BoardCell. */
+  displayState: GameState | RedactedGameState;
   /** Always the real, committed state — used to know which cells are truly empty and to diff captures. */
-  baseState: GameState;
+  baseState: GameState | RedactedGameState;
   content: GameContent;
   selection: Selection | null;
   targetCellIdx: number | null;

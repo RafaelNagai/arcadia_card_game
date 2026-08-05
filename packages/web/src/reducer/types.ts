@@ -1,4 +1,4 @@
-import type { GameContent, GameState, PlayerId, Rotation } from '@eltyca/engine';
+import type { GameContent, GameState, PlayerId, RedactedGameState, Rotation } from '@eltyca/engine';
 
 export type Selection =
   | { mode: 'setup-ship' }
@@ -7,12 +7,14 @@ export type Selection =
 
 export interface UIState {
   content: GameContent;
-  gameState: GameState;
+  /** A real GameState in hot-seat (never redacted, single shared screen); a RedactedGameState
+   *  online (this client's own view, synced from the server — see useOnlineMatch.ts). */
+  gameState: GameState | RedactedGameState;
   selection: Selection | null;
   targetCellIdx: number | null;
   /** Speculative result of resolvePlacement for the current selection+target — never committed, just diffed for the capture preview overlay. */
   previewState: GameState | null;
-  /** Non-null while the "pass the device" screen should be shown for this player, hiding the board/hand from the other player. */
+  /** Non-null while the "pass the device" screen should be shown for this player, hiding the board/hand from the other player. Hot-seat only — an online UIState never populates this. */
   awaitingHandoff: PlayerId | null;
   error: string | null;
 }
@@ -26,4 +28,8 @@ export type Action =
   | { type: 'SELECT_CELL'; cellIdx: number }
   | { type: 'CONFIRM_PLACEMENT'; discardCardId?: string }
   | { type: 'CANCEL_SELECTION' }
-  | { type: 'DISMISS_ERROR' };
+  | { type: 'DISMISS_ERROR' }
+  /** Dispatched by useOnlineMatch whenever the server pushes a fresh (redacted) game state —
+   *  replaces `gameState` wholesale and clears any in-flight local selection/preview, since
+   *  those were speculating about a state that's now stale. Never dispatched in hot-seat. */
+  | { type: 'SYNC_REMOTE_STATE'; gameState: RedactedGameState };
