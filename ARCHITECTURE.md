@@ -1,109 +1,93 @@
-# ELTYCA — Protótipo Web
+# ELTYCA — Arquitetura técnica
 
-### Especificação técnica, baseada nas Regras v0.9 — **M0 a M3 implementados**
+### Baseado nas Regras v0.9. Hot-seat, draft Porto, multiplayer online real e deploy — todos implementados.
 
 ---
 
-## Por que este protótipo existe
+## O que este projeto é hoje
 
-Ele não é o jogo. Ele é o **instrumento de medição** do jogo.
+ELTYCA começou como um instrumento de medição (um protótipo pra validar as regras com dados de simulação antes de qualquer coisa visual) e evoluiu, deliberadamente, para o jogo de verdade: arte por carta, capitão e navio, modo Porto (draft), partida online real com sala por código, e desistência. A engenharia por trás continua a mesma — motor puro, testado, simulável — mas o objetivo não é mais só medir, é ser jogado.
 
-O objetivo é responder às sete perguntas da lista de teste das regras com dados em vez de opinião: se a Carga está cara ou barata, se o Navio domina a partida, se a Abordagem é forte demais, se os +3 da rota decidem sozinhos, quanto dura uma partida de verdade.
-
-Isso significa uma inversão de prioridade em relação a um projeto normal: **motor de regras e telemetria vêm antes de qualquer coisa visual.** Uma tela feia que registra tudo vale mais aqui do que uma tela bonita que não mede nada.
-
-Esse instrumento já existe e roda: motor com 46 testes automatizados, três bots, simulação em lote com relatório, e um app jogável com arrastar-e-soltar e telemetria exportável. O resto deste documento descreve o que foi construído — não mais um plano, um relato do que existe.
+Este documento descreve a arquitetura como ela existe agora, não um plano. Pra regras de jogo (o "porquê" de cada mecânica), ver [regras_v0.9.md](regras_v0.9.md). Pra convenções de como trabalhar neste repositório, ver [CLAUDE.md](CLAUDE.md).
 
 ---
 
 ## A decisão de arquitetura que importa
 
-> **O motor de regras é uma função pura, sem nenhuma dependência de UI.**
+> **O motor de regras é uma função pura, sem nenhuma dependência de UI, rede ou DOM.**
 
 ```
-resolvePlacement(state, action) -> newState
+resolvePlacement(state, content, playerId, cellIdx, item, rotation) -> newState
 ```
 
-Sem DOM, sem framework, sem timers, sem aleatoriedade não-semeada. Todo acaso passa por um `seed` guardado no estado.
+Todo acaso passa por um `seed` guardado no estado. Isso não é elegância — é o que permite o motor rodar **fora do navegador**: simular partidas com bots antes de convidar um humano (`npm run batch`), e mais tarde, rodar dentro de um Durable Object da Cloudflare sem nenhuma adaptação (o servidor de multiplayer chama exatamente as mesmas funções que o reducer local do hot-seat chama).
 
-O motivo não é elegância. É que um motor puro roda **fora do navegador**, e isso libera o modo mais valioso do projeto inteiro: simular partidas com bots antes de convidar um ser humano. Isso já está de pé — `npm run batch` roda centenas de partidas em segundos e cospe taxa de vitória, médias de métrica e um CSV pra planilha.
-
-**Stack escolhida:** TypeScript nos dois pacotes. Monorepo com npm workspaces:
+**Stack:** TypeScript em todos os pacotes. Monorepo com npm workspaces, três pacotes:
 
 ```
 arcadia_card_game/
-├── package.json                 # workspaces: packages/*
+├── package.json                    # workspaces: packages/*
 ├── tsconfig.base.json
+├── regras_v0.9.md                  # regras do jogo (fonte da verdade de design)
+├── ARCHITECTURE.md                 # este arquivo
+├── CLAUDE.md                       # guia de convenções pro Claude Code
 └── packages/
-    ├── engine/                  # @eltyca/engine — TS puro, zero UI
+    ├── engine/                     # @eltyca/engine — TS puro, zero UI, zero rede
     │   ├── src/
     │   │   ├── types.ts, constants.ts, rotation.ts, config.ts
-    │   │   ├── rules/           # resolvePlacement, setup, turn, route,
-    │   │   │                    # scoring, hand, silencing, initialState, log
-    │   │   ├── effects/         # os dois ganchos + exemplos
-    │   │   ├── content/         # cartas/capitães/navios/decks de exemplo
-    │   │   ├── bots/            # random, greedy, route
-    │   │   ├── simulation/      # runMatch, runBatch, summarize
-    │   │   ├── telemetry/       # computeTelemetry, csv, serialize
-    │   │   └── cli/             # simulateMatch.ts, runBatch.ts
-    │   └── test/                # 16 arquivos, 46 testes, Vitest
-    └── web/                     # @eltyca/web — Vite + React, consome o engine
+    │   │   ├── rules/              # resolvePlacement, setup, turn (+ surrender), route,
+    │   │   │                       # scoring, hand, silencing, initialState, log,
+    │   │   │                       # redact (sigilo), draft (Porto), setupProgress
+    │   │   ├── effects/            # os dois ganchos + exemplos (efeitos de carta/passivas)
+    │   │   ├── content/            # cards.json, ships.json, captains.json (dados, não código)
+    │   │   ├── bots/                # random, greedy, route
+    │   │   ├── simulation/          # runMatch, runBatch, summarize
+    │   │   ├── telemetry/           # computeTelemetry, csv, serialize
+    │   │   └── cli/                 # simulateMatch.ts, runBatch.ts
+    │   └── test/                    # 21 arquivos, Vitest
+    │
+    ├── server/                     # @eltyca/server — multiplayer online
+    │   ├── wrangler.jsonc          # config de deploy: Durable Object binding + migração SQLite
+    │   ├── src/
+    │   │   ├── server.ts           # EltycaRoom — o Durable Object (partyserver)
+    │   │   ├── protocol.ts         # ClientMessage / ServerMessage (contrato de rede)
+    │   │   ├── applyAction.ts      # mensagem validada -> novo estado (chama o engine direto)
+    │   │   ├── room.ts             # estado persistido da sala, atribuição de slot P1/P2
+    │   │   ├── setupProgress.ts    # resumo de progresso do setup pro cliente
+    │   │   └── validate.ts         # validação que o engine não faz sozinho (turno do setup)
+    │   └── test/                   # vitest, mesmo padrão do engine
+    │
+    └── web/                        # @eltyca/web — Vite + React
+        ├── wrangler.jsonc          # config de deploy: Worker de assets estáticos
         └── src/
-            ├── App.tsx, Match.tsx
-            ├── reducer/         # gameReducer, drive tudo via ações
-            ├── components/      # board, card, hand, panels, log, start, end, hotseat
-            ├── hooks/           # useDragPlacement, useCommitAnimations, useRotateShortcut
-            └── game/            # setupProgress, dropTargets, captureEffects, theme
+            ├── App.tsx              # rotas: /, /settings, /game, /online, /online/:code
+            ├── Match.tsx            # orquestrador pré-jogo hot-seat (choice -> draft)
+            ├── LiveMatch.tsx        # componente controlado — usado por hot-seat E online
+            ├── LiveMatchHost.tsx    # dono do reducer local, só hot-seat
+            ├── reducer/             # gameReducer, draftReducer — mesmas ações nos dois modos
+            ├── hooks/useOnlineMatch.ts  # conecta ao servidor, troca dispatch local por rede
+            ├── components/          # board, card, hand, panels, log, draft, end, hotseat,
+            │                        # online (lobby/sala), settings (desistir)
+            └── game/                 # setupProgress, dropTargets, captureEffects, theme,
+                                       # clientId (localStorage), roomCode
 ```
 
-Scripts principais: `npm test` (motor), `npm run simulate` (uma partida via CLI), `npm run batch -- N` (N partidas por par de bot, CSV no fim), `npm run dev:web` (app jogável).
-
----
-
-## Escopo
-
-**v1 — jogável e mensurável.** ✅ Feito. Dois jogadores, hot-seat, mesma tela. Sem contas, sem servidor, sem persistência.
-
-**v2 — instrumentado.** ✅ Feito. Painel de configuração com todos os botões de balanceamento (na tela inicial), exportação de telemetria (JSON/CSV, tanto no app quanto no CLI), modo simulação com bots.
-
-**v3 — opcional.** 🟡 Parcial. Os três bots existem e rodam em lote (`runBatch`). Partida por link e coleção persistente **não** foram feitas — continuam fora de escopo.
-
-**Fora de escopo ainda:** arte definitiva, som, layout mobile dedicado, deckbuilding persistente, contas, modo Porto (draft).
+Scripts principais: ver [CLAUDE.md](CLAUDE.md#commands).
 
 ---
 
 ## Modelo de dados
 
-O código é todo em inglês — os tipos abaixo já são os nomes reais em `packages/engine/src/types.ts`, não uma tradução aproximada.
+O código é todo em inglês — os tipos abaixo são os nomes reais em `packages/engine/src/types.ts`.
 
-### Direções
+### Direções e rotação
 
-Oito direções, índice 0 a 7, sentido horário a partir do Norte.
+Oito direções, índice 0 a 7, sentido horário a partir do Norte. Cada giro de 90° desloca o padrão de setas duas posições no índice.
 
 ```ts
 // 0=N  1=NE  2=E  3=SE  4=S  5=SW  6=W  7=NW
-const OFFSET: [number, number][] = [
-  [-1, 0], [-1, 1], [0, 1], [1, 1],
-  [1, 0], [1, -1], [0, -1], [-1, -1]
-];
-
-const opposite = (d: number) => (d + 4) % 8;
-```
-
-### Rotação
-
-A carta é quadrada: quatro orientações. Cada giro de 90° desloca o padrão **duas posições** no índice.
-
-```ts
-type Rotation = 0 | 1 | 2 | 3; // 0°, 90°, 180°, 270°
-
-function effectiveArrows(arrows: boolean[], rot: Rotation): boolean[] {
-  const out = new Array(8).fill(false);
-  for (let i = 0; i < 8; i++) {
-    if (arrows[i]) out[(i + rot * 2) % 8] = true;
-  }
-  return out;
-}
+type Rotation = 0 | 1 | 2 | 3;
+function effectiveArrows(arrows: boolean[], rot: Rotation): boolean[] { /* desloca rot*2 */ }
 ```
 
 ### Entidades
@@ -113,145 +97,113 @@ type Element = 'energy' | 'anomaly' | 'paradox' | 'cognitive' | 'astral';
 type CardType = 'creature' | 'vessel' | 'npc';
 
 interface Card {
-  id: string;
-  name: string;
-  type: CardType;
-  element: Element;
-  power: number;
-  arrows: boolean[];      // length 8, orientação impressa
+  id: string; name: string; type: CardType; element: Element; power: number;
+  arrows: boolean[];       // length 8, orientação impressa
   effect?: EffectDef;
   tier: 'E'|'D'|'C'|'B'|'A'|'S'|'SS';
+  imageUrl: string;        // caminho em packages/web/public/, ex: "/creatures/creature-01.jpg"
 }
 
 interface Ship {
-  id: string;
-  name: string;
-  shields: boolean[];     // length 8
-  hull: number;
+  id: string; name: string; shields: boolean[]; hull: number; imageUrl: string;
 }
 
 interface Captain {
-  id: string;
-  name: string;
-  cargoSlots: number;     // 2..5
-  passive?: EffectDef;
+  id: string; name: string; cargoSlots: number; passive?: EffectDef; imageUrl: string;
 }
 
-// Setup só enterra o Navio ou Carga — carta comum nunca é item de setup.
 type SetupItem = { kind: 'cargo' } | { kind: 'ship' };
 type HandItem = { kind: 'card'; cardId: string } | { kind: 'cargo' };
 
 type CellContent =
   | { kind: 'card'; cardId: string; rot: Rotation; owner: PlayerId }
-  | { kind: 'ship'; shipId: string; owner: PlayerId }   // sem campo rot: nunca gira, estruturalmente
+  | { kind: 'ship'; shipId: string; owner: PlayerId }   // sem rot: nunca gira
   | { kind: 'cargo'; placedBy: PlayerId }               // neutra: sem dono
   | null;
 
-interface Cell {
-  idx: number;             // row * width + column
-  chasm: boolean;
-  content: CellContent;
-  hiddenUntil: 'setup' | null;
-}
+interface Cell { idx: number; chasm: boolean; content: CellContent; hiddenUntil: 'setup' | null; }
 
 interface Player {
-  id: PlayerId;
-  captainId: string;
-  shipId: string;
-  deck: string[];
-  hand: HandItem[];
-  cargoRemaining: number;
-  discard: string[];
+  id: PlayerId; captainId: string; shipId: string;
+  deck: string[]; hand: HandItem[]; cargoRemaining: number; discard: string[];
 }
 
-interface Config { /* ver seção Configuração */ }
-
 interface GameState {
-  config: Config;
-  seed: number;
-  grid: { width: number; height: number };
-  cells: Cell[];
-  players: Player[];
-  turnPlayer: PlayerId;
+  config: Config; seed: number; grid: { width: number; height: number };
+  cells: Cell[]; players: Player[]; turnPlayer: PlayerId;
   phase: 'choice' | 'draft' | 'setup' | 'main' | 'end';
-  turnNumber: number;
-  log: LogEvent[];
+  turnNumber: number; log: LogEvent[];
+  surrenderedBy: PlayerId | null;   // set por rules/turn.ts::surrender
 }
 ```
 
-O **dono do Navio agora** é o `owner` dentro de `CellContent`. `Player.shipId` guarda de quem o Navio é originalmente — é isso que decide qual Capitão fica silenciado (`rules/silencing.ts::isCaptainSilenced`).
+`Player.shipId` guarda de quem o Navio é **originalmente** — decide qual Capitão fica silenciado (`rules/silencing.ts`). Quem controla o Navio *agora* é o `owner` dentro de `CellContent`.
 
 ---
 
 ## O coração: resolver uma colocação
 
-`packages/engine/src/rules/resolvePlacement.ts`. É a parte com teste automatizado antes de qualquer tela — os 12 testes da lista abaixo cobrem exatamente isso.
+`packages/engine/src/rules/resolvePlacement.ts`.
 
 ```
 resolvePlacement(state, content, playerId, cellIdx, item, rotation, options?):
 
 1. Valida: casa vazia, não é abismo, item está na mão.
-
-2. Coloca. Se for Carga: aplica a regra de descarte e reposição
-   (rules/hand.ts::playCargo), e ENCERRA. Carga não resolve setas.
-
-3. A = effectiveArrows(card.arrows, rotation)
-   Daqui em diante `working` (um clone) É o snapshot: nenhuma captura
-   é escrita nele até o fim, todas as comparações leem esse estado.
-
-4. Resolução direta — para cada d em A:
-     neighbor = vizinho da casa na direção d
-     se inválido, vazio, abismo, carga, ou já é seu -> ignora
-
-     se vizinho é NAVIO adversário:
-        se ship.shields[opposite(d)] == false  -> DOMÍNIO (boarding)
-        senão: se effectivePower(carta) > ship.hull -> DOMÍNIO
-               senão -> nada
-
-     se vizinho é CARTA adversária:
-        B = effectiveArrows(cartaAlvo.arrows, rotAlvo)
-        se B[opposite(d)] == false -> DOMÍNIO (boarding), não propaga
-        senão -> CLASH:
-             se effectivePower(carta) > effectivePower(alvo) -> DOMÍNIO, propaga
-             senão -> nada (empate mantém com o defensor, salvo tieKeepsDefender=false)
-
-5. Chain — para cada carta dominada por CLASH:
-     C = effectiveArrows(dela)
-     para cada d em C:
-        vizinho adversário, ainda não capturado neste turno,
-        sem seta de volta -> DOMÍNIO por chain
-
-   Profundidade controlada por config.chainDepth (1 por padrão, ou Infinity).
-
-6. Nenhuma carta é dominada mais de uma vez no mesmo turno (Set<idx>).
-
+2. Se for Carga: aplica descarte+reposição (rules/hand.ts::playCargo), ENCERRA.
+3. A = effectiveArrows(card.arrows, rotation) — `working` é um snapshot; nenhuma
+   captura é escrita até o fim, todas as comparações leem o snapshot.
+4. Resolução direta, para cada d em A:
+     vizinho NAVIO adversário: sem escudo -> domínio (boarding);
+       com escudo -> domínio se effectivePower(carta) > hull
+     vizinho CARTA adversária: sem seta de volta -> domínio (boarding), não propaga;
+       com seta de volta -> CLASH: maior effectivePower domina e propaga
+5. Chain — cada carta dominada por CLASH propaga pelas próprias setas, profundidade
+   controlada por config.chainDepth (1 padrão, ou Infinity).
+6. Nenhuma carta dominada mais de uma vez no mesmo turno.
 7. Repõe a mão até o limite (rules/hand.ts::refillHand).
 ```
 
-`resolvePlacement` para exatamente no passo 7 — quem avança `turnPlayer` e detecta fim de partida é uma camada fina acima (`rules/turn.ts::playTurn`), pra manter a função testável isolada. Colocação de Navio/Carga no setup usa `rules/setup.ts::placeInSetup`, que reaproveita a mesma validação de casa mas nunca resolve setas (fica tudo oculto até `revealSetup`).
+`resolvePlacement` para no passo 7 — quem avança `turnPlayer`/detecta fim de partida é `rules/turn.ts::playTurn`, uma camada fina acima, mantendo a função de resolução isolada e testável. Setup usa `rules/setup.ts::placeInSetup`, que reaproveita a mesma validação de casa mas nunca resolve setas (fica oculto até `revealSetup`).
 
-### Poder efetivo e domínio permitido
+**Poder efetivo e domínio:** os dois únicos ganchos de extensão são `rules/effectivePower.ts` (modificadores de carta/oposição/passiva de Capitão) e `rules/canBeDominated.ts` (travas), apoiados num registry pequeno (`effects/registry.ts`) — cada efeito é uma função registrada por id, nunca um sistema genérico de gatilhos.
 
-```ts
-effectivePower(ctx: PowerContext): number
-// aplica MODIFICADORES: da própria carta, da carta oposta,
-// e do passivo do Capitão do dono — se ele não estiver silenciado.
-
-canBeDominated(ctx: LockContext): boolean
-// aplica TRAVAS. Default true.
-```
-
-Continuam sendo os dois únicos ganchos (`rules/effectivePower.ts`, `rules/canBeDominated.ts`), apoiados num registry pequeno (`effects/registry.ts`) — cada efeito de carta ou passivo de Capitão é uma função registrada por id, nunca um sistema genérico de gatilhos.
-
-**Silenciamento:** `rules/silencing.ts::isCaptainSilenced` — checa se o Navio original daquele jogador está sob controle adversário antes de aplicar o passivo.
+**Fim de partida:** normalmente quando o tabuleiro enche (`rules/turn.ts::isGameOver`). `rules/turn.ts::surrender(state, playerId)` também encerra a partida a qualquer momento (setup ou main), forçando o **outro** jogador como vencedor via `GameState.surrenderedBy` — `computeTelemetry` checa esse campo antes de calcular o placar normalmente, então quem desiste perde mesmo se estiver na frente no tabuleiro.
 
 ---
 
-## Cálculo da rota
+## Sistema de conteúdo — cartas, navios e capitães são dados
 
-`rules/route.ts::largestRoute`. Mesmo grafo simples, roda só na pontuação final — Navio e Carga nunca entram (Carga porque não tem `owner`, estruturalmente; Navio porque a rota só olha `content.kind === 'card'`).
+`packages/engine/src/content/{cards,ships,captains}.json`. Cada entrada tem todos os campos do tipo (`Card`/`Ship`/`Captain`), com uma conveniência: setas/escudos são escritos como a lista de **índices ativos** (`"arrows": [0, 2]`), não os 8 booleanos que o motor usa de fato — `sampleCards.ts`/`sampleShips.ts` fazem essa conversão (`arrowsFrom`) ao carregar. `imageUrl` aponta pra um arquivo em `packages/web/public/{creatures,ships,captains}/`.
 
-Bônus de +3 (`config.routeBonus`) só para quem tiver a **maior estritamente** (`routeBonusWinner`). Empate: ninguém leva.
+Adicionar uma carta/navio/capitão novo é só um objeto novo no array JSON com um `id` novo — nenhum código muda. `sampleCaptains.test.ts`/`sampleCards.test.ts`/`sampleShipsCaptains.test.ts` garantem que não hajam ids duplicados nem campos obrigatórios faltando.
+
+---
+
+## Sigilo — a redação de estado
+
+`packages/engine/src/rules/redact.ts::redactGameStateForPlayer(state, viewerId)`.
+
+Tipo próprio (`RedactedGameState`/`RedactedCellContent`), **não** um novo caso no `CellContent` real — assim nenhum dos lugares que fazem pattern-match exaustivo em `CellContent.kind` precisa de um branch morto pra um valor que o estado autoritativo nunca contém de verdade. Redação só acontece na borda de rede (dentro de `server.ts`), nunca dentro do motor.
+
+O que é apagado: mão do adversário (`{kind:'card', cardId}` vira `{kind:'card'}` — some a identidade, `kind` fica porque a contagem de Carga é pública); baralho do adversário (vira só `{length}`); peças enterradas do setup que não são suas (viram `{kind:'hidden', owner}` — até saber que é especificamente um Navio já vaza informação); `seed` (a ordem de compra é determinística a partir dele, então fica oculto — a composição do baralho já é pública via draft, então vazar `seed` deixaria reconstruir a ordem exata).
+
+**`phase === 'end'` é a única exceção deliberada** — nesse ponto a telemetria precisa da mão/baralho reais de ambos, e não há mais nada a esconder, igual a virar as cartas no fim de uma partida física.
+
+Esse é o motivo de **`SetupProgressSummary`** existir como campo explícito no protocolo em vez de o cliente recalcular localmente: `nextSetupPlayer`/`isShipPlaced` detectam uma peça colocada inspecionando `content.kind`, e uma peça escondida do adversário nunca tem esse campo depois de redigida — o cliente acharia que o adversário nunca termina o setup. O servidor calcula isso contra o estado real e manda pronto.
+
+---
+
+## Multiplayer online
+
+`packages/server` é um Durable Object (`EltycaRoom`, via `partyserver`) rodando como Cloudflare Worker. Uma sala = uma instância do Durable Object; o **nome** da instância (`this.name`, vindo do segmento `:name` da URL — `/parties/main/<código>`) É o código compartilhado. Estado persistido em `ctx.storage` (uma chave, o blob `PersistedRoomState` inteiro), recarregado em `onStart()` — sobrevive à hibernação do Durable Object entre mensagens, não só a uma conexão.
+
+- **Conexão e slots**: primeira conexão vira P1, segunda vira P2, a terceira é rejeitada (`room.ts::assignPlayerSlot`). Reconexão (refresh de página) é resolvida por um `clientId` (UUID em `localStorage`, primeiro uso de localStorage no projeto) mandado como query param — o servidor reclama o mesmo slot em vez de tratar como um 3º jogador. Verificado que sobrevive a um refresh no meio de uma partida real, não só no lobby.
+- **Nenhuma mensagem do cliente carrega `playerId`** — o jogador agindo é sempre derivado da conexão no servidor (`protocol.ts`'s `ClientMessage`), nunca do payload. Um cliente nunca consegue alegar ser o adversário.
+- **`applyAction.ts`** espelha o que `gameReducer.ts`/`draftReducer.ts` já fazem localmente, chamando as mesmas funções do `@eltyca/engine` — sem duplicar regra nenhuma. A validação extra que o motor não dá de graça (`assertSetupTurn`, já que `placeInSetup` não valida de quem é a vez, ao contrário de `playTurn`) vive em `validate.ts`.
+- **Cliente híbrido**: seleção/hover/preview de jogada continuam 100% locais (a mesma `computePreview`/`resolvePlacement` que o hot-seat usa, contra o último estado redigido recebido) — só ações que realmente comitam (`CONFIRM_PLACEMENT`, `PICK_*`, `SURRENDER`) viram mensagens de rede. Ver `useOnlineMatch.ts`.
+- **`LiveMatch` é um componente controlado** — `state`/`dispatch` vêm de fora, e um `viewerId?: PlayerId` opcional distingue os dois modos: ausente (hot-seat) mostra sempre quem estiver ativo no momento (uma tela só, passada de mão em mão); presente (online) mostra sempre o mesmo jogador fixo, travado pra somente-leitura quando não é a vez dele.
+
+Verificação de sigilo real (não cosmética) é feita inspecionando os **frames WebSocket brutos** (`page.on('websocket', ws => ws.on('framereceived', ...))`), não só checando o que a UI renderiza — ver a skill `run-and-verify`.
 
 ---
 
@@ -265,155 +217,76 @@ score(P) = (cartas comuns sob controle de P)
          + (config.routeBonus se maiorRota(P) for única e máxima)
 ```
 
-Cargas valem 0. Empate na pontuação final = `'drift'`.
+Cargas valem 0. Empate na pontuação final = `'drift'`. Desistência (`GameState.surrenderedBy`) sobrescreve esse cálculo inteiro em `computeTelemetry` — o resultado nunca é `'drift'` nem depende do placar quando alguém desistiu.
 
 ---
 
-## Configuração — todos os botões num arquivo
+## Configuração
 
-`packages/engine/config/config.default.json`, carregado por `src/config.ts::loadConfig(overrides?)`. Editável na **tela inicial** do app (todo campo abaixo tem um input lá — os marcados "not wired" existem, são salvos e exportados com a telemetria, mas ainda não mudam a resolução):
+`packages/engine/config/config.default.json`, carregado por `config.ts::loadConfig(overrides?)`. Editável na tela `/settings` do app — todo campo tem um input lá.
 
-```json
-{
-  "grid": { "width": 5, "height": 5 },
-  "chasms": [12],
-  "maxHandSize": 7,
-  "deckSize": 12,
-  "draftPerRound": 4,
-  "draftRounds": 3,
-  "routeBonus": 3,
-  "chainDepth": 1,
-  "tieKeepsDefender": true,
-  "shipOnEdge": false,
-  "shipRotatable": false,
-  "discardCanBeCargo": false,
-  "setupHiddenCards": 2,
-  "powerChart": {
-    "2": 10, "3": 9, "4": 8, "5": 7, "6": 6, "7": 5, "8": 4
-  },
-  "modifierCost": 2,
-  "lockCost": 4
-}
-```
-
-`deckSize`, `draftPerRound`, `draftRounds`, `shipRotatable`, `powerChart`, `modifierCost`, `lockCost` ainda não são lidos em runtime (deck vem direto do `PlayerSetup`; draft e rotação de Navio não estão implementados; o gabarito de poder é ferramenta de criação de carta, nunca consultada durante a partida). `discardCanBeCargo` **é lido** — relaxa a trava "descarte nunca pode ser Carga" quando não sobra carta comum na mão.
+Campos **não** lidos em runtime hoje: `shipRotatable` (rotação de Navio não implementada), `powerChart` (ferramenta de criação de carta, nunca consultada durante a partida), `modifierCost`/`lockCost` (idem). `deckSize` vem do `PlayerSetup` real (drafted ou hot-seat), não é reamostrado do config. `discardCanBeCargo` **é lido** — relaxa a trava "descarte nunca pode ser Carga" quando não sobra carta comum na mão. `draftPerRound`/`draftRounds` **são lidos** pelo modo Porto (`rules/draft.ts`).
 
 ---
 
-## Telemetria — o que registrar em toda partida
+## Deploy
 
-Implementado em `telemetry/computeTelemetry.ts`, chamado uma vez por partida (no CLI e no app, no início da sequência de fim de partida).
+Dois deploys separados, mesma conta Cloudflare:
 
-**Da partida:** seed, config usada, capitães/navios/decks de cada jogador, vencedor, placar final, número de turnos, duração real, log turno a turno (já no formato usado pra montar o texto de replay).
-
-**Do que a gente quer saber:**
-
-| Métrica | Responde qual pergunta |
-|---|---|
-| Cargas jogadas por jogador e em que turno | Carga está cara ou barata |
-| Quantas vezes o Navio trocou de dono, e em que turnos | O Navio vira o jogo inteiro |
-| Turno da primeira queda de cada Navio | Casco está na faixa certa |
-| Domínios por Abordagem vs por Confronto vs por Cadeia | Abordagem é forte demais |
-| Tamanho da maior rota de cada jogador | Os +3 decidem sozinhos |
-| Média de setas do deck vencedor vs perdedor | O gabarito está inclinado |
-| Cartas nunca jogadas | Cartas mortas no set |
-| Margem de vitória | Partidas apertadas ou atropelo |
-
-Exportação: `telemetry/csv.ts` (`toTelemetryRow`, `rowsToCsv`) e `telemetry/serialize.ts` (`telemetryToJson`, preserva `Infinity` como string legível). No app, os botões "Download JSON"/"Download CSV" ficam na tela de **Analysis** (ver Interface). No CLI, `runBatch.ts` escreve um CSV com uma linha por partida de todo o lote.
-
----
-
-## Modo simulação
-
-`simulation/runMatch.ts` (uma partida headless: setup aleatório + bots no turno principal) e `simulation/runBatch.ts` (N partidas, agregado via `summarize.ts`). `npm run batch -- N` roda os 3×3 pares de bot e escreve o CSV combinado.
-
-**Bots implementados** (`bots/`), do mais burro ao menos:
-
-1. **`randomBot`** — casa e rotação sorteadas. Linha de base: se um deck vence outro consistentemente contra ele, o desbalanceamento é do deck, não do jogador.
-2. **`greedyBot`** — testa toda combinação (item × casa × rotação) através do próprio `resolvePlacement` especulativo e fica com a que mais domina cartas nesse turno. Mede se "abordagem é forte demais".
-3. **`routeBot`** — mesma busca, pontuando por `largestRoute` em vez de domínios. Mede se os +3 valem a pena.
-
-Os dois últimos compartilham a busca por força bruta (`bots/scoreSearch.ts::bestMoveByScore`) — nenhuma heurística duplicando lógica do motor, só o motor pontuando os próprios resultados especulativos.
-
-Uma leitura real já feita com essa ferramenta (config padrão, 20 partidas por par): `routeBot` bate `randomBot` 100% das vezes; `greedyBot` bate `routeBot` 65/35. Já é sinal, não é medo.
-
----
-
-## Interface — o que existe hoje
-
-### Tela inicial
-
-`components/start/StartScreen.tsx`. Título grande + tagline, seguido de todos os knobs de balanceamento do arquivo de config, seção por seção (Board, Hand & deck, Combat & scoring, Ship, Cargo, Draft, Card-creation chart). Botão "Start match" cria a partida com esse config.
-
-### Setup
-
-Cada jogador enterra o Navio (nunca na borda) e `config.setupHiddenCards` Cargas (nunca carta comum — a Carga que sobrar continua jogável no turno principal). **Alterna peça a peça** (`game/setupProgress.ts::nextSetupPlayer`): quem colocou menos peças até agora joga a seguir, empate resolvido pela ordem fixa dos jogadores. Um jogador que termina antes (Capitão com pouca Carga) simplesmente some da alternância e o outro termina sozinho, sem handoff redundante.
-
-### Tabuleiro e mão — arrastar e soltar
-
-Arraste a carta/Navio/Carga da mão até uma casa (`hooks/useDragPlacement.ts`). Scroll do mouse **ou** tecla `R` giram a carta enquanto ela está sendo arrastada. O clique clássico (selecionar → clicar na casa → confirmar) continua funcionando em paralelo, como caminho alternativo — os dois convergem pras mesmas ações do reducer.
-
-Antes de soltar, o tabuleiro já mostra em **overlay** o que aquela colocação vai capturar — não é um recurso à parte, é a própria `resolvePlacement` chamada de forma especulativa (`resolverColocação(estado_atual, ...)`, resultado nunca commitado a menos que o jogador solte ali).
-
-### Animações
-
-Três efeitos, todos derivados por diff (nenhuma mudança no motor pra existir):
-
-- **Drop** — qualquer casa que passa de vazia pra ocupada faz um bounce de entrada (setup ou turno principal).
-- **Dominada** — flash vermelho em cada casa realmente capturada pela última jogada.
-- **Dominando** — pulso verde na casa de quem acabou de capturar algo.
-
-### Painéis, log, hot-seat
-
-Capitão e Navio de cada jogador nas laterais, com indicador de **silenciado**. Log de turno em texto corrido (`formatLogEvent`), uma linha por evento. Tela de "passe o dispositivo" entre turnos e a cada peça do setup, escondendo a mão/decisão até a revelação.
-
-### Fim de partida — três telas
-
-1. **Contagem** (`ScoreCountingScreen`) — o total de cada jogador sobe de 0 até o valor real em paralelo, ~1.2s, avança sozinho.
-2. **Vencedor** (`WinnerScreen`) — só o resultado e os placares, limpo. Botões "Analyze" e "New match".
-3. **Análise** (`AnalysisScreen`) — atrás do botão "Analyze": resumo de telemetria, downloads JSON/CSV, log completo. "Back to result" volta pro vencedor sem recalcular nada (mesma telemetria computada uma vez em `EndSequence`).
+- **`packages/server`** → Cloudflare Worker com Durable Object, via `wrangler deploy` (`wrangler.jsonc`: binding `Main` → classe `EltycaRoom`, migração `new_sqlite_classes` — obrigatório desde jul/2026 pra contas sem namespace legado). Local: `wrangler dev --port 1999`.
+- **`packages/web`** → Cloudflare Worker de **assets estáticos** (não é mais o produto "Pages" clássico — o fluxo atual do dashboard passa por Workers Builds). `wrangler.jsonc`: `assets.directory: "./dist"` + `not_found_handling: "single-page-application"` (substitui o antigo `_redirects` de Pages, que hoje até conflita/gera loop). Build: `npm run build --workspace=packages/web`. Deploy: `npm run deploy --workspace=packages/web`.
+- `VITE_PARTYKIT_HOST` (env var do build do `web`) aponta pro host publicado do `server` — `<nome>.<subdomínio>.workers.dev` por padrão, ou um domínio customizado se configurado.
 
 ---
 
 ## Testes automatizados
 
-✅ Escritos primeiro, como planejado — `packages/engine/test/`, 16 arquivos, 46 testes, Vitest. Os 12 originais (um por regra que mudou de ideia pelo menos uma vez):
+`packages/engine/test/` (21 arquivos) + `packages/server/test/` (2 arquivos), Vitest. Cobertura por regra, cada uma nascida de uma dúvida de design real:
 
-1. Seta contra carta sem seta de volta → domínio, sem propagação. (`boardingCard.test.ts`)
-2. Seta contra seta → confronto; empate mantém com o defensor. (`clashCard.test.ts`)
-3. Cadeia: só a partir de vitória em confronto, profundidade 1, sem capturar duas vezes. (`chain.test.ts`)
-4. Rotação: padrão de setas desloca 2 índices por giro; 4 giros voltam ao original. (`rotation.test.ts`)
-5. Navio: ângulo sem escudo cai sempre, ângulo com escudo exige poder estritamente maior que o Casco. (`shipResolution.test.ts`)
-6. Navio não pode ser colocado na borda; nunca é rotacionado (estrutural); nunca propaga cadeia; nunca entra em rota. (`shipPlacement.test.ts`)
-7. Navio pode ser dominado em turnos consecutivos, e o passivo do Capitão liga e desliga junto. (`captainSilencing.test.ts`)
-8. Carga: neutra, não pode ser dominada, não pontua, não entra em rota. (`cargoNeutral.test.ts`)
-9. Carga jogada obriga descarte de carta comum — nunca de outra Carga — e repõe a mão até o limite. (`cargoDiscard.test.ts`)
-10. Mão nunca passa do limite; deck vazio não trava o turno. (`handLimit.test.ts`)
-11. Rota: componente conexa por setas mútuas; empate na maior rota não dá bônus a ninguém. (`route.test.ts`)
-12. Pontuação final bate com a contagem manual num tabuleiro montado à mão. (`scoring.test.ts`)
+Seta sem volta → domínio sem propagação (`boardingCard`); seta contra seta → confronto, empate mantém defensor (`clashCard`); cadeia só a partir de clash, profundidade 1 (`chain`); rotação desloca 2 por giro (`rotation`); Navio: ângulo sem escudo cai sempre, com escudo exige poder > casco (`shipResolution`); Navio nunca na borda/nunca gira/nunca propaga/nunca entra em rota (`shipPlacement`); passivo do Capitão liga/desliga com o Navio (`captainSilencing`); Carga neutra, não pontua, não entra em rota (`cargoNeutral`); Carga obriga descarte de carta comum (`cargoDiscard`); mão nunca passa do limite (`handLimit`); rota é componente conexa por setas mútuas (`route`); placar bate com contagem manual (`scoring`); desistência força vencedor independente do placar (`turn`); sigilo real por campo (`redact`); draft Porto (`draft`); conteúdo JSON sem duplicatas (`sampleCards`/`sampleShipsCaptains`); telemetria/CSV/JSON (`telemetry`); bots e simulação em lote (`bots`/`simulation`).
 
-Mais: `telemetry.test.ts`, `bots.test.ts`, `simulation.test.ts`, `setupCargoOnly.test.ts` (a regra de setup só-Carga, incluindo o caso de borda de Capitão com pouca Carga).
+Servidor: atribuição de slot e reconexão (`room`), toda ação validada incluindo turno de setup e desistência (`applyAction`).
+
+---
+
+## Modo simulação
+
+`simulation/runMatch.ts` (uma partida headless: setup aleatório + bots) e `simulation/runBatch.ts` (N partidas, agregado via `summarize.ts`). `npm run batch -- N` roda os 3×3 pares de bot.
+
+**Bots** (`bots/`): `randomBot` (linha de base — se um deck vence esse consistentemente, o desbalanceamento é do deck); `greedyBot` (busca por força bruta via `resolvePlacement` especulativo, maximiza domínios no turno); `routeBot` (mesma busca, maximiza `largestRoute`). Os dois últimos compartilham `bots/scoreSearch.ts::bestMoveByScore` — nenhuma heurística duplicando o motor, só o motor pontuando os próprios resultados especulativos.
+
+---
+
+## Interface — visão geral
+
+- **`/`** — landing, arte de fundo, "Start" (hot-seat) e "Play online".
+- **`/settings`** — knobs de balanceamento do config.
+- **`/game`** — hot-seat: `Match.tsx` (choice → draft) entrega pra `LiveMatchHost.tsx` (dono do reducer local) → `LiveMatch.tsx`.
+- **`/online`** — criar sala (gera código) ou entrar com um código.
+- **`/online/:code`** — lobby (código copiável, indicador de presença) → mesmo choice/draft do hot-seat, mas por rede → `LiveMatch.tsx`, dessa vez alimentado por `useOnlineMatch.ts`.
+- **Tabuleiro e mão** — arrastar-e-soltar (`hooks/useDragPlacement.ts`) com giro por scroll/tecla `R`; clique clássico continua funcionando em paralelo. Overlay de prévia de captura é a própria `resolvePlacement` chamada especulativamente, nunca commitada a menos que a colocação seja confirmada.
+- **Animações** — drop, dominada (flash vermelho), dominando (pulso verde), todas derivadas por diff, nenhuma mudança no motor pra existir.
+- **Settings em batalha** — engrenagem no cabeçalho (`components/settings/SettingsMenu.tsx`), hoje só "Surrender", com confirmação.
+- **Fim de partida — três telas** — Contagem (`ScoreCountingScreen`) → Vencedor (`WinnerScreen`, mostra "X surrendered the match" quando aplicável) → Análise (atrás de "Analyze": telemetria, downloads JSON/CSV, log completo).
 
 ---
 
 ## Marcos
 
-**M0 — Motor + testes.** ✅ Feito. Roda no terminal (`npm run simulate`), resolve uma partida inteira via script.
+**Motor + testes.** ✅ Roda no terminal (`npm run simulate`).
+**Hot-seat jogável.** ✅ Tabuleiro, mão, arrastar-e-soltar, animações, tela inicial, setup alternado peça a peça.
+**Config + telemetria.** ✅ Painel de knobs, exportação JSON/CSV, tela de análise.
+**Simulação.** ✅ Três bots, execução em lote, relatório com win rate e médias.
+**Modo Porto (draft).** ✅ Escolha de Capitão/Navio revelada na hora, pool de cartas compartilhado, alternância de picks.
+**Arte real.** ✅ Cada carta/navio/capitão com imagem própria, via JSON de conteúdo.
+**Multiplayer online real.** ✅ Sala por código, sigilo real (verificado por inspeção de frame WebSocket, não só UI), reconexão por `clientId`, draft e partida inteira pela rede.
+**Desistência.** ✅ Botão de settings em batalha, força vitória do adversário independente do placar.
+**Deploy.** ✅ Servidor (Worker + Durable Object) e site (Worker de assets estáticos) publicados na Cloudflare.
 
-**M1 — Hot-seat jogável.** ✅ Feito, e evoluído depois: tabuleiro, mão, rotação e overlay de previsão continuam, mas a interação virou arrastar-e-soltar (clique ainda funciona em paralelo), ganhou animações de captura, uma tela inicial de verdade, e o setup passou a alternar peça a peça em vez de jogador a jogador.
-
-**M2 — Config + telemetria.** ✅ Feito. Painel de knobs (tela inicial), exportação JSON/CSV, tela de agregação (Analysis, atrás de um botão pra manter a tela de resultado limpa).
-
-**M3 — Simulação.** ✅ Feito. Os três bots, execução em lote (`npm run batch`), relatório com win rate e médias por métrica.
-
-**M4 — Opcional.** Não feito: bot melhor, partida por link, coleção persistente.
-
-**Depois do M1, em rodadas de ajuste pós-playtest:** a regra de setup mudou de "2 itens quaisquer da mão" pra "só Carga, quantidade capada pela Carga disponível" (removeu o blefe original, decisão consciente do design); drag-and-drop com giro por scroll/tecla substituiu o clique como interação principal; animações de queda/domínio/dominação; setup passou a alternar por peça; fim de partida virou uma sequência de três telas em vez de uma só.
-
-O protótipo cumpriu a função dele quando você conseguir dizer, com número, quais dos sete itens da lista de teste eram problema de verdade — e quais eram medo. `npm run batch` já dá o primeiro pedaço dessa resposta de graça.
+**Fora de escopo, documentado, não construído:** 3+ jogadores (refactor real, `PlayerId` é hardcoded), matchmaking/lista de salas, hardening de colisão de código de sala, UX rica de desconexão (timers de forfeit — hoje só um indicador simples "adversário conectado: sim/não"), rate-limiting/anti-abuso, chat/voz, histórico de partidas além da sala atual, negociação de config entre os dois jogadores (quem cria a sala manda), rotação de Navio, som, layout mobile dedicado.
 
 ---
 
 ## Processo de commits
 
-Commitar faseado, nunca um commit gigante com "motor inteiro" ou "app inteiro". Cada commit é uma unidade de trabalho que dá pra entender e reverter sozinha — por exemplo: um passo do algoritmo de `resolvePlacement` com seus testes, um grupo de componentes de UI relacionados, uma correção específica encontrada ao testar no navegador. Preferir várias mensagens pequenas e claras a uma só que resume tudo.
+Commitar faseado, nunca um commit gigante. Cada commit é uma unidade de trabalho que dá pra entender e reverter sozinha — um passo de algoritmo com seus testes, um grupo de componentes de UI relacionados, uma correção específica encontrada ao testar no navegador. Ver o histórico do git para o padrão já estabelecido.
