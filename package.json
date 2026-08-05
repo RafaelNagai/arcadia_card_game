@@ -11,7 +11,8 @@
     "batch": "npm run batch --workspace=packages/engine",
     "dev:web": "npm run dev --workspace=packages/web",
     "dev:server": "npm run dev --workspace=packages/server",
-    "deploy:server": "npm run deploy --workspace=packages/server"
+    "deploy:server": "npm run deploy --workspace=packages/server",
+    "deploy:web": "npm run deploy --workspace=packages/web"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

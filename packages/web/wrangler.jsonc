@@ -1,0 +1,11 @@
+{
+  "name": "eltyca-web",
+  "compatibility_date": "2026-08-04",
+  "assets": {
+    "directory": "./dist",
+    // Serves index.html (200) for any path that isn't a real static file, so react-router's
+    // client-side routes (/online/:code etc.) work once this is the actual server, not just
+    // Vite's dev middleware.
+    "not_found_handling": "single-page-application"
+  }
+}
