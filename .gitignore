@@ -4,7 +4,7 @@ dist/
 *.log
 *.tsbuildinfo
 *.csv
-.claude/
+.claude/settings.local.json
 .partykit/
 .wrangler/
 .env

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)",
+      "Bash(curl -sf http://localhost:5173)",
+      "Bash(node -e \"require.resolve\\('playwright'\\)\")",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npx playwright *)",
+      "Bash(pkill -9 -f \"wrangler dev\")",
+      "Bash(pkill -9 -f vite)",
+      "Bash(pkill -9 -f workerd)",
+      "Bash(select:TodoWrite)"
+    ]
+  }
+}
