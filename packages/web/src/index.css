@@ -76,11 +76,68 @@ button.confirm {
   flex: none;
 }
 
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 header h1 {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--text-dim);
   margin: 0;
+}
+
+button.danger {
+  background: var(--danger);
+  color: #2a0a0a;
+  font-weight: 600;
+  border: none;
+}
+
+/* --- settings menu --- */
+
+.settings-menu {
+  position: relative;
+}
+
+.settings-gear {
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 6px 9px;
+}
+
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+}
+
+.settings-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 11;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.settings-confirm p {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.settings-confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .error-banner {
@@ -599,6 +656,12 @@ header h1 {
 
 .app-end {
   text-align: center;
+}
+
+.surrender-note {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin: -8px 0 16px;
 }
 
 .scores {

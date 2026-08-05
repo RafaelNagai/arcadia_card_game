@@ -183,3 +183,21 @@ describe('applyAction — play-card', () => {
     expect(next.game!.cells[targetCell].content).toMatchObject({ kind: 'card', owner: game.turnPlayer });
   });
 });
+
+describe('applyAction — surrender', () => {
+  it('ends the match, crediting the other player as the surrenderer, regardless of whose turn it is', () => {
+    const room = roomInGame();
+    const game = room.game!;
+    const notTurnPlayer = game.turnPlayer === 'P1' ? 'P2' : 'P1';
+
+    const next = applyAction(room, notTurnPlayer, { type: 'surrender' }, sampleContent);
+
+    expect(next.game!.phase).toBe('end');
+    expect(next.game!.surrenderedBy).toBe(notTurnPlayer);
+  });
+
+  it('rejects surrendering before the match has actually started', () => {
+    const room = lobbyRoom();
+    expect(() => applyAction(room, 'P1', { type: 'surrender' }, sampleContent)).toThrow(/not started/);
+  });
+});

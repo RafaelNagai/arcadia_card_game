@@ -16,6 +16,9 @@ export interface MatchTelemetry {
   turnCount: number;
   durationMs: number | null;
   winner: PlayerId | 'drift';
+  /** Set when the match ended by concession rather than a full board — `winner` above is
+   *  already forced to the *other* player in this case, regardless of `finalScore`. */
+  surrenderedBy: PlayerId | null;
   finalScore: Score[];
   players: { id: PlayerId; captainId: string; shipId: string; deck: string[] }[];
   /** turn-by-turn log, already in replayable form */
@@ -44,7 +47,11 @@ export function computeTelemetry(
   durationMs: number | null = null
 ): MatchTelemetry {
   const scores = computeScores(state, content);
-  const winner = determineWinner(scores);
+  // A concession overrides the normal score comparison entirely — the conceding player
+  // loses regardless of how the (possibly incomplete) board happens to be scored.
+  const winner = state.surrenderedBy
+    ? state.players.find((p) => p.id !== state.surrenderedBy)!.id
+    : determineWinner(scores);
 
   const cargoPlaysByPlayer = {} as Record<PlayerId, number[]>;
   const playedCardIdsByPlayer = {} as Record<PlayerId, Set<string>>;
@@ -100,6 +107,7 @@ export function computeTelemetry(
     turnCount: state.turnNumber,
     durationMs,
     winner,
+    surrenderedBy: state.surrenderedBy,
     finalScore: scores,
     players: playerSetups.map((p) => ({ id: p.id, captainId: p.captainId, shipId: p.shipId, deck: p.deck })),
     turns: state.log,

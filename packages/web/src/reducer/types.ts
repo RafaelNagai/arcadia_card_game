@@ -29,6 +29,12 @@ export type Action =
   | { type: 'CONFIRM_PLACEMENT'; discardCardId?: string }
   | { type: 'CANCEL_SELECTION' }
   | { type: 'DISMISS_ERROR' }
+  /** Concede the match — playerId is whoever's currently displayed (LiveMatch already knows
+   *  this; the reducer doesn't need to re-derive "current player" the way commitPlacement
+   *  does, since surrender applies regardless of whose turn it technically is). Online
+   *  intercepts this and sends it to the server instead of mutating locally, same as
+   *  CONFIRM_PLACEMENT — see useOnlineMatch.ts. */
+  | { type: 'SURRENDER'; playerId: PlayerId }
   /** Dispatched by useOnlineMatch whenever the server pushes a fresh (redacted) game state —
    *  replaces `gameState` wholesale and clears any in-flight local selection/preview, since
    *  those were speculating about a state that's now stale. Never dispatched in hot-seat. */

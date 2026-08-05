@@ -8,11 +8,12 @@ export interface WinnerScreenProps {
 
 /** The clean result screen — winner and final score only. Everything else (telemetry, log, downloads) lives behind "Analyze". */
 export function WinnerScreen({ telemetry, onAnalyze, onNewMatch }: WinnerScreenProps) {
-  const { winner, finalScore } = telemetry;
+  const { winner, surrenderedBy, finalScore } = telemetry;
 
   return (
     <div className="app app-end">
       <h1>{winner === 'drift' ? 'Drift — tie' : `${winner} wins`}</h1>
+      {surrenderedBy && <p className="surrender-note">{surrenderedBy} surrendered the match</p>}
 
       <div className="scores">
         {finalScore.map((score) => (

@@ -9,6 +9,7 @@ import {
   placeInSetup,
   playTurn,
   revealSetup,
+  surrender,
   toPlayerSetups,
 } from '@eltyca/engine';
 import type { ClientMessage } from './protocol';
@@ -37,6 +38,8 @@ export function applyAction(room: PersistedRoomState, playerId: PlayerId, msg: C
       return applySetupPlacement(room, playerId, msg.cellIdx, msg.item);
     case 'play-card':
       return applyMainPlay(room, playerId, msg.cellIdx, msg.item, msg.rotation, msg.discardCardId, content);
+    case 'surrender':
+      return { ...room, game: surrender(mustGame(room), playerId) };
   }
 }
 

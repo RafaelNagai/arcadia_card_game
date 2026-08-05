@@ -148,6 +148,13 @@ export function useOnlineMatch(roomCode: string, content: GameContent, initialCo
         return;
       }
 
+      if (action.type === 'SURRENDER') {
+        // The server derives the acting player from the connection, not the action's
+        // payload — see protocol.ts's ClientMessage doc comment — so playerId isn't sent.
+        send({ type: 'surrender' });
+        return;
+      }
+
       if (action.type === 'CONFIRM_PLACEMENT') {
         setGameUIState((prev) => {
           if (!prev) return prev;

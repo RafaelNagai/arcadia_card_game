@@ -77,6 +77,9 @@ export function redactGameStateForPlayer(state: GameState, viewerId: PlayerId): 
     phase: state.phase,
     turnNumber: state.turnNumber,
     log: state.log, // every entry is a placement that already happened in the open
+    // Always null here — surrender() sets phase to 'end' in the same update, so a
+    // surrendered match always hits the branch above instead, never this one.
+    surrenderedBy: state.surrenderedBy,
     // Deck order is a deterministic function of `seed` (shuffle(deck, createRng(seed))) —
     // deck *membership* is already public (the Porto draft is drafted face-up), so leaking
     // the seed would let a motivated client recompute the opponent's exact draw order even

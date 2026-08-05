@@ -10,6 +10,15 @@ function nextPlayerId(state: GameState): PlayerId {
   return state.players[(idx + 1) % state.players.length].id;
 }
 
+/** Ends the match immediately, conceding to whoever `playerId` isn't — see
+ *  computeTelemetry's use of `surrenderedBy` for how the forced win overrides the normal
+ *  score comparison. Allowed during setup or main (anything short of an already-ended
+ *  match), since conceding isn't a turn action the way placing a card is. */
+export function surrender(state: GameState, playerId: PlayerId): GameState {
+  if (state.phase === 'end') throw new Error('The match has already ended');
+  return { ...state, phase: 'end', surrenderedBy: playerId };
+}
+
 /** Thin layer above resolvePlacement: advances turnPlayer/turnNumber and checks for the end of the match.
  *  resolvePlacement itself stops at "refill the hand" and never touches whose turn it is. */
 export function playTurn(

@@ -11,6 +11,7 @@ import {
   playTurn,
   resolvePlacement,
   revealSetup,
+  surrender,
 } from '@eltyca/engine';
 import type { Action, Selection, UIState } from './types';
 
@@ -70,6 +71,19 @@ export function gameReducer(state: UIState, action: Action): UIState {
 
     case 'CONFIRM_PLACEMENT':
       return commitPlacement(state, action.discardCardId);
+
+    // Hot-seat only in practice — useOnlineMatch intercepts this before it reaches here,
+    // same reasoning as commitSetupPlacement/commitMainPlacement's doc comments below.
+    case 'SURRENDER':
+      return {
+        ...state,
+        gameState: surrender(state.gameState as GameState, action.playerId),
+        selection: null,
+        targetCellIdx: null,
+        previewState: null,
+        error: null,
+        awaitingHandoff: null,
+      };
 
     case 'CANCEL_SELECTION':
       return { ...state, selection: null, targetCellIdx: null, previewState: null, error: null };

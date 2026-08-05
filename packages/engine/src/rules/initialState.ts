@@ -51,5 +51,6 @@ export function createInitialState(config: Config, players: PlayerSetup[], seed:
     phase: 'setup',
     turnNumber: 1,
     log: [],
+    surrenderedBy: null,
   };
 }

@@ -11,6 +11,7 @@ import { PanelShip } from './components/panels/PanelShip';
 import { LogPanel } from './components/log/LogPanel';
 import { HotSeatScreen } from './components/hotseat/HotSeatScreen';
 import { EndSequence } from './components/end/EndSequence';
+import { SettingsMenu } from './components/settings/SettingsMenu';
 import { useRotateShortcut } from './hooks/useRotateShortcut';
 import { useDragPlacement } from './hooks/useDragPlacement';
 import { useCommitAnimations } from './hooks/useCommitAnimations';
@@ -106,6 +107,7 @@ export default function LiveMatch({
       <div className="game-screen">
         <header>
           <h1>ELTYCA (setup){viewerId && !canAct ? ` — waiting for ${activeSetupPlayer}` : ''}</h1>
+          <SettingsMenu onSurrender={() => dispatch({ type: 'SURRENDER', playerId: player.id })} />
         </header>
         {state.error && <div className="error-banner">{state.error}</div>}
         {viewerId && !opponentConnected && (
@@ -155,6 +157,7 @@ export default function LiveMatch({
           Turn {gameState.turnNumber} · {activePlayer.id} to play
           {viewerId && !canAct ? ' — waiting for opponent' : ''}
         </h1>
+        <SettingsMenu onSurrender={() => dispatch({ type: 'SURRENDER', playerId: displayedPlayer.id })} />
       </header>
       {state.error && <div className="error-banner">{state.error}</div>}
       <div className="layout">

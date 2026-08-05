@@ -14,7 +14,8 @@ export type ClientMessage =
   | { type: 'pick-ship'; shipId: string }
   | { type: 'pick-card'; cardId: string }
   | { type: 'place-setup'; cellIdx: number; item: SetupItem }
-  | { type: 'play-card'; cellIdx: number; item: HandItem; rotation: Rotation; discardCardId?: string };
+  | { type: 'play-card'; cellIdx: number; item: HandItem; rotation: Rotation; discardCardId?: string }
+  | { type: 'surrender' };
 
 /** Setup-phase turn/progress info the server must compute itself and ship explicitly — a
  *  client can't safely re-derive this from a redacted GameState (nextSetupPlayer/isShipPlaced

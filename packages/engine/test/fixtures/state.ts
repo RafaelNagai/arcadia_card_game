@@ -118,5 +118,6 @@ export function makeMinimalState(options: MinimalStateOptions = {}): GameState {
     phase: options.phase ?? 'main',
     turnNumber: 1,
     log: [],
+    surrenderedBy: null,
   };
 }

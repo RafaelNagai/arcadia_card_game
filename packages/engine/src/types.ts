@@ -129,6 +129,9 @@ export interface GameState {
   phase: Phase;
   turnNumber: number;
   log: LogEvent[];
+  /** Set by rules/turn.ts's surrender() the instant a player concedes; null otherwise. Forces
+   *  the *other* player as the winner regardless of board score — see computeTelemetry. */
+  surrenderedBy: PlayerId | null;
 }
 
 /** Static match content — card/captain/ship definitions, indexed by id. */

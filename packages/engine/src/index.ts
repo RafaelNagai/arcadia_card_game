@@ -12,7 +12,7 @@ export { canBeDominated } from './rules/canBeDominated';
 export { refillHand, removeCardFromHand, removeCargoFromHand, playCargo } from './rules/hand';
 export { resolvePlacement, type PlacementOptions } from './rules/resolvePlacement';
 export { placeInSetup, revealSetup, type SetupItem } from './rules/setup';
-export { playTurn, isGameOver } from './rules/turn';
+export { playTurn, isGameOver, surrender } from './rules/turn';
 export { createInitialState, type PlayerSetup } from './rules/initialState';
 export {
   isShipPlaced,
