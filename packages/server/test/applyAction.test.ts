@@ -21,10 +21,10 @@ function lobbyRoom(overrides?: Partial<PersistedRoomState>): PersistedRoomState 
 function roomInGame(configOverrides?: Parameters<typeof loadConfig>[0]): PersistedRoomState {
   let room = lobbyRoom({ config: loadConfig({ draftPerRound: 1, draftRounds: 1, ...configOverrides }) });
   room = applyAction(room, 'P1', { type: 'start-match' }, sampleContent);
-  room = applyAction(room, 'P1', { type: 'pick-captain', captainId: 'captain-loud' }, sampleContent);
-  room = applyAction(room, 'P1', { type: 'pick-ship', shipId: 'ship-widowmaker' }, sampleContent);
-  room = applyAction(room, 'P2', { type: 'pick-captain', captainId: 'captain-broker' }, sampleContent);
-  room = applyAction(room, 'P2', { type: 'pick-ship', shipId: 'ship-sieve' }, sampleContent);
+  room = applyAction(room, 'P1', { type: 'pick-captain', captainId: 'captain-1' }, sampleContent);
+  room = applyAction(room, 'P1', { type: 'pick-ship', shipId: 'ship-1' }, sampleContent);
+  room = applyAction(room, 'P2', { type: 'pick-captain', captainId: 'captain-2' }, sampleContent);
+  room = applyAction(room, 'P2', { type: 'pick-ship', shipId: 'ship-2' }, sampleContent);
 
   // 1 round * 1 card/round * 2 players = 2 total picks.
   for (let i = 0; i < 2; i++) {
@@ -70,10 +70,10 @@ describe('applyAction — full draft playthrough transitions the room into a rea
     let room = lobbyRoom({ config: loadConfig({ draftPerRound: 2, draftRounds: 2 }) });
     room = applyAction(room, 'P1', { type: 'start-match' }, sampleContent);
 
-    room = applyAction(room, 'P1', { type: 'pick-captain', captainId: 'captain-loud' }, sampleContent);
-    room = applyAction(room, 'P1', { type: 'pick-ship', shipId: 'ship-widowmaker' }, sampleContent);
-    room = applyAction(room, 'P2', { type: 'pick-captain', captainId: 'captain-broker' }, sampleContent);
-    room = applyAction(room, 'P2', { type: 'pick-ship', shipId: 'ship-sieve' }, sampleContent);
+    room = applyAction(room, 'P1', { type: 'pick-captain', captainId: 'captain-1' }, sampleContent);
+    room = applyAction(room, 'P1', { type: 'pick-ship', shipId: 'ship-1' }, sampleContent);
+    room = applyAction(room, 'P2', { type: 'pick-captain', captainId: 'captain-2' }, sampleContent);
+    room = applyAction(room, 'P2', { type: 'pick-ship', shipId: 'ship-2' }, sampleContent);
     expect(room.phase).toBe('draft');
     expect(room.draft?.stage).toBe('draft');
 
@@ -102,10 +102,10 @@ describe('applyAction — full draft playthrough transitions the room into a rea
   it('rejects a pick made out of turn (trusting the engine\'s own pickCard validation)', () => {
     let room = lobbyRoom();
     room = applyAction(room, 'P1', { type: 'start-match' }, sampleContent);
-    room = applyAction(room, 'P1', { type: 'pick-captain', captainId: 'captain-loud' }, sampleContent);
-    room = applyAction(room, 'P1', { type: 'pick-ship', shipId: 'ship-widowmaker' }, sampleContent);
-    room = applyAction(room, 'P2', { type: 'pick-captain', captainId: 'captain-broker' }, sampleContent);
-    room = applyAction(room, 'P2', { type: 'pick-ship', shipId: 'ship-sieve' }, sampleContent);
+    room = applyAction(room, 'P1', { type: 'pick-captain', captainId: 'captain-1' }, sampleContent);
+    room = applyAction(room, 'P1', { type: 'pick-ship', shipId: 'ship-1' }, sampleContent);
+    room = applyAction(room, 'P2', { type: 'pick-captain', captainId: 'captain-2' }, sampleContent);
+    room = applyAction(room, 'P2', { type: 'pick-ship', shipId: 'ship-2' }, sampleContent);
 
     const notCurrentPicker = room.draft!.currentPicker === 'P1' ? 'P2' : 'P1';
     expect(() =>
@@ -131,8 +131,8 @@ describe('applyAction — place-setup', () => {
     ).toThrow(/turn/);
 
     room = applyAction(room, 'P2', { type: 'place-setup', cellIdx: 8, item: { kind: 'ship' } }, sampleContent);
-    expect(room.game!.cells[6].content).toEqual({ kind: 'ship', shipId: 'ship-widowmaker', owner: 'P1' });
-    expect(room.game!.cells[8].content).toEqual({ kind: 'ship', shipId: 'ship-sieve', owner: 'P2' });
+    expect(room.game!.cells[6].content).toEqual({ kind: 'ship', shipId: 'ship-1', owner: 'P1' });
+    expect(room.game!.cells[8].content).toEqual({ kind: 'ship', shipId: 'ship-2', owner: 'P2' });
   });
 
   it('reveals and transitions to the main phase once both players finish setup', () => {

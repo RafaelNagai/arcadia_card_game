@@ -19,6 +19,6 @@ export const sampleContent: GameContent = {
 };
 
 export const samplePlayerSetups: PlayerSetup[] = [
-  { id: 'P1', captainId: 'captain-loud', shipId: 'ship-widowmaker', deck: sampleDeckP1, cargoSlots: 4 },
-  { id: 'P2', captainId: 'captain-broker', shipId: 'ship-sieve', deck: sampleDeckP2, cargoSlots: 2 },
+  { id: 'P1', captainId: 'captain-1', shipId: 'ship-1', deck: sampleDeckP1, cargoSlots: 4 },
+  { id: 'P2', captainId: 'captain-2', shipId: 'ship-2', deck: sampleDeckP2, cargoSlots: 3 },
 ];
