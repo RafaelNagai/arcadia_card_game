@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck (engine)
+        run: npx tsc -b --noEmit
+        working-directory: packages/engine
+
+      - name: Typecheck (server)
+        run: npx tsc -b --noEmit
+        working-directory: packages/server
+
+      - name: Typecheck (web)
+        run: npx tsc -b --noEmit
+        working-directory: packages/web
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test (engine + server)
+        run: npm test
+
+      - name: Build web
+        run: npm run build --workspace=packages/web
