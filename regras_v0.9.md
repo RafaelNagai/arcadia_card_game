@@ -31,7 +31,7 @@ No fim, ganha quem controla mais cartas, com um bônus pra maior rota.
 |---|---|
 | Tabuleiro | Grade 5×5 (escala com o nº de jogadores) |
 | Marcadores de Eltys | ~30 fichas por jogador, uma cor cada |
-| Cartas de Carga | 5 por jogador |
+| Cartas de Carga | 7 por jogador (2 de lastro fixo de setup + até 5 da Carga do Capitão) |
 | Capitão | 1 por jogador, escolhido antes da partida |
 | Navio | 1 por jogador, escolhido antes da partida |
 | Deck | 12 cartas comuns |
@@ -46,18 +46,20 @@ Domínio é marcado com **Eltys**, não virando a carta. Carta de um lado só, a
 
 | Campo | O que faz |
 |---|---|
-| **Cargas** | Quantas Cargas você carrega. De 2 a 5. Define quantas cartas comuns cabem na sua mão. |
-| **Passivo** | Uma regra em texto, sempre de duas pontas: um bônus e um ônus. |
+| **Cargas** | Quantas Cargas você carrega. De 1 a 5. Define quantas cartas comuns cabem na sua mão. |
+| **Passivo** | Uma regra em texto, sempre **passiva** (nunca uma ação que você escolhe ativar) e sempre **só bônus** — sem ônus. Ligada a um arquétipo (Buffer, Controlador, Vidente, etc.). |
 
 O Capitão é a carta de arte cheia do jogo — retrato, nome próprio, o personagem daquele jogador. É a única peça que carrega texto de regra, justamente pra que exista **um passivo por jogador** e não quatro coisas rodando ao mesmo tempo na mesa.
 
-Exemplos de passivo, pra trocar pelos personagens reais:
+> **Sem ônus no texto, o balanceamento vem de escopo e magnitude** — quão específico é o subconjunto de cartas/situações que a passiva afeta — e do valor de Cargas de cada Capitão, que já é, por si só, um trade-off estrutural do sistema (mais Cargas = menos cartas comuns na mão inicial).
+
+Exemplos de arquétipo, pra trocar pelos personagens reais (elenco de lançamento completo em [GDD.md § Capitães e Navios](GDD.md)):
 
 | Arquétipo | Passivo |
 |---|---|
-| **O que grita mais alto** | Suas cartas de Criatura têm +2 de Poder · suas cartas de NPC têm −1 |
-| **A que não confia em ninguém** | Suas cartas adjacentes ao seu Navio não podem ser dominadas por Abordagem · você compra 1 carta a menos na primeira mão |
-| **O que já viu tudo** | Você vê a mão de um adversário no fim do setup · seu Navio tem −2 de Casco |
+| **Buffer** | Suas cartas de Criatura têm +2 de Poder. |
+| **Controlador** | Suas cartas adjacentes ao seu Navio não podem ser dominadas por Abordagem. |
+| **Movimento** | Suas cartas adjacentes ao Navio são empurradas 1 casa no fim do turno, se houver espaço. |
 
 ---
 
@@ -120,9 +122,11 @@ Poucos escudos mas grossos (difícil de furar, fácil de contornar) contra muito
 
 ### Rotação
 
-A carta é **quadrada** e pode ser colocada em qualquer uma das **quatro orientações** — 0°, 90°, 180° e 270°. Cada giro desloca o padrão de setas em duas posições (um lado vira o lado seguinte, um canto vira o canto seguinte).
+Por padrão, a carta é colocada **na orientação impressa, sem escolha** — 0° fixo.
 
-Uma carta não é uma direção, é um *padrão*: "três setas em L" é uma ferramenta diferente em cada casa do tabuleiro.
+**Exceção:** cartas de **Paradoxo**, sob o Capitão **Cryow**, mantêm rotação livre nas **quatro orientações** — 0°, 90°, 180° e 270° — na hora de colocar. Cada giro desloca o padrão de setas em duas posições (um lado vira o lado seguinte, um canto vira o canto seguinte).
+
+> Rotação livre já foi regra universal, pra toda carta de todo jogador. Virou um poder específico de Capitão — ver `GDD.md § Capitães e Navios`. "Três setas em L" volta a ser uma ferramenta diferente em cada casa do tabuleiro só quando é uma carta de Paradoxo em mesa com o Cryow.
 
 | Tipo | O que é | Papel |
 |---|---|---|
@@ -136,13 +140,13 @@ Uma carta não é uma direção, é um *padrão*: "três setas em L" é uma ferr
 
 ## A mão e as Cargas
 
-**A mão tem sempre 7 cartas**, e as Cargas ocupam espaço nela.
+**A mão base tem no máximo 5 cartas**, e as Cargas do seu Capitão ocupam espaço nela — mas só entram na mão **depois** do setup (ver § Preparação), não fazem parte do lastro enterrado.
 
-Capitão com Carga 4 começa com **3 cartas comuns e 4 Cargas**. Capitão com Carga 2 começa com 5 comuns e 2 Cargas.
+Capitão com Carga 3 (Navah, Navarro, Cycar) começa com **2 cartas comuns e 3 Cargas**. Capitão com Carga 1 (Katty) começa com 4 comuns e 1 Carga.
 
-**Ao colocar uma carta comum:** compre até voltar a 7.
+**Ao colocar uma carta comum:** compre até voltar a 5.
 
-**Ao colocar uma Carga:** descarte **1 carta comum** da mão e compre até voltar a 7. A Carga saiu da mão e não volta, então aquele espaço fica livre pro resto da partida.
+**Ao colocar uma Carga:** descarte **1 carta comum** da mão e compre até voltar a 5. A Carga saiu da mão e não volta, então aquele espaço fica livre pro resto da partida.
 
 > **O descarte não pode ser uma Carga.** Sem essa trava, a linha ótima é jogar carga e descartar carga duas vezes seguidas, esvaziar o porão em dois turnos gastando só duas casas, e o arco da partida evapora.
 
@@ -151,7 +155,7 @@ O efeito disso é que você começa sufocado e termina com a mão aberta — e c
 ### A Carga em si
 
 - **Neutra.** Não é de ninguém, não pontua pra ninguém, não entra em rota.
-- Sem setas, não domina, **não pode ser dominada**.
+- Sem setas, não domina, **não pode ser dominada** — mas pode ser **destruída** por efeito específico de Capitão (ver Katty em [GDD.md § Capitães e Navios](GDD.md)), o que é diferente de dominada: ninguém fica com ela, ela só sai do jogo.
 - Serve pra fechar um ângulo aberto do seu Navio, cortar a rota do adversário, ou simplesmente destravar a sua mão.
 
 ---
@@ -180,11 +184,11 @@ As cartas saem do **Baralho do Porto** (pilha comum) ou, em campanha, da coleç�
 
 1. Monte a grade e marque os **Abismos**. Casa morta.
 2. Cada jogador escolhe **Capitão** e **Navio** e revela os dois.
-3. Compre a mão: 7 cartas, sendo as Cargas do seu Capitão e o resto comprado do deck.
-4. **Setup escondido:** cada jogador coloca **o Navio e Cargas viradas para baixo**, na ordem que quiser — nunca carta comum. O Navio não pode ir na borda e entra em pé. O número de Cargas enterradas é o de sempre (padrão 2, configurável); se o Capitão tiver menos Carga do que isso, enterra só o que tiver — o resto da mão fica intocado.
-5. **Revela tudo de uma vez.** Complete a mão até 7.
+3. **Setup escondido:** cada jogador enterra **1 Navio + 2 Cargas de um lastro neutro**, virados para baixo, na ordem que quiser. Esse lastro é sempre o mesmo pra todo mundo — **não sai da Carga do Capitão**, é fixo independente de quem você escolheu. O Navio não pode ir na borda e entra em pé.
+4. **Revela tudo de uma vez.**
+5. **Só agora monte a mão:** pegue as Cargas do seu Capitão + compre cartas comuns do baralho, até ter no máximo **5 cartas no total**.
 
-> O setup deixou de ser blefe (as 2 cartas escondidas eram carta-comum-ou-Carga antes; agora são sempre Carga, sem força nenhuma) e virou só a organização inicial do porão — Navio e lastro descendo antes da partida começar de verdade.
+> O setup não é mais sobre blefe de identidade de carta (o lastro é sempre Carga, sem força nenhuma) — o que ele ainda esconde é **posição**: até a revelação, ninguém sabe em qual das 8 casas do anel o Navio adversário está, o que mantém o primeiro ataque de cada jogador como aposta, não cálculo. Ver `GDD.md § Modo de jogo` para o raciocínio completo.
 
 ---
 
@@ -274,9 +278,9 @@ As casas livres depois do setup dividem exato pelo número de jogadores.
 
 ## Direção de arte
 
-**Carta quadrada, sem moldura circular.** Ela pode ser colocada em qualquer uma das quatro orientações, e isso significa que arte e texto vão aparecer de lado ou de cabeça pra baixo com frequência. É aceito: dá pra ler e dá pra reconhecer de qualquer ângulo.
+**Carta quadrada, sem moldura circular.** A maioria das cartas hoje é colocada em orientação fixa (ver § Rotação) — mas cartas de Paradoxo sob o Capitão Cryow continuam girando livremente, então pra essa fatia do baralho arte e texto ainda vão aparecer de lado ou de cabeça pra baixo com frequência. É aceito: dá pra ler e dá pra reconhecer de qualquer ângulo.
 
-Três consequências práticas, que não custam nada:
+As três consequências práticas abaixo continuam valendo pro baralho inteiro, não só pras cartas que giram — não custam nada e mantêm a arte consistente caso mais poderes de rotação apareçam depois:
 
 - **O Poder no centro**, ou repetido em cantos opostos, pra ser lido em qualquer orientação.
 - **Texto de efeito curto.** Uma linha. Frase longa de cabeça pra baixo é onde o ritmo morre.
