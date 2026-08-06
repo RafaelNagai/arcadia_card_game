@@ -1,6 +1,6 @@
 # ELTYCA
 
-A card game (hot-seat and real online multiplayer) built as an npm-workspaces monorepo. Full design rules: [regras_v0.9.md](regras_v0.9.md) (Portuguese, authoritative game rules). Full technical architecture: [ARCHITECTURE.md](ARCHITECTURE.md) — read that before making non-trivial changes; this file is a fast-loading index, not a substitute.
+A card game (hot-seat and real online multiplayer) built as an npm-workspaces monorepo. Full game design document: [GDD.md](GDD.md) (Portuguese, authoritative — pitch, narrative, complete rules in § 5 onward, content roster, production/business scope). Full technical architecture: [ARCHITECTURE.md](ARCHITECTURE.md) — read that before making non-trivial changes; this file is a fast-loading index, not a substitute.
 
 ## Packages
 

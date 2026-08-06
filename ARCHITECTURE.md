@@ -1,6 +1,6 @@
 # ELTYCA — Arquitetura técnica
 
-### Baseado nas Regras v0.9. Hot-seat, draft Porto, multiplayer online real e deploy — todos implementados.
+### Baseado no GDD (design + regras). Hot-seat, draft Porto, multiplayer online real e deploy — todos implementados.
 
 ---
 
@@ -8,7 +8,7 @@
 
 ELTYCA começou como um instrumento de medição (um protótipo pra validar as regras com dados de simulação antes de qualquer coisa visual) e evoluiu, deliberadamente, para o jogo de verdade: arte por carta, capitão e navio, modo Porto (draft), partida online real com sala por código, e desistência. A engenharia por trás continua a mesma — motor puro, testado, simulável — mas o objetivo não é mais só medir, é ser jogado.
 
-Este documento descreve a arquitetura como ela existe agora, não um plano. Pra regras de jogo (o "porquê" de cada mecânica), ver [regras_v0.9.md](regras_v0.9.md). Pra convenções de como trabalhar neste repositório, ver [CLAUDE.md](CLAUDE.md).
+Este documento descreve a arquitetura como ela existe agora, não um plano. Pra regras de jogo (o "porquê" de cada mecânica), ver [GDD.md](GDD.md) § 5 em diante. Pra convenções de como trabalhar neste repositório, ver [CLAUDE.md](CLAUDE.md).
 
 ---
 
@@ -28,7 +28,7 @@ Todo acaso passa por um `seed` guardado no estado. Isso não é elegância — �
 arcadia_card_game/
 ├── package.json                    # workspaces: packages/*
 ├── tsconfig.base.json
-├── regras_v0.9.md                  # regras do jogo (fonte da verdade de design)
+├── GDD.md                           # design + regras do jogo (fonte da verdade de design)
 ├── ARCHITECTURE.md                 # este arquivo
 ├── CLAUDE.md                       # guia de convenções pro Claude Code
 └── packages/
