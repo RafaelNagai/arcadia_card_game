@@ -18,7 +18,7 @@
 
 ## 2. Pilares de design
 
-1. **Um texto de regra por jogador.** Todo o "motor" de um deck mora no passivo do Capitão. Cartas comuns raramente têm efeito de texto extenso — a profundidade vem de posicionamento, não de pilhas de keywords.
+1. **Um texto de regra por jogador.** Todo o "motor" de um deck mora no passivo do Capitão. *(2026-08-07 — endurecido: cartas comuns não têm efeito de texto nenhum por enquanto, nem raro. Só o Capitão carrega regra. Ver § 5.12.)* A profundidade vem de posicionamento, não de pilhas de keywords.
 2. **O Navio é o ponto quente.** Ele não briga, mas decide quem tem passivo ativo. Disputar as 8 casas ao redor dele é uma linha de jogo por si só.
 3. **O baralho comum é previsível; o Capitão é onde mora a exceção.** Cartas comuns seguem regras fixas e legíveis (posição fixa, sem giro, sem se mover depois de colocada). É o arquétipo do Capitão que abre uma brecha específica nessas regras — Violet recicla posição, Golar empurra cartas, Cryow gira Paradoxo. Isso mantém o baralho simples de ler e concentra a complexidade tática num único lugar da mesa.
 4. **Carta nova não pode ser carta mais forte.** O orçamento de Tier (§ 5.12) existe para que quem entrou depois não perca por ter uma coleção menor.
@@ -34,7 +34,7 @@
 |---|---|
 | **Produto final** | Jogo comercial em **Unity**, para venda. |
 | **Plataforma alvo** | **PC (Steam)**. |
-| **Modelo de venda** | Em aberto — avaliado pago único (premium), pago + expansões, ou free-to-play com compras. Nenhum compromisso ainda. |
+| **Modelo de venda** | **Pago único.** Comparável direto: Balatro (solo dev, Steam, pago único, sem live-ops). DLC futura fica possível, não é compromisso. |
 | **Equipe** | **Solo dev** (o autor deste documento faz o desenvolvimento; arte pode ser terceirizada). |
 | **Papel do protótipo web** | Validar Porto (draft), Rota (deck construído), Capitão/Navio, multiplayer online e a curva de Carga *antes* de investir em produção Unity. |
 
@@ -56,21 +56,38 @@ Esse é o ponto central da narrativa: **ELTYCA não é um jogo de cartas sobre A
 
 | Elemento do RPG | Conexão com ELTYCA |
 |---|---|
-| **Mar de Nuvens** — mundo de continentes flutuantes, sem chão firme, viajado por navios voadores (`01_01_00_introducao.md`) | É o cenário principal. Usa-se "Embarcação" (não "Navio") pra não confundir com a peça do jogador (§ 5.5). O bestiário das cartas, porém, veio de puxar Arcádia inteira, não só o Mar de Nuvens — ver § 8.2. |
+| **Mar de Nuvens** — mundo de continentes flutuantes, sem chão firme, viajado por navios voadores (`01_01_00_introducao.md`) | É o cenário principal — o "mar de perigos" onde as cartas acontecem (§ 4, origem do jogo). O bestiário das cartas, porém, veio de puxar Arcádia inteira, não só o Mar de Nuvens — ver § 8.1. |
 | **Eltys** — minério arcano raro que move navios, alimenta feitiços e é a base de poder econômico das nações (`04_03_00_regioes.md`) | É literalmente o nome da ficha de domínio do jogo. Proposta de flavor (não confirmada, revisar): as fichas de Eltys do jogo são pedaços reais do minério — dominar uma carta é "carregá-la" com Eltys, o mesmo recurso que decide poder entre nações no mundo real do jogo. |
 | **Os Cinco Elementos** — Energia, Anomalia, Paradoxo, Cognitivo, Astral, o sistema de magia do RPG (`02_02_00_elementos.md`) | São, nome por nome, os cinco elementos das cartas comuns (§ 5.5). Não é coincidência — é o mesmo sistema arcano, só que virado paleta de cores e etiqueta de carta. |
-| **Camelot e os Imperiais** — a guarda nacional de Camelot (`04_03_00_regioes.md`) | Já citados como um dos arquétipos de NPC ("contramestres, cartógrafos, Imperiais"), e batizam o Navio "Cruz Imperial" (§ 7). |
-| **Constelações e Navegação** — assinaturas mágicas usadas pra rastrear ilhas que nunca ficam paradas (`03_03_00_constelacao_e_navegacao.md`) | Não vira mecânica direta (evitar confundir com "Rota", que no card game é a cadeia de setas mútuas), mas já rendeu carta de verdade: "A Última Maré de Aetheria" (§ 8.3) é a mesma ilha lendária do exemplo de Fennick nesse capítulo do RPG. |
+| **Camelot e os Imperiais** — a guarda nacional de Camelot (`04_03_00_regioes.md`) | Batizam o Navio "Cruz Imperial" (§ 7). |
+| **Constelações e Navegação** — assinaturas mágicas usadas pra rastrear ilhas que nunca ficam paradas (`03_03_00_constelacao_e_navegacao.md`) | Não vira mecânica direta (evitar confundir com "Conexão", a cadeia de setas mútuas do card game — ver § 5.1), mas é uma fonte natural de flavor pra Mito ainda não usada — nenhuma carta atual referencia Fennick ou Constelação diretamente (as duas tentativas anteriores, Fennick e "A Última Maré de Aetheria", saíram do pool). Candidato pra próxima leva. |
 | **Navios Materiais vs. Orgânicos** (`03_02_00_navios.md`) | O RPG já distingue essas duas categorias de navio (aço/madeira vs. criatura colossal domesticada) — vira regra de design real (não só flavor) pro elenco de Navios (§ 7). |
-| **Bestiário de Arcádia** (`book/creatures.json`, fora deste repositório) | Fonte direta de 12 Criaturas reais do card game (§ 8.2) — nomes, lore e nível de poder do RPG, não inventados pro jogo. |
+| **Bestiário de Arcádia** (`book/creatures.json`, fora deste repositório) | Fonte direta de 12 Criaturas reais do card game (§ 8.1) — nomes, lore e nível de poder do RPG, não inventados pro jogo. |
+
+### A origem do jogo dentro de Arcádia
+
+> **Decisão registrada 2026-08-07.**
+
+ELTYCA nasceu de tédio de convés. Ninguém sabe dizer ao certo onde — cada porto de Arcádia jura que foi o dele — mas a lenda mais contada é a mesma em toda taverna: numa travessia longa demais, uma tripulação entediada começou a apostar pedaços de carga e lascas de Eltys que sobravam do porão, riscando padrões de setas em tábua de madeira só pra ter alguma coisa em jogo. O jogo pegou. Ficou rústico, de mão em mão, de navio em navio, até alguém em terra perceber que dava pra vender aquilo — e o que era distração de marinheiro virou o maior sucesso comercial de jogo de Arcádia inteira.
+
+**Hoje é o pôquer de Arcádia.** Criança joga na rua, no beco, na escada do porto — por diversão, por coleção, sem nada em jogo além de orgulho e a esperança de puxar uma Lendária. Adulto joga em taverna, e aí a coisa muda de figura: aposta dinheiro, favor, informação, o que estiver na mesa. É o mesmo baralho, as mesmas regras — só o que está em risco que muda com quem senta pra jogar.
+
+Isso também explica por que a ficha de domínio se chama **Eltys**: a lenda diz que o jogo original usava lascas reais do minério como marcador, porque era o que sobrava fácil num navio de carga. O nome ficou depois que Eltys de verdade virou caro demais pra desperdiçar em jogo — hoje são fichas pintadas, mas ninguém trocou o nome.
+
+**O que as cartas representam, dentro dessa ficção:** perigo real que marinheiro enfrenta no Mar de Nuvens — bicho (Criatura), coisa construída e animada por magia (Construto), boato de taverna que ninguém confirma (Mito), ou capricho natural/arcano do próprio mar (Fenômeno) — ver § 5.5. O objetivo, dentro da ficção, é o mesmo do jogo de verdade: sair com mais Eltys que o adversário, num mar cheio de perigo.
+
+**O que isso confirma/resolve:**
+- **Colecionador é canônico**, não só flavor de marketing — é o motor da economia in-world, e bate direto com Tier SS já valer "máximo 1 por deck" (§ 5.12): puxar uma Lendária é sonho de colecionador de verdade.
+- **A régua de "quem vira carta"** fica clara: perigo real, reconhecível ou temido por quem navega — nunca gente comum do dia a dia. É por isso que NPC saiu da tipagem (§ 5.5).
+- **Porto** (modo recomendado) e **Rota** (construído) ganham motivação social — Porto é o casual de rua/taverna que qualquer um senta pra jogar; Rota é pra quem já investiu, já colecionou, já tem baralho montado.
 
 ### O framing do "garoto do porto" (conceito, não travado)
 
-> **Decisão registrada 2026-08-06:** a ideia adotada — não confirmada em detalhe — é apresentar/vender o jogo pela perspectiva de **uma criança de porto**: alguém que vê navios voadores passando, joga ELTYCA em becos, tavernas e portos ao lado de uma embarcação de verdade. Não é uma criança "no quarto" — é rua, contrabando, o Mar de Nuvens acontecendo ao redor.
+> **Decisão registrada 2026-08-06:** a ideia adotada — não confirmada em detalhe — é apresentar/vender o jogo pela perspectiva de **uma criança de porto**: alguém que vê navios voadores passando, joga ELTYCA em becos, tavernas e portos ao lado de uma embarcação de verdade. Não é uma criança "no quarto" — é rua, contrabando, o Mar de Nuvens acontecendo ao redor. Essa criança joga a versão sem aposta — o adulto na taverna ao lado é quem joga valendo alguma coisa (ver acima).
 
-- **Confirmado como direção de arte / posicionamento de marca** (capa, trailer, tom visual).
-- **Ainda não decidido** se isso deveria moldar UI/menus do jogo (telas literalmente ambientadas num porto/taverna) ou ficar restrito a material de marketing e à ilustração das cartas.
-- Combina bem com o que já existia antes desse framing — "Embarcação: barcos pequenos, escunas de contrabando, naufrágios" e "NPC: gente de porto" — o framing não inventa tom novo, reforça o que já estava lá.
+**Se afeta UI ou só arte/marketing — resolvido 2026-08-07:** framing forte fica **só no Modo Aventura** (§ 10), onde o protagonista É essa criança. Menu principal, partida Porto/Rota solta, vs. Bot, vs. Jogador — tudo isso fica com UI funcional e neutra (tabuleiro, mão, retrato do Capitão, sem cena em volta). Fora do Modo Aventura, o framing aparece só em arte/marketing (capa, trailer, ilustração de carta), não na estrutura de tela.
+
+Dentro do Modo Aventura, o framing forte não fica preso ao ponto de vista fixo da criança — a **tela de partida em si** (não só a navegação do mapa) é ambientada onde aquele Desafio específico acontece: mesa de taverna, convés de navio, canto de beco, dependendo do nó/região. Varia com o contexto, não é uma câmera fixa nos olhos de um personagem só.
 
 ---
 
@@ -81,7 +98,7 @@ Conjunto completo das regras mecânicas — a parte deste documento que se parec
 ### 5.1 Vocabulário
 
 - **Dominar** — passar uma carta para o seu controle. Acontece por Abordagem ou por Confronto.
-- **Rota** — cadeia de cartas suas ligadas por setas mútuas.
+- **Conexão** — cadeia de cartas suas ligadas por setas mútuas. *(Renomeada 2026-08-07, era "Rota" — colidia com o nome do modo de jogo Rota, § 5.7.)*
 - **Eltys** — a ficha que marca quem domina cada carta.
 - **Abismo** — casa morta do tabuleiro.
 
@@ -94,7 +111,7 @@ Conjunto completo das regras mecânicas — a parte deste documento que se parec
 | Cartas de Carga | 7 por jogador (2 de lastro fixo de setup + até 5 da Carga do Capitão) |
 | Capitão | 1 por jogador, escolhido antes da partida |
 | Navio | 1 por jogador, escolhido antes da partida |
-| Deck | 12 cartas comuns por jogador, escolhidas do baralho compartilhado de 30 (§ 8) |
+| Deck | 12 cartas comuns por jogador, escolhidas do baralho compartilhado de 33 (§ 8) |
 
 Domínio é marcado com **Eltys**, não virando a carta. Carta de um lado só, arte inteira, domínio legível do outro lado da mesa.
 
@@ -118,7 +135,7 @@ Elenco completo em § 6.
 Colocado no tabuleiro, escondido, no setup. **É a peça que não briga.**
 
 - **Não tem Poder. Não tem setas. Nunca domina ninguém e nunca propaga cadeia.**
-- **Nunca faz parte de uma rota.**
+- **Nunca faz parte de uma Conexão.**
 - **Nunca é rotacionado.** Entra sempre em pé, e por isso a disposição dos escudos é característica dele, não escolha de turno.
 - **Não tem texto.** Ele é objetivo posicional, não motor de regras.
 - Tem **Escudos**: quais dos 8 ângulos ele guarda.
@@ -163,8 +180,9 @@ Elenco completo em § 7.
 - **Poder** — número único, usado em todo Confronto.
 - **Setas** — de 2 a 8, nas 8 posições da borda (4 lados, 4 cantos).
 - **Elemento** — Energia, Anomalia, Paradoxo, Cognitivo ou Astral (os cinco do RPG, § 4). Um só.
-- **Tipo** — Criatura, Embarcação ou NPC.
-- **Efeito** — opcional, texto curto.
+- **Tipo** — Criatura, Construto, Mito ou Fenômeno (§ 4 explica o porquê desses 4).
+
+> **Cartas comuns não têm campo de Efeito por enquanto** *(2026-08-07)*. Só o Capitão carrega texto de regra (§ 5.3, § 6) — ver § 5.12 pro raciocínio completo e pro que fica pra trás se isso voltar depois.
 
 > **Nem elemento nem tipo têm regra própria.** São etiquetas: só fazem alguma coisa quando o texto de uma carta diz que fazem. Custa zero imprimir e abre espaço de design pra sempre.
 
@@ -176,15 +194,16 @@ Por padrão, a carta é colocada **na orientação impressa, sem escolha** — 0
 
 > Rotação livre já foi regra universal, pra toda carta de todo jogador — virou um poder específico de Capitão (Pilar #3). "Três setas em L" é uma ferramenta diferente em cada casa do tabuleiro só quando é uma carta de Paradoxo em mesa com o Cryow.
 
-**Tipo:**
+**Tipo:** *(refeito 2026-08-07 — substitui Criatura/Embarcação/NPC. Motivo completo em § 4 "A origem do jogo dentro de Arcádia": carta só existe pra perigo real de marinheiro, e "NPC" genérico não passava nesse teste — nem "Embarcação", que confundia com a peça do Navio.)*
 
 | Tipo | O que é | Papel |
 |---|---|---|
-| **Criatura** | O bestiário de Arcádia (§ 8.2) | O grosso do baralho, e o que rende arte. A maioria não tem efeito, mas as mais raras (Tier A e acima) podem carregar um. |
-| **Embarcação** | Barcos pequenos, escunas de contrabando, naufrágios | Silhueta larga, muitas setas, Poder baixo |
-| **NPC** | Gente de porto: contramestres, cartógrafos, Imperiais | Onde efeitos aparecem com mais frequência |
+| **Criatura** | Bicho do bestiário de Arcádia (§ 8.1) | O grosso do baralho, e o que rende arte |
+| **Construto** | Coisa construída e animada por magia — golem, autômato, servo — nunca nasceu | Perigo mecânico, não biológico; lastro em "Forja do Golem de Lava" (`02_02_01_energia.md`) |
+| **Mito** | Figura ou episódio de lenda contada de porto em porto — a carta nunca confirma se é verdade | Nunca afirma, só conta — voz de "conta-se que..."; onde cabem coisas como a lenda de Matriel/"How God Was Deceived" |
+| **Fenômeno** | Capricho natural ou arcano do Mar de Nuvens — tempestade, corrente amaldiçoada, fenda no céu | Silhueta grande, muitas setas, Poder baixo — preenche o papel que Embarcação tinha |
 
-*Embarcação* e não *Navio*, pra não confundir com a peça do jogador.
+Sem Embarcação como Tipo de carta, a palavra "Embarcação" fica livre — não precisa mais da distinção "*Embarcação* e não *Navio*" de antes.
 
 ### 5.6 A mão e as Cargas
 
@@ -202,9 +221,9 @@ O efeito disso é que você começa sufocado e termina com a mão aberta — e c
 
 **A Carga em si:**
 
-- **Neutra.** Não é de ninguém, não pontua pra ninguém, não entra em rota.
+- **Neutra.** Não é de ninguém, não pontua pra ninguém, não entra em Conexão.
 - Sem setas, não domina, **não pode ser dominada** — mas pode ser **destruída** por efeito específico de Capitão (Katty, § 6), o que é diferente de dominada: ninguém fica com ela, ela só sai do jogo.
-- Serve pra fechar um ângulo aberto do seu Navio, cortar a rota do adversário, ou simplesmente destravar a sua mão.
+- Serve pra fechar um ângulo aberto do seu Navio, cortar a Conexão do adversário, ou simplesmente destravar a sua mão.
 
 ### 5.7 Os dois modos
 
@@ -256,14 +275,14 @@ Acaba quando todas as casas livres estão ocupadas. **Vence quem fizer mais pont
 |---|---|
 | Cada carta comum sob o seu Eltys | +1 |
 | Cada Navio sob o seu Eltys (o seu ou o tomado) | +1 |
-| **Maior rota da partida** | **+3** |
+| **Maior Conexão da partida** | **+3** |
 | Cartas de Carga | 0 |
 
-**A rota** é a maior cadeia de cartas comuns suas ligadas por **setas mútuas** — as duas cartas precisam apontar uma para a outra. Navios e Cargas nunca entram.
+**A Conexão** é a maior cadeia de cartas comuns suas ligadas por **setas mútuas** — as duas cartas precisam apontar uma para a outra. Navios e Cargas nunca entram. *(Renomeada 2026-08-07, era "Rota" — colidia com o modo de jogo Rota, § 5.7.)*
 
-Empate na maior rota: **ninguém leva os +3**. Empate na pontuação: **Deriva**.
+Empate na maior Conexão: **ninguém leva os +3**. Empate na pontuação: **Deriva**.
 
-> Os +3 são o contrapeso do jogo. Carta com muitas setas tem Poder baixo pelo orçamento de Tier e perde quase todo Confronto — mas é ela que costura rota longa.
+> Os +3 são o contrapeso do jogo. Carta com muitas setas tem Poder baixo pelo orçamento de Tier e perde quase todo Confronto — mas é ela que costura Conexão longa.
 
 ### 5.11 Escala por número de jogadores
 
@@ -286,7 +305,7 @@ As casas livres depois do setup dividem exato pelo número de jogadores.
 
 > Ferramenta **sua**, na hora de criar carta. Não vai pra mesa.
 
-**Tier é orçamento, não é sobre contagem de Setas.** *(Reescrito 2026-08-06 — a versão anterior definia Tier só pela contagem de Setas, e usava Modificador/Trava com custos diferentes. Não bate mais com como o elenco real foi desenhado, ver § 8.)* Toda carta comum tem um total fixo pro seu Tier:
+**Tier é orçamento, não é sobre contagem de Setas.** Toda carta comum tem um total fixo pro seu Tier:
 
 > **Setas + Poder + custo de Efeito = Tier**
 
@@ -299,20 +318,19 @@ As casas livres depois do setup dividem exato pelo número de jogadores.
 | S | 14 |
 | SS | 15 |
 
-Sem efeito, **B (12) é o padrão** — qualquer combinação Setas/Poder sem efeito já soma 12 (2+10, 3+9, 4+8, 5+7, 6+6, 7+5, 8+4). Tiers abaixo do padrão (D, C) são cartas deliberadamente mais fracas do que a contagem de Setas sugeriria; tiers acima (A, S, SS) são mais fortes. **Setas e Poder são potes independentes dentro do total** — Tier baixo não obriga muitas Setas: dá pra ser fraco com poucas Setas e Poder baixo também, contanto que a soma bata.
-
-**Todo efeito custa 2** — Modificador (mexe no número da comparação, ex: *cartas de Anomalia adversárias têm −2 de Poder contra esta*), Trava (nega a interação inteira, ex: *cartas de Cognitivo nunca dominam esta*), ou exceção de regra (ex: *pode ser colocada sobre uma Carga*) custam o mesmo. Não existe mais preço diferente por tipo de efeito.
+**B (12) é o padrão** — qualquer combinação Setas/Poder já soma 12 (2+10, 3+9, 4+8, 5+7, 6+6, 7+5, 8+4). Tiers abaixo do padrão (D, C) são cartas deliberadamente mais fracas do que a contagem de Setas sugeriria; tiers acima (A, S, SS) são mais fortes. **Setas e Poder são potes independentes dentro do total** — Tier baixo não obriga muitas Setas: dá pra ser fraco com poucas Setas e Poder baixo também, contanto que a soma bata.
 
 **SS (15) é, na prática, Lendária** — máximo 1 por deck no modo Rota (§ 5.7).
 
 **Por que respeitar isso:** as cartas vão ser entregues uma por uma como loot de sessão (§ 10). Se carta nova for carta mais forte sem gastar Tier, quem jogou mais sessões ganha sem jogar. Com o orçamento, carta de Tier alto é rara de propósito, não um acidente de design.
 
-**Escrita de efeito:**
-
-- Um gatilho por carta: *ao entrar*, *ao ser dominada*, *ao vencer um Confronto*, *enquanto*.
-- Sinergia por **elemento** ou por **tipo**. É o que dá sentido aos símbolos.
-- Efeito que muda **quem se conecta com quem** é mais interessante e menos perigoso que efeito que muda Poder.
-- Nada que cancele o turno do adversário.
+> ### Efeito de carta — pausado por enquanto
+>
+> **Decisão registrada 2026-08-07: cartas comuns não carregam efeito nenhum.** `custo de Efeito` na fórmula acima é sempre **0** pra toda carta comum hoje — só o Capitão tem texto de regra (Pilar #1, § 5.3, § 6).
+>
+> **Como chegamos aqui:** as 14 cartas que tinham efeito (Trava/Modificador, todas "enquanto" — condição permanente presa a uma carta só) foram identificadas como redundantes com o que o Capitão já faz, só que em miniatura. Uma primeira tentativa de consertar isso — trocar pra efeitos de entrada ("Desembarque": um evento pontual, não uma condição permanente, pra separar de verdade Capitão-como-regra-do-jogo de carta-como-coisa-que-acontece) — chegou a ser desenhada e nomeada, mas a decisão final foi mais simples: tirar efeito de carta do jogo inteiramente, por ora. As 14 cartas voltaram a ser puro Setas/Poder, usando o orçamento inteiro sem gastar em Efeito (ver § 8 pros números atualizados).
+>
+> **Se isso voltar no futuro:** o conceito "Desembarque" (gatilho *ao entrar*, evento único, não condição permanente) fica registrado aqui como o caminho já pensado — evita duplicar o trabalho de decidir de novo qual tipo de efeito diferenciaria carta de Capitão. Outros gatilhos cogitados e nunca implementados: *ao ser dominada*, *ao vencer um Confronto*. Regras de escrita que valiam antes, pra reaproveitar se algum dia isso for retomado: um gatilho por carta; sinergia por elemento ou tipo; efeito que muda **quem se conecta com quem** é mais interessante e menos perigoso que efeito que muda Poder; nada que cancele o turno do adversário.
 
 ---
 
@@ -320,13 +338,13 @@ Sem efeito, **B (12) é o padrão** — qualquer combinação Setas/Poder sem ef
 
 Regra geral de design do passivo já em § 5.3 (sempre passiva, sempre só bônus, sempre ligada a um arquétipo nomeado). Esta seção é o elenco real.
 
-> **Fechado 2026-08-06**, com pontos de resolução mecânica ainda em aberto — ver final desta seção.
+> **Fechado 2026-08-06**, com Navarro e Cycar revisados em 2026-08-07 (troca de Tipo NPC pra Construto, ver "Decisões de balanceamento" abaixo).
 
 | Capitão | Arquétipo | Passiva | Cargas |
 |---|---|---|---|
 | **Navah** | Buffer | Suas cartas de Criatura têm +2 de Poder. | 3 |
-| **Navarro** | Buffer | Suas cartas de NPC têm +2 de Poder. | 3 |
-| **Cycar** | Buffer | Suas cartas de NPC têm +1 de Poder para cada espaço vazio ao redor da posição escolhida, **até um máximo de +3**. | 3 |
+| **Navarro** | Buffer | Suas cartas de Construto têm +2 de Poder. | 3 |
+| **Cycar** | Buffer | Suas cartas ganham +1 de Poder em Confronto contra cartas do Tipo Criatura ou Construto. | 3 |
 | **Katty** | Controlador | Suas cartas do elemento Anomalia destroem Cargas adjacentes — ganha 1 ponto por Carga destruída. | 1 |
 | **Violet** | Controlador | Suas cartas podem ser colocadas sobre uma carta **sua** já dominada, ou sobre uma Carga, em vez de só em casa vazia. | 2 |
 | **Golar** | Movimento | No final do turno, suas cartas adjacentes (vertical/horizontal) ao Navio são empurradas 1 casa **radialmente, pra longe do Navio**, se houver espaço. | 2 |
@@ -337,12 +355,12 @@ Regra geral de design do passivo já em § 5.3 (sempre passiva, sempre só bônu
 **Por que os arquétipos existem:** três categorias — Buffer (mexe em Poder por Tipo/situação), Controlador (nega ou reconfigura uma regra padrão a seu favor), Movimento (quebra a regra de "carta fica onde foi colocada", § 5.5/5.9) — cada Capitão é uma instância clara de um deles, nunca uma frase de efeito solta.
 
 **Decisões de balanceamento já feitas:**
-- **Cycar — teto de +3.** Sem teto, o bônus chegava a +8 num tabuleiro vazio (turno 1), quebrando a troca setas×Poder do orçamento de Tier (§ 5.12) — um NPC de 8 setas/4 Poder (a carta mais fraca do orçamento, feita só pra Rota) virava 12 de Poder de graça, sem contrajogo possível nos primeiros turnos. +3 fica um pouco acima do +2 fixo do Navah/Navarro, como compensação por exigir leitura de tabuleiro (o bônus não é garantido — cai conforme a mesa enche).
-- **Cycar / Katty** — calculados **uma vez, no momento da colocação**. O Poder do Cycar fica fixo depois de colocado; a Carga da Katty só é destruída se já estiver adjacente na hora da jogada, não depois.
+- **Navarro/Cycar — de NPC pra Construto.** *(2026-08-07)* Os dois liam Tipo NPC, cortado na Fase 1 da tipagem (§ 5.5). Passaram por uma versão intermediária (Navarro→Mito, Cycar→Fenômeno com bônus por espaço vazio) antes de fechar na versão final acima — Navarro buffa Construto direto, Cycar troca o bônus por espaço vazio por **+1 de Poder em Confronto contra Criatura ou Construto especificamente**, um bônus fixo (não escala mais com o tabuleiro, então não precisa mais de teto).
+- **Katty** — calculada **uma vez, no momento da colocação**: a Carga só é destruída se já estiver adjacente na hora da jogada, não depois.
 - **Violet** — só cartas **suas** já dominadas, nunca do adversário. Continua sendo utilidade/reciclagem, não uma forma de ignorar Abordagem/Confronto.
-- **Golar** — empurrão é **radial, pra longe do Navio**, e é **reposicionamento mudo** — não re-dispara Abordagem/Confronto contra os vizinhos novos. Só importa pro cálculo final de Rota (§ 5.10) e pras jogadas futuras. Sem isso, Golar ganharia uma rodada extra de combate de graça todo turno — forte demais, e complica a ordem de resolução se mais de uma carta empurrar ao mesmo tempo.
+- **Golar** — empurrão é **radial, pra longe do Navio**, e é **reposicionamento mudo** — não re-dispara Abordagem/Confronto contra os vizinhos novos. Só importa pro cálculo final de Conexão (§ 5.10) e pras jogadas futuras. Sem isso, Golar ganharia uma rodada extra de combate de graça todo turno — forte demais, e complica a ordem de resolução se mais de uma carta empurrar ao mesmo tempo.
 - **Cryow** — rotacionar acontece **no momento de colocar a carta**, parte da ação normal de "colocar uma carta" — não é uma ação ativa separada, e por isso nem levanta a questão de "re-disparo": as setas resolvem uma vez, na hora de colocar, exatamente como qualquer carta.
-- **Katty pontua mesmo, de propósito.** Cada Carga destruída rende **+1 ponto**, uma exceção deliberada ao § 5.10 (Carga normalmente vale 0). Fica como o item de maior risco de balanceamento do elenco pra observar em playtest (§ 13): o setup sozinho já bota 4 Cargas no tabuleiro antes do turno 1 (2 por jogador, lastro fixo), o que dá a Katty uma fonte de pontos incondicional — não depende de vencer Confronto nenhum — disponível cedo. Se isso se provar forte demais em jogo real, o teto (como o do Cycar) é o conserto mais direto.
+- **Katty pontua mesmo, de propósito.** Cada Carga destruída rende **+1 ponto**, uma exceção deliberada ao § 5.10 (Carga normalmente vale 0). Fica como o item de maior risco de balanceamento do elenco pra observar em playtest (§ 13): o setup sozinho já bota 4 Cargas no tabuleiro antes do turno 1 (2 por jogador, lastro fixo), o que dá a Katty uma fonte de pontos incondicional — não depende de vencer Confronto nenhum — disponível cedo. Se isso se provar forte demais em jogo real, um teto no número de Cargas destruídas por partida é o conserto mais direto.
 
 ---
 
@@ -371,80 +389,82 @@ Regra geral de design do passivo já em § 5.3 (sempre passiva, sempre só bônu
 
 ## 8. Cartas comuns — elenco de lançamento
 
-> **Fechado 2026-08-06.** Usa o orçamento de Tier de § 5.12. 33 comuns + 4 Lendárias = 37 cartas.
+> **Fechado 2026-08-07.** Usa o orçamento de Tier de § 5.12. 37 cartas, organizadas por Tipo (§ 5.5: Criatura, Construto, Mito, Fenômeno) — reestruturado nesta sessão depois do refactor de tipagem; a organização antiga (por origem: baralho original / bestiário do RPG / criações Arcádia) não fazia mais sentido como divisão principal, mas a proveniência de cada carta ficou anotada onde importa.
 
-### 8.1 Baralho original — NPCs e Embarcações (7)
+### 8.1 Criatura (19)
 
-As 5 cartas de Embarcação e 2 de NPC que já existiam no protótipo (`packages/engine/src/content/cards.json`), auditadas contra o orçamento nesta sessão. Uma correção: **Contramestre Vey** tinha um efeito (Trava) sem descontar o custo do Poder — subiu de Poder 2 pra 4 pra fechar em Tier B. As 13 cartas de Tipo Criatura que existiam nesse mesmo baralho original **foram descartadas e substituídas** por § 8.3 — nomes inventados sem lastro, revisitados nesta sessão.
+O bestiário de verdade — bicho, nada mais. 12 vêm direto do RPG (`book/creatures.json`, repositório irmão), 7 são originais ancoradas nas regiões de Arcádia (§ 4).
 
-| Setas | Nome | Tipo | Elemento | Poder | Tier | Efeito |
+| Tier | Nome | Elemento | Setas | Índices | Poder | Origem |
 |---|---|---|---|---|---|---|
-| 4 | Cartógrafo do Porto | NPC | Anomalia | 6 | B | Modificador: Anomalia adversária −2 contra esta |
-| 6 | Contramestre Vey | NPC | Paradoxo | 4 *(corrigido)* | B | Trava: Energia nunca domina esta |
-| 7 | Galé do Naufrágio Salgado | Embarcação | Cognitivo | 5 | B | — |
-| 7 | Lancha do Contrabandista | Embarcação | Astral | 5 | B | — |
-| 7 | Baleeira Esfarrapada | Embarcação | Energia | 5 | B | — |
-| 8 | Casco Afundado | Embarcação | Anomalia | 4 | B | — |
-| 8 | Armada de Madeira à Deriva | Embarcação | Paradoxo | 4 | B | — |
+| SS | Sugovat | Cognitivo | 2 | `[3,7]` | 13 | RPG — rouba trauma/memória |
+| SS | Nauak | Paradoxo | 8 | `[0,1,2,3,4,5,6,7]` | 7 | RPG — nasceu de magia paradoxal |
+| A | Tuntruga | Anomalia | 4 | `[7,0,1,2]` | 9 | RPG |
+| A | Vinhavora | Anomalia | 5 | `[0,1,2,4,6]` | 8 | RPG |
+| A | Dragão das Planícies | Energia | 4 | `[0,1,4,5]` | 9 | RPG |
+| A | Las Praga | Energia | 6 | `[0,1,2,3,5,7]` | 7 | RPG |
+| A | Las Grande | Energia | 3 | `[0,3,6]` | 10 | RPG |
+| A | Devorador de Auroras | Astral | 5 | `[0,1,3,5,6]` | 8 | Original — predador raro do Norte, come luz arcana do céu |
+| A | Leviatã de Rubra | Paradoxo | 3 | `[2,4,7]` | 10 | Original — ser colossal das dunas profundas de Rubra |
+| B | Hondra | Astral | 4 | `[1,3,5,7]` | 8 | RPG |
+| B | Ceifeira das Copas | Anomalia | 5 | `[0,1,3,5,6]` | 7 | Original — caça do topo das árvores de Galahad, camuflada |
+| B | Medusa das Correntes | Cognitivo | 6 | `[1,2,3,4,5,7]` | 6 | Original — água-viva do céu, ferroada alucinógena |
+| C | Pedroso | Astral | 4 | `[0,2,3,6]` | 7 | RPG |
+| C | Anomora | Anomalia | 7 | `[0,1,2,3,4,5,7]` | 4 | RPG |
+| C | Escorpião de Rubra | Energia | 6 | `[0,1,2,4,5,6]` | 5 | Original — deserto de Rubra |
+| D | Goblin Saqueador | Paradoxo | 6 | `[0,1,2,3,4,6]` | 4 | RPG |
+| D | Goblin Explorador | Cognitivo | 6 | `[0,1,2,4,5,7]` | 4 | RPG |
+| D | Ratazana-de-Casco | Anomalia | 7 | `[0,1,2,3,4,5,6]` | 3 | Original — praga de casco abandonado no Mar de Nuvens |
+| D | Gaivota-Chorona de Union | Cognitivo | 8 | `[0,1,2,3,4,5,6,7]` | 2 | Original — ave carniceira dos portos de Union |
 
-### 8.2 Bestiário do RPG (12)
+`book/creatures.json` tem exatamente as 12 usadas — nenhuma sobrando (conferido nesta sessão). A única coisa a mais era uma variante interna do Pedroso ("Pedroso Menor"), descartada por decisão do usuário.
 
-Adaptação direta de 12 criaturas reais do bestiário de Arcádia (`book/creatures.json`, repositório irmão fora de `arcadia_card_game`). Nível/HP/DA do RPG definiram a força relativa; Elemento veio da lore de cada uma (ex: Nauak nasceu de "magia paradoxal" → Paradoxo; Sugovat rouba traumas/memórias → Cognitivo; Tuntruga se camufla mimetizando pedra → Anomalia). Onde há efeito, ele espelha uma imunidade real da criatura no RPG — não é inventado.
+### 8.2 Mito (6)
 
-| Tier | Nome | Tipo | Elemento | Setas | Índices | Poder | Efeito |
-|---|---|---|---|---|---|---|---|
-| SS | Sugovat | Criatura | Cognitivo | 2 | `[3,7]` | 11 | Trava: Astral nunca domina esta |
-| SS | Nauak | Criatura | Paradoxo | 7 | `[0,2,3,4,5,6,7]` | 6 | +3 de Poder contra cartas do Tipo NPC |
-| A | Tuntruga | Criatura | Anomalia | 4 | `[7,0,1,2]` | 9 | — |
-| A | Vinhavora | Criatura | Anomalia | 5 | `[0,1,2,4,6]` | 8 | — |
-| A | Dragão das Planícies | Criatura | Energia | 4 | `[0,1,4,5]` | 7 | Pode ser colocada sobre uma Carga |
-| A | Las Praga | Criatura | Energia | 6 | `[0,1,2,3,5,7]` | 7 | — |
-| A | Las Grande | Criatura | Energia | 3 | `[0,3,6]` | 8 | Trava: Cognitivo nunca domina esta |
-| B | Hondra | Criatura | Astral | 4 | `[1,3,5,7]` | 8 | — |
-| C | Pedroso | Criatura | Astral | 4 | `[0,2,3,6]` | 7 | — |
-| C | Anomora | Criatura | Anomalia | 7 | `[0,1,2,3,4,5,7]` | 4 | — |
-| D | Goblin Saqueador | Criatura | Paradoxo | 6 | `[0,1,2,3,4,6]` | 4 | — |
-| D | Goblin Explorador | Criatura | Cognitivo | 6 | `[0,1,2,4,5,7]` | 4 | — |
+Figura ou episódio de lenda contada de porto em porto — a carta nunca confirma se é verdade (§ 4, § 5.5).
 
-**Notas:**
-- Todas Tipo Criatura, mas 4 delas carregam efeito (Sugovat, Nauak, Dragão, Las Grande) — isso amplia o que § 5.5 diz sobre Tipo (efeito não é mais exclusividade de NPC, só mais raro em Criatura).
-- `book/creatures.json` tem exatamente essas 12 criaturas — nenhuma sobrando pra levas futuras (conferido nesta sessão). A única coisa a mais era uma variante interna do Pedroso ("Pedroso Menor"), descartada por decisão do usuário.
+| Tier | Nome | Elemento | Setas | Índices | Poder | De onde vem |
+|---|---|---|---|---|---|---|
+| S | Figura de Energia | Energia | 2 | `[1,5]` | 12 | Consumido pelo próprio elemento (§ 5.12, "Leis" de cada elemento no RPG) |
+| S | Figura de Anomalia | Anomalia | 3 | `[2,5,7]` | 11 | idem |
+| S | Figura de Paradoxo | Paradoxo | 4 | `[1,2,5,6]` | 10 | idem |
+| S | Figura de Cognitivo | Cognitivo | 5 | `[1,3,4,6,7]` | 9 | idem |
+| S | Figura de Astral | Astral | 6 | `[1,2,3,5,6,7]` | 8 | idem |
+| B | Capuz Dourado | Astral | 6 | `[0,1,2,3,4,5]` | 6 | A garota da trilha de Galahad, capuz abençoado por um deus (`content/tall_tails/golden_hood.md`) |
 
-### 8.3 Criaturas originais de Arcádia (18)
+Nenhuma tem efeito de texto (§ 5.12) — mesmo as Figuras, que antes tinham "imune ao próprio elemento" como Trava.
 
-Sem mais fonte real de bestiário disponível, essas 18 foram criadas do zero — mas ancoradas nas regiões e planos de Arcádia já estabelecidos em § 4, não são nomes decorativos. Substituem as 13 cartas Criatura do baralho original (§ 8.1 antiga), que eram só flavor oceânico sem lastro nenhum.
+### 8.3 Construto (6)
 
-**13 gerais**, cobrindo Tier D a A, mais 2 Lendárias novas substituindo "O Soberano Sem Maré" e "Fauce-do-Vazio":
+Coisa construída e animada por magia — nunca nasceu (§ 4, § 5.5).
 
-| Tier | Nome | Tipo | Elemento | Setas | Índices | Poder | Efeito | De onde vem |
-|---|---|---|---|---|---|---|---|---|
-| D | Ratazana-de-Casco | Criatura | Anomalia | 7 | `[0,1,2,3,4,5,6]` | 3 | — | Praga comum em cascos abandonados no Mar de Nuvens |
-| D | Gaivota-Chorona de Union | Criatura | Cognitivo | 8 | `[0,1,2,3,4,5,6,7]` | 2 | — | Ave carniceira dos portos de Union, grito perturbador |
-| C | Escorpião de Rubra | Criatura | Energia | 6 | `[0,1,2,4,5,6]` | 5 | — | Deserto de Rubra, carapaça usada por engenheiros locais |
-| C | Lince-das-Neves do Norte | Criatura | Paradoxo | 5 | `[1,2,4,5,7]` | 6 | — | Predador solitário do Norte de Galahad |
-| C | Sussurro do Duto | Criatura | Astral | 6 | `[0,2,3,4,6,7]` | 5 | — | Vive nos túneis de Britannia, folclore dos anões sobre desabamento |
-| B | Ceifeira das Copas | Criatura | Anomalia | 5 | `[0,1,3,5,6]` | 7 | — | Caça do topo das árvores colossais de Galahad, camuflada |
-| B | Arauto de Ferro | Criatura | Energia | 4 | `[0,2,5,7]` | 8 | — | Besta de guerra criada pelos Imperiais de Camelot |
-| B | Medusa das Correntes | Criatura | Cognitivo | 6 | `[1,2,3,4,5,7]` | 6 | — | Água-viva do céu que deriva entre ilhas, ferroada alucinógena |
-| A | Guardiã de Galahad | Criatura | Anomalia | 4 | `[0,3,5,6]` | 9 | — | A própria floresta de Galahad, decidindo quem pode passar |
-| A | Devorador de Auroras | Criatura | Astral | 4 | `[0,1,3,6]` | 7 | Modificador: Astral adversária −2 | Predador raro do Norte, se alimenta da luz arcana do céu |
-| A | Leviatã de Rubra | Criatura | Paradoxo | 3 | `[2,4,7]` | 10 | — | Ser colossal que nada pelas dunas profundas de Rubra |
-| **SS** | O Arquiteto do Caos | Criatura | Energia | 3 | `[1,4,6]` | 10 | Trava: Paradoxo nunca domina esta | Testemunhou o Período Existencial, antes do próprio conceito de Paradoxo existir |
-| **SS** | A Última Maré de Aetheria | Criatura | Astral | 4 | `[2,3,5,7]` | 9 | Modificador: +3 contra Embarcação | Guarda a ilha lendária de Aetheria — a mesma do exemplo de Fennick em § 4 |
+| Tier | Nome | Elemento | Setas | Índices | Poder | De onde vem |
+|---|---|---|---|---|---|---|
+| SS | O Titã de Eltys | Energia | 3 | `[1,4,6]` | 12 | Autômato ancestral feito de Eltys puro, de antes das nações atuais, reativa de vez em quando |
+| B | Arauto de Ferro | Energia | 4 | `[0,2,5,7]` | 8 | Besta de guerra criada pelos Imperiais de Camelot |
+| B | Marionete do Contrabandista | Energia | 7 | `[0,1,2,3,4,5,6]` | 5 | Boneco de convés que Union constrói pra enganar patrulha à distância |
+| B | Golem de Duto | Anomalia | 7 | `[1,2,3,4,5,6,7]` | 5 | Golem de escavação de Britannia, às vezes foge de controle |
+| B | Colosso de Engrenagens | Paradoxo | 7 | `[0,1,3,4,5,6,7]` | 5 | Máquina de guerra de Rubra — engenharia pura, sem depender de arcano |
+| C | Sussurro do Duto | Energia | 6 | `[0,2,3,4,6,7]` | 5 | Autômato de manutenção dos anões de Britannia, avisa desabamento nos túneis |
 
-**5 Figuras — Tier S**, preenchendo o que a § 8.2 deixou vazio de propósito. Seres que usaram tanto o próprio elemento que foram corrompidos e dominados por ele — a consequência levada ao extremo das "Leis" de cada elemento no RPG (Lei da Volatilidade Arcana, Lei da Deformação Residual, etc., `content/books/02_02_0X`). Todas têm o mesmo efeito estrutural — **imunes ao próprio elemento**, já saturadas demais pra mais dele entrar, mesmo padrão do Cartógrafo do Porto (§ 8.1) levado ao extremo — o que faz a diferença entre elas ser só Setas/Poder, numa progressão limpa (a mesma curva do gabarito base, deslocada +2):
+### 8.4 Fenômeno (6)
 
-| Tier | Nome | Tipo | Elemento | Setas | Índices | Poder | Efeito |
-|---|---|---|---|---|---|---|---|
-| S | Figura de Energia | Criatura | Energia | 2 | `[1,5]` | 10 | Trava: Energia nunca domina esta |
-| S | Figura de Anomalia | Criatura | Anomalia | 3 | `[2,5,7]` | 9 | Trava: Anomalia nunca domina esta |
-| S | Figura de Paradoxo | Criatura | Paradoxo | 4 | `[1,2,5,6]` | 8 | Trava: Paradoxo nunca domina esta |
-| S | Figura de Cognitivo | Criatura | Cognitivo | 5 | `[1,3,4,6,7]` | 7 | Trava: Cognitivo nunca domina esta |
-| S | Figura de Astral | Criatura | Astral | 6 | `[1,2,3,5,6,7]` | 6 | Trava: Astral nunca domina esta |
+Capricho natural ou arcano do Mar de Nuvens — preenche o papel que Embarcação tinha (silhueta grande, muitas setas, Poder baixo).
 
-**Notas:**
-- Total de Lendárias (SS) no pool inteiro: **4** — Sugovat e Nauak (§ 8.2) mais O Arquiteto do Caos e A Última Maré de Aetheria (aqui). Todas valem "máximo 1 por deck" (§ 5.7).
-- Distribuição de Elemento no pool combinado de 33 comuns: **Anomalia 9**, Energia 7, Astral 6, Paradoxo 6, **Cognitivo 5** — Anomalia ficou puxando mais que o resto, Cognitivo é o mais raro. Não é grave (nenhum é zero), mas se a próxima leva de cartas mirar em equilibrar, é Cognitivo que precisa de mais peças.
+| Tier | Nome | Elemento | Setas | Índices | Poder | De onde vem |
+|---|---|---|---|---|---|---|
+| SS | A Respiração do Abismo | Astral | 4 | `[2,3,5,7]` | 11 | O abismo sem fundo sob Arcádia exala névoa prateada até o Mar de Nuvens — raro, mas catalogado |
+| A | Falha Arcana de Camelot | Energia | 4 | `[0,3,5,6]` | 9 | Descarga quando a magia institucionalizada de Camelot sobrecarrega |
+| B | Nevoeiro Devorador | Anomalia | 8 | `[0,1,2,3,4,5,6,7]` | 4 | Névoa do Mar de Nuvens que engole embarcação inteira, dizem |
+| B | Corrente Amaldiçoada | Paradoxo | 8 | `[0,1,2,3,4,5,6,7]` | 4 | Corrente que sempre arrasta destroço atrás de si, contra o vento |
+| B | Miragem de Porto | Cognitivo | 4 | `[0,2,4,6]` | 8 | Porto fantasma que marinheiro às vezes vê, atraindo navio pra rocha que não existe em mapa nenhum |
+| C | Nevasca Viva | Paradoxo | 5 | `[1,2,4,5,7]` | 6 | O próprio branco-total do Norte de Galahad, com forma |
+
+**Notas gerais do § 8:**
+- **Nenhuma carta tem efeito de texto** (§ 5.12) — só o Capitão carrega regra.
+- **Total de Lendárias (SS): 4** — Sugovat, Nauak (Criatura), O Titã de Eltys (Construto), A Respiração do Abismo (Fenômeno). Todas valem "máximo 1 por deck" (§ 5.7).
+- **Distribuição por Tipo:** Criatura 19, Mito 6, Construto 6, Fenômeno 6 — Criatura ainda é o grosso do baralho de propósito (§ 5.5), os outros três parelhos entre si.
+- **Distribuição de Elemento:** Energia 10, Anomalia 8, Paradoxo 7, Cognitivo 6, Astral 6 — Energia ficou puxando mais que o resto dessa vez (efeito colateral de virar o elemento padrão pra Construto). Não é grave, mas próxima leva pode mirar Cognitivo/Astral se quiser equilibrar.
 - `packages/engine/src/content/cards.json` do protótipo não reflete nada disso — este GDD é a fonte de verdade.
 
 ---
@@ -455,25 +475,46 @@ Sem mais fonte real de bestiário disponível, essas 18 foram criadas do zero �
 
 Isso também casa com o estado técnico real do protótipo: `PlayerId = 'P1' | 'P2'` está hardcoded em todo o motor (`packages/engine`), e escalar pra 3+ jogadores é um refator real, não um parâmetro — não foi começado. Ver `CLAUDE.md` § Non-negotiable invariants.
 
-| Modo | Descrição | Escopo v1 |
-|---|---|---|
-| **Porto** (draft na hora) | Modo recomendado — ninguém chega com deck resolvido, coleções desiguais jogam parelho. | Dentro do escopo v1. |
-| **Rota** (deck construído) | Pra quem já manja — 12 comuns + 1 Lendária, montado em casa. | Dentro do escopo v1. |
-| **vs. Bot** | Contra IA. | Dentro do escopo v1 — já existem bots/simulação no protótipo (`npm run simulate`, `npm run batch`). |
-| **vs. Jogador (online)** | Multiplayer real via código de sala. | Já validado no protótipo web (PartyKit); arquitetura equivalente precisa ser recriada em Unity — decisão de rede (P2P vs. servidor autoritativo) ainda não tomada pro produto final. |
+> **Ordem de construção** *(2026-08-07)*: **bot primeiro, jogador depois, Modo Aventura por último.** Bot e multiplayer já foram validados no protótipo web — é a base mais rápida de recriar em Unity. Aventura (§ 10) é sistema inteiramente novo (mapa, nós, loja, troca) e fica pra depois dos dois modos de partida solta estarem redondos.
+
+> **Offline-first, exceto onde é impossível — decisão registrada 2026-08-07.** Ninguém fica bloqueado de jogar só porque não tem internet. **Modo Aventura, vs. Bot e hot-seat local não precisam de rede nenhuma.** Só **vs. Jogador (online)** exige conexão — porque conectar duas pessoas remotas é a única coisa aqui que é, por natureza, impossível sem rede.
+
+| Modo | Descrição | Precisa de rede? | Escopo v1 |
+|---|---|---|---|
+| **Porto** (draft na hora) | Modo recomendado — ninguém chega com deck resolvido, coleções desiguais jogam parelho. | Não (regra do modo, independe de contra quem você joga) | Dentro do escopo v1. |
+| **Rota** (deck construído) | Pra quem já manja — 12 comuns + 1 Lendária, montado em casa. | Não | Dentro do escopo v1. |
+| **vs. Bot** | Contra IA. | **Não** | Dentro do escopo v1, **primeiro a construir** — já existem bots/simulação no protótipo (`npm run simulate`, `npm run batch`). |
+| **vs. Jogador (local/hot-seat)** | Dois jogadores no mesmo aparelho, revezando a vez. | **Não** | Dentro do escopo v1 — já existe no protótipo web (`/game`). |
+| **vs. Jogador (online)** | Multiplayer real via código de sala. | **Sim** — único modo que exige | Dentro do escopo v1, **segundo a construir**. Já validado no protótipo web (PartyKit); servidor autoritativo (§ arquitetura de rede abaixo) precisa ser recriado em Unity, mas só pra essa linha da tabela — o resto do jogo não depende disso. |
+
+**Arquitetura de rede (só pro modo online):** servidor autoritativo, não P2P — reaproveitando o backend já validado (PartyKit/Cloudflare Durable Object), com Unity como cliente fino que manda ação e recebe estado redigido via WebSocket. P2P puro é incompatível com o requisito de redação real de servidor (esconder mão/Navio de verdade, não só na UI — ver memória do projeto/`packages/server`), e reescrever o motor de regras em C# duplicaria trabalho já validado em TypeScript, o tipo de custo que um solo dev (§ 3) não deveria pagar duas vezes.
+| **Modo Aventura** (roguelite) | Progressão/coleção — ver § 10. | **Fora do escopo v1**, mas é o próximo passo depois de bot+jogador (não backlog de "algum dia", como duplas/trios abaixo). |
 | **3/4/6 jogadores, duplas/trios** | Escala descrita em § 5.11, "Fique de olho a partir de 3" quanto a balanceamento. | **Fora do escopo v1.** Backlog (§ 12). |
 
 ---
 
-## 10. Progressão e coleção
+## 10. Progressão e coleção — Modo Aventura
 
-As regras dizem que cartas "vão ser entregues uma por uma como loot de sessão" — mas não definem o formato. **Isso segue em aberto.** Opções cogitadas, nenhuma escolhida:
+> **Decisão registrada 2026-08-07.**
 
-- **Recompensa pós-partida** — toda partida rende carta nova, tipo loot casual.
-- **Progressão por campanha/história** — cartas desbloqueadas seguindo capítulos/missões.
-- **Híbrido** — loot casual + marcos de campanha pra Capitães/Navios/raras.
+Progressão vem de um modo roguelite — **Modo Aventura**. O protagonista é o garoto/a garota de porto do § 4 (mesma pessoa, não dois conceitos separados): percorre ruas, portos e tavernas de Arcádia desafiando gente pra partida, sonhando em virar um navegador lendário algum dia. Backstory leve de propósito — não é campanha com ramificação narrativa grande, é só o contexto que costura as recompensas.
 
-**Por que isso importa antes de produzir conteúdo demais:** o próprio orçamento de Tier (§ 5.12) foi desenhado assumindo *algum* sistema de loot sequencial ("se carta nova for carta mais forte, quem jogou mais sessões ganha sem jogar") — então a forma exata da progressão deveria ser decidida antes de desenhar a curva de desbloqueio de conteúdo (quantas cartas por sessão, se existe "banco" de cartas disponíveis desde o início no modo Rota vs. indisponíveis até desbloquear, etc.).
+**100% offline** (§ 9) — todos os Desafios são contra NPC/bot, sem depender de rede nenhuma. Ninguém fica de fora do Modo Aventura por falta de internet.
+
+**Estrutura:**
+
+- **Mapa ramificado**, cruzando as regiões de Arcádia (Union, Britannia, Camelot, Galahad, Norte de Galahad, Rubra) — cada região puxa os bichos/Construtos/Fenômenos já ancorados nela (§ 8) pros adversários daquele trecho do mapa.
+- **Trilha** — os ramais que você escolhe entre um nó e outro. Termo novo, escolhido pra não colidir com "Conexão" (mecânica, § 5.1) nem com o modo "Rota" (§ 5.7) — os três já disputavam a mesma palavra antes.
+- **Nós de Trilha:**
+  - **Desafio** — partida completa (Porto ou Rota) contra um NPC do lugar. Vencer avança na Trilha e dá recompensa. A tela da partida em si é ambientada onde o Desafio acontece — mesa de taverna, convés de navio, canto de beco — varia por nó/região (§ 4), não é uma câmera fixa no garoto/garota de porto.
+  - **Loja** — gasta Eltys (moeda in-fiction, § 4) pra comprar uma carta específica.
+  - **Troca** — troca uma carta sua por outra.
+- **Recompensa ao vencer um Desafio:** escolhe entre carta nova (mini-draft, 2-3 opções), Troca, ou Eltys pra gastar numa Loja depois — mesmo padrão de roguelite de carta já validado (tipo Slay the Spire).
+- **Perder é permadeath.** A run acaba, você recomeça do início do mapa. Mantido simples de propósito nesta fase — sem vidas, sem soft-loss. Pode evoluir depois se jogo real mostrar que é frustrante demais dado o tamanho de uma partida de ELTYCA (9 colocações cada).
+
+**Por que isso importa antes de produzir conteúdo demais:** o orçamento de Tier (§ 5.12) já foi desenhado assumindo *algum* sistema de loot sequencial ("se carta nova for carta mais forte, quem jogou mais sessões ganha sem jogar") — isso agora está resolvido: carta de Tier alto é recompensa rara de Desafio vencido, não desbloqueio automático.
+
+**Ainda em aberto:** partida solta (Porto/Rota contra bot ou jogador, fora do Modo Aventura) também rende loot, ou o Modo Aventura é a única fonte de progressão? Não decidido ainda.
 
 ---
 
@@ -521,15 +562,16 @@ Itens originais da v0.9 das regras, mais os que surgiram desenhando Capitães/Na
 
 1. **A Carga está boa demais ou ruim demais?** Se todo mundo despejar as cargas nos três primeiros turnos, o descongestionamento está barato. Se ninguém jogar nenhuma, o custo em casas está alto.
 2. **O Navio vira o jogo inteiro?** Ele pula de mão em mão de propósito. Se as partidas viverem só em torno daquelas oito casas e o resto do tabuleiro ficar indiferente, o problema é o passivo do Capitão estar forte demais.
-3. **O Casco está na faixa certa?** Poder das comuns vai de 2 a 11 agora (§ 8). Casco 5 é furado por boa parte do baralho; Casco 9 (Scarlet/Violet) só cai pra Tier SS.
-4. **Os +3 da rota decidem sozinhos?** Se toda partida virar corrida por rota, cai pra +2.
+3. **O Casco está na faixa certa?** Poder vai de 2 a 13 agora (§ 8) — 10 se contar só as não-Lendárias. Casco 5 é furado por boa parte do baralho; Casco 9 (Scarlet/Violet) só cai pra Tier SS.
+4. **Os +3 da Conexão decidem sozinhos?** Se toda partida virar corrida por Conexão, cai pra +2.
 5. **Abordagem é forte demais?** Com Cryow/Paradoxo em mesa, a carta de poucas setas fica melhor do que parece. Se decks de 2–3 setas dominarem, endureça a coluna de cima do orçamento.
 6. **O elemento e o tipo estão pesando?** Só existem através do texto das cartas. Se o símbolo parecer decoração, mais cartas mencionando na próxima leva.
 7. **Duração real.** 24 colocações num jogo de 2 (mão agora com máximo 5, não 7 — recontar). Se estourar 30 min, corte uma Carga antes de mexer no tabuleiro.
-8. **Passiva sem ônus fica forte demais sem avisar?** Sem ônus escrito no texto do Capitão, é mais fácil um passivo passar do ponto sem que isso salte aos olhos de quem lê a carta — Cycar já precisou de teto (§ 6); vale reler o elenco inteiro com esse viés.
+8. **Passiva sem ônus fica forte demais sem avisar?** Sem ônus escrito no texto do Capitão, é mais fácil um passivo passar do ponto sem que isso salte aos olhos de quem lê a carta — uma versão anterior do Cycar precisou de teto por esse motivo (§ 6); vale reler o elenco inteiro com esse viés.
 9. **Katty muda o total de pontos da partida?** Cargas destruídas geram pontos que não existiam antes (§ 5.10 normalmente zera Carga) — e o setup sozinho já garante 4 Cargas no tabuleiro antes do turno 1. Testar se isso desequilibra o placar final; se sim, aplicar teto (mesma lógica do Cycar).
-10. **Empurrão do Golar confunde a leitura de Rota?** Reposicionamento silencioso pode deixar difícil acompanhar de cabeça qual é a "maior cadeia" no fim de jogo, mesmo sem re-disparar captura — vale testar com tabuleiro físico ou protótipo antes de assumir que é só cosmético.
-11. **O orçamento de Tier (D-SS) entrega variedade real, ou os extremos quebram o jogo?** *(novo)* Sugovat (2 setas/11 Poder) e Nauak (7 setas/6 Poder + efeito) são os primeiros cards fora do padrão B(12) do baralho original — testar se saem cedo demais e decidem a partida sozinhos antes de produzir mais S/SS.
+10. **Empurrão do Golar confunde a leitura de Conexão?** Reposicionamento silencioso pode deixar difícil acompanhar de cabeça qual é a "maior cadeia" no fim de jogo, mesmo sem re-disparar captura — vale testar com tabuleiro físico ou protótipo antes de assumir que é só cosmético.
+11. **O orçamento de Tier (D-SS) entrega variedade real, ou os extremos quebram o jogo?** Sugovat (2 setas/13 Poder) e Nauak (8 setas/7 Poder) são os primeiros cards fora do padrão B(12) do baralho original — testar se saem cedo demais e decidem a partida sozinhos antes de produzir mais S/SS.
+12. **Baralho sem nenhum efeito de carta fica raso demais?** *(novo, 2026-08-07)* Toda a profundidade de build agora mora só no Capitão — testar se 9 turnos de puro Setas/Poder sem nenhuma leitura de texto de carta ainda segura a atenção, ou se falta alguma coisa. "Desembarque" (§ 5.12) é o caminho já desenhado se a resposta for sim.
 
 ---
 
@@ -541,13 +583,13 @@ Itens originais da v0.9 das regras, mais os que surgiram desenhando Capitães/Na
 | Nome da carta neutra | ✅ Resolvido — Carga |
 | Moldura "Mundo das Tintas" como ficção oficial do card game | ✅ Resolvido — cortada |
 | Quantos Capitães/Navios/Cartas no set base | 🟡 Parcial — 7 Capitães (§ 6), 7 Navios (§ 7) e 33 comuns + 4 Lendárias (§ 8) fechados; só a forma de desbloqueio de conteúdo novo segue em aberto |
-| Modo campanha / como cartas entram na coleção | 🔴 Em aberto (§ 10) |
-| Modelo de venda (premium / DLC / F2P) | 🔴 Em aberto (§ 3) |
-| Arquitetura de rede pro multiplayer em Unity | 🔴 Em aberto — protótipo web usa PartyKit/Durable Object; não decidido se isso se repete em Unity |
-| Framing "garoto do porto" afeta UI ou só arte/marketing | 🔴 Em aberto (§ 4) |
+| Modo campanha / como cartas entram na coleção | ✅ Resolvido — Modo Aventura, roguelite (§ 10). Só falta decidir se partida solta também rende loot. |
+| Modelo de venda (premium / DLC / F2P) | ✅ Resolvido — pago único (§ 3) |
+| Arquitetura de rede pro multiplayer em Unity | ✅ Resolvido — servidor autoritativo, reaproveitando PartyKit/Durable Object; só o modo online depende disso, resto do jogo é offline (§ 9) |
+| Framing "garoto do porto" afeta UI ou só arte/marketing | ✅ Resolvido — forte só no Modo Aventura, resto fica neutro (§ 4, § 10) |
 | Katty gera pontos destruindo Cargas — total de pontos da partida deixa de ser fixo | 🔴 Em aberto, mantido de propósito — ver § 6 e § 13; teto é o conserto se se provar forte demais |
 | Ideias em avaliação (backlog completo) | 🔴 Nenhuma decidida ou descartada — ver § 12 |
-| Testes de balanceamento (Carga, Navio/Casco, +3 da rota, Abordagem, elemento/tipo pesando, duração real, passiva sem ônus, leitura de Rota com o empurrão do Golar, extremos do orçamento de Tier) | 🔴 Em aberto — ver § 13; ainda pendentes de playtesting sistemático |
+| Testes de balanceamento (Carga, Navio/Casco, +3 da Conexão, Abordagem, elemento/tipo pesando, duração real, passiva sem ônus, leitura de Conexão com o empurrão do Golar, extremos do orçamento de Tier) | 🔴 Em aberto — ver § 13; ainda pendentes de playtesting sistemático |
 
 ---
 
@@ -558,4 +600,4 @@ Itens originais da v0.9 das regras, mais os que surgiram desenhando Capitães/Na
 - `content/books/` — livro de regras do RPG de mesa Arcádia (lore fonte). Especialmente relevantes pra ELTYCA: `01_01_00_introducao.md`, `02_02_00_elementos.md` (+ os 5 arquivos de elemento individual), `03_02_00_navios.md`, `03_03_00_constelacao_e_navegacao.md`, `04_03_00_regioes.md`, `04_06_00_bestiario.md`.
 - `content/tall_tails/` — contos curtos ambientados em Arcádia, fonte potencial de flavor text pra cartas individuais (não explorado ainda neste GDD).
 - `content/timeline.json` — linha do tempo histórica de Arcádia.
-- `book/creatures.json` — bestiário completo do RPG Arcádia, repositório irmão fora de `arcadia_card_game`. Fonte das 12 Criaturas de § 8.2 — as 12 que existem no arquivo, nenhuma sobrando (conferido 2026-08-06). Levas futuras de Criatura precisam de fonte nova ou vão ser originais, como § 8.3.
+- `book/creatures.json` — bestiário completo do RPG Arcádia, repositório irmão fora de `arcadia_card_game`. Fonte de 12 das 19 Criaturas em § 8.1 — as 12 que existem no arquivo, nenhuma sobrando (conferido 2026-08-06). Levas futuras de Criatura precisam de fonte nova ou vão ser originais, como as outras 7 já são.
